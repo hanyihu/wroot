@@ -137,6 +137,7 @@ public class SetupApiService extends BaseService {
         return entity;
     }
 
+
     /*管理细则*/
     public PageInfo<RiderManagement> ruleList(Lookup lookup) {
         startPage(lookup);
