@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.examine.mapper.ExamineMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`rider_id` AS riderId ,
+		a.`sendcity` AS sendcity ,
+		a.`address` AS address ,
+		a.`phone` AS phone ,
+		a.`health_card` AS healthCard ,
+		a.`healthcardno` AS healthCardNo ,
+		a.`health_validity` AS healthValidity ,
+		a.`id_card` AS idCard ,
+		a.`status` AS status ,
+		a.`examine_remark` AS examineRemark,
+		a.`create_time` AS createTime
+
+	</sql>
+
+	<!--查询列表 -->
+    <select id="list" resultType="com.vic.ck.entity.RiderExamine">
+		SELECT
+		<include refid="base_list" />
+        ,b.`nickname` AS nickName
+        FROM rider_examine a
+        LEFT JOIN customer b ON a.`rider_id` = b.`id`
+		WHERE 1=1
+
+		ORDER BY a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+    <select id="findById" resultType="com.vic.ck.entity.RiderExamine">
+		SELECT
+		<include refid="base_list" />
+
+        FROM rider_examine a
+		WHERE a.id = #{id}
+	</select>
+
+    <!--根据骑手id查询对象 -->
+    <select id="findByRiderId" resultType="com.vic.ck.entity.RiderExamine">
+        SELECT
+        <include refid="base_list"/>
+
+        FROM rider_examine a
+        WHERE a.rider_id = #{riderId}
+    </select>
+
+    <update id="update" parameterType="com.vic.ck.entity.Customer">
+		update customer
+		<set>
+            <if test="isRider != null">`isRider` = #{isRider},</if>
+            <if test="sendCity != null">`sendcity` = #{sendCity},</if>
+            <if test="sendArea != null">`sendarea` = #{sendArea},</if>
+            <if test="ttlAccounts != null">`ttl_account` = #{ttlAccounts},</if>
+            <if test="healthCard != null">`health_card` = #{healthCard},</if>
+            <if test="healthCardNo != null">`healthCardNo` = #{healthCardNo},</if>
+            <if test="healthValidity != null">`health_validity` = #{healthValidity},</if>
+
+            <if test="idCard != null">`id_card` = #{idCard}</if>
+
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--提交成功时修改审核状态-->
+    <update id="updateExamine" parameterType="com.vic.ck.entity.RiderExamine">
+        update rider_examine
+        <set>
+
+            <if test="status != null">`status` = #{status},</if>
+            <if test="examineRemark != null">`examine_remark` = #{examineRemark}</if>
+
+
+        </set>
+		where id = #{id}
+	</update>
+
+    <!--修改-->
+    <update id="updateRiderExamine" parameterType="com.vic.ck.entity.RiderExamine">
+        update rider_examine
+        <set>
+
+            <if test="riderId != null">`rider_id` = #{riderId},</if>
+            <if test="sendcity != null">`sendcity` = #{sendcity},</if>
+            <if test="address != null">`address` = #{address},</if>
+            <if test="phone != null">`phone` = #{phone},</if>
+            <if test="healthCard != null">`health_card` = #{healthCard},</if>
+            <if test="healthCardNo != null">`healthcardno` = #{healthCardNo},</if>
+            <if test="healthValidity != null">`health_validity` = #{healthValidity},</if>
+            <if test="idCard != null">`id_card` = #{idCard},</if>
+            <if test="createTime != null">`create_time` = #{createTime},</if>
+            <if test="status != null">`status` = #{status},</if>
+            <if test="examineRemark != null">`examine_remark` = #{examineRemark}</if>
+
+
+        </set>
+        where rider_id = #{riderId}
+    </update>
+
+
+
+</mapper>

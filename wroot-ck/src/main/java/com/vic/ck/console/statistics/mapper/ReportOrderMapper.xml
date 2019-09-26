@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.statistics.mapper.ReportOrderMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`at_date` AS atDate ,
+		a.`order_number` AS	orderNumber ,
+		a.`order_success_number` AS orderSuccessNumber ,
+		a.`total_number` AS totalNumber ,
+		a.`total_amount` AS totalAmount ,
+		a.`buy_number` AS buyNumber ,
+		a.`buy_success_number` AS
+		buySuccessNumber ,
+		a.`group_number` AS groupNumber ,
+		a.`group_success_number` AS groupSuccessNumber ,
+		a.`hotel_number` AS
+		hotelNumber ,
+		a.`hotel_success_number` AS hotelSuccessNumber
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.ReportOrder">
+		SELECT
+		<include refid="base_list" />
+		FROM report_order a
+		WHERE 1=1
+		ORDER BY id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.ReportOrder">
+		SELECT
+		<include refid="base_list" />
+		FROM report_order a
+		WHERE id = #{id}
+	</select>
+
+	<!--根据日期查询所有有订单的商家-->
+	<select id="merchantsWithOrders"  resultType="int">
+		SELECT
+		a.merchant_id AS id
+		FROM `order` a
+		WHERE 1=1 AND DATE(a.create_time) = #{day}
+	</select>
+
+	<select id="findByday" resultType="com.vic.ck.entity.ReportOrder">
+		SELECT
+		<include refid="base_list" />
+		FROM report_order a
+		WHERE DATE(a.`at_date`) = #{day}
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into report_order
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="atDate !=null and atDate !='' ">`at_date`, </if>
+			<if test="orderNumber !=null and orderNumber !='' ">`order_number`, </if>
+			<if test="orderSuccessNumber !=null and orderSuccessNumber !='' ">`order_success_number`, </if>
+			<if test="totalNumber !=null and totalNumber !='' ">`total_number`, </if>
+			<if test="totalAmount !=null and totalAmount !='' ">`total_amount`, </if>
+			<if test="buyNumber !=null and buyNumber !='' ">`buy_number`, </if>
+			<if test="buySuccessNumber !=null and buySuccessNumber !='' ">`buy_success_number`, </if>
+			<if test="groupNumber !=null and groupNumber !='' ">`group_number`, </if>
+			<if test="groupSuccessNumber !=null and groupSuccessNumber !='' ">`group_success_number`, </if>
+			<if test="hotelNumber !=null and hotelNumber !='' ">`hotel_number`, </if>
+			<if test="hotelSuccessNumber !=null and hotelSuccessNumber !='' ">`hotel_success_number`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="atDate !=null and atDate !='' ">#{atDate}, </if>
+			<if test="orderNumber !=null and orderNumber !='' ">#{orderNumber}, </if>
+			<if test="orderSuccessNumber !=null and orderSuccessNumber !='' ">#{orderSuccessNumber}, </if>
+			<if test="totalNumber !=null and totalNumber !='' ">#{totalNumber}, </if>
+			<if test="totalAmount !=null and totalAmount !='' ">#{totalAmount}, </if>
+			<if test="buyNumber !=null and buyNumber !='' ">#{buyNumber}, </if>
+			<if test="buySuccessNumber !=null and buySuccessNumber !='' ">#{buySuccessNumber}, </if>
+			<if test="groupNumber !=null and groupNumber !='' ">#{groupNumber}, </if>
+			<if test="groupSuccessNumber !=null and groupSuccessNumber !='' ">#{groupSuccessNumber}, </if>
+			<if test="hotelNumber !=null and hotelNumber !='' ">#{hotelNumber}, </if>
+			<if test="hotelSuccessNumber !=null and hotelSuccessNumber !='' ">#{hotelSuccessNumber}</if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.ReportOrder">
+		update report_order
+		<set>
+			<if test="atDate != null">`at_date` = #{atDate}, </if>
+			<if test="orderNumber != null">`order_number` = #{orderNumber}, </if>
+			<if test="orderSuccessNumber != null">`order_success_number` = #{orderSuccessNumber}, </if>
+			<if test="totalNumber != null">`total_number` = #{totalNumber}, </if>
+			<if test="totalAmount != null">`total_amount` = #{totalAmount}, </if>
+			<if test="buyNumber != null">`buy_number` = #{buyNumber}, </if>
+			<if test="buySuccessNumber != null">`buy_success_number` = #{buySuccessNumber}, </if>
+			<if test="groupNumber != null">`group_number` = #{groupNumber}, </if>
+			<if test="groupSuccessNumber != null">`group_success_number` = #{groupSuccessNumber}, </if>
+			<if test="hotelNumber != null">`hotel_number` = #{hotelNumber}, </if>
+			<if test="hotelSuccessNumber != null">`hotel_success_number` = #{hotelSuccessNumber}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from report_order where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<select id="existCurrentDay" resultType="boolean">
+		SELECT COUNT(1) > 0 FROM
+		report_order a WHERE at_date = #{day}
+	</select>
+	<select id="staticticsCurrentDayOrder" resultType="com.vic.ck.entity.ReportOrder">
+	
+	SELECT
+		COUNT(1) AS orderNumber,
+		SUM(CASE WHEN a.`status` IN (1,4,5) THEN 1 ELSE 0 END ) AS orderSuccessNumber,
+		
+		(SELECT COUNT( DISTINCT b.customer_id) FROM `order` b WHERE DATE(b.`pay_time`) = #{day} AND b.`status` IN (1,4,5)  ) AS totalNumber,
+		SUM(CASE WHEN a.`status` IN (1,4,5) THEN  a.`amount` ELSE 0 END) AS totalAmount,
+		
+		SUM(CASE a.`order_type` WHEN 1 THEN 1 ELSE 0 END ) AS buyNumber,
+		SUM(CASE WHEN a.`order_type`=1 AND a.`status` IN (1,4,5) THEN 1 ELSE 0	END ) AS buySuccessNumber,
+		
+		SUM(CASE a.`order_type` WHEN 2 THEN 1 ELSE 0 END ) AS groupNumber,
+		SUM(CASE  WHEN a.`order_type`=2 AND a.`status` IN (1,4,5) THEN 1 ELSE 0 END ) AS groupSuccessNumber,
+		
+		SUM(CASE a.`order_type` WHEN 3 THEN 1 ELSE 0 END ) AS hotelNumber,
+		SUM(CASE WHEN  a.`order_type`=3 AND a.`status` IN (1,4,5) THEN 1 ELSE 0 END ) AS hotelSuccessNumber
+		
+		FROM `order` a
+		WHERE 1=1 AND DATE(a.`pay_time`) = #{day}
+		
+	</select>
+
+	<!--商家统计-->
+	<select id="selectMerchantsByTime" resultType="com.vic.ck.entity.BusinessStatistics">
+		SELECT
+		id ,
+		(SELECT NAME FROM merchant WHERE id=#{mid}) AS merchantsName,
+		COUNT(1) AS orderNumber,
+		SUM(CASE WHEN a.`status` IN (0,1,2,3,4,8,9) THEN 1 ELSE 0 END ) AS orderSuccessNumber,
+
+		(SELECT COUNT( DISTINCT b.customer_id) FROM `order` b WHERE DATE(b.`pay_time`) = #{day} AND b.`status` IN (0,1,2,3,4,8,9)  ) AS totalNumber,
+		SUM(CASE WHEN a.`status` IN (0,1,2,3,4,8,9) THEN  a.`amount`* a.`quantity` ELSE 0 END) AS totalAmount,
+
+		SUM(CASE WHEN a.`status` IN (0,1,2,3,4,8,9) THEN a.`amount` * a.`quantity` ELSE 0 END) AS orderSuccessAmount,
+		round((SUM(CASE WHEN a.`status` IN (0,1,2,3,4,8,9) THEN a.`amount`*a.quantity ELSE 0 END))/(SUM(CASE WHEN a.`status` IN (0,1,2,3,4,8,9) THEN 1 ELSE 0 END )),0) AS capitaPrice
+		FROM `order` a
+		WHERE 1=1 AND DATE(a.`pay_time`) = #{day} AND a.merchant_id =#{mid}
+	</select>
+
+
+	<!--查询所有会员-->
+	<select id="judgeState" resultType="int">
+		SELECT customer_id FROM customer_vip_record WHERE `status`=1
+	</select>
+
+	<!--会员统计-->
+	<select id="selectMembers" resultType="com.vic.ck.entity.MemberStatistics">
+		SELECT
+		b.nickname AS membersName,
+		COUNT(1) AS orders,
+		SUM(a.`amount`* a.`quantity`) AS orderAmount,
+		round((SUM(a.`amount`*a.quantity))/(COUNT(1)),0) AS orderPrice
+		FROM `order` a LEFT JOIN customer b ON
+		a.customer_id=b.id
+		WHERE   customer_id=${id}
+	</select>
+
+	<!--查询退款额-->
+	<select id="refundAmounts" resultType="com.vic.ck.entity.MemberStatistics">
+		SELECT  a.`money` AS refundAmounts
+		FROM customer_balance_record a
+		WHERE a.`customer_id` = #{id}
+			AND a.`type` = #{type}
+	</select>
+</mapper>

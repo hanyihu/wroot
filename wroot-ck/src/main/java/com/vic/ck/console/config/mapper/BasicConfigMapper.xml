@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.console.config.mapper.BasicConfigMapper">
+    <!-- 查询所有基础配置的数据 -->
+    <select id="list" resultType="com.vic.ck.entity.BasicConfig">
+        SELECT
+          a.id as id,
+          a.name as name,
+          a.icp_record as icp_record,
+          a.web_keyword as web_keyword
+        FROM
+          basic_config a
+        where
+          type = 'system'
+    </select>
+
+    <!-- 根据id获取基础配置的详细信息 -->
+    <select id="getBasicConfigById" resultType="com.vic.ck.entity.BasicConfig">
+        SELECT
+          a.id as id,
+          a.name as name,
+          a.icp_record as icp_record,
+          a.web_keyword as web_keyword
+        FROM
+          basic_config a
+        WHERE
+          a.id=#{id}
+    </select>
+
+    <!-- 新增基础配置 -->
+    <insert id="insertBasicConfig">
+        insert into basic_config(
+          type,name,icp_record,web_keyword
+        ) values (
+          'system',#{name},#{icp_record},#{web_keyword}
+        );
+    </insert>
+
+    <!-- 修改基础配置 -->
+    <update id="updateBasicConfig">
+        update basic_config set
+        name=#{name},icp_record=#{icp_record},web_keyword=#{web_keyword}
+        where id=#{id};
+    </update>
+
+    <!-- 批量删除基础配置 -->
+    <delete id="deleteBasicConfig">
+        delete from basic_config
+        where id in
+        <foreach item="id" collection="ids" open="(" separator=","
+                 close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

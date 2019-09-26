@@ -1,0 +1,46 @@
+.olny-hide{display: none;}
+
+form table th{
+	text-align: center;
+}
+
+.row-nocol{margin-left:0px;margin-right:0px;}
+.btn-group{width:100%;}
+
+.width5em{width:5em;}
+.hidden-template{display:none !important;}
+
+/*查询表单按钮*/
+form.lookup .form-btn-bar{display:inline-block;}
+
+td > img[data-src]{height:1.7em;}
+td > img[data-attachment]{height:1.7em;}
+.ace-switch + .lbl{font-size:12px;}
+/*页面动作按钮栏*/
+.action-bar{text-align:right;padding-right:4em;margin-bottom:0.4em;}
+td > img[data-src]{height:1.7em;}
+/*分页栏*/
+.pager-form{margin-top:0.5em;}
+.pager-form .pagination{margin:0em;}
+.pager-form .pager-list li{cursor:pointer;}
+.input-xs{padding-top:2px !important;padding-bottom:2px !important;height:2em !important;}
+/*红色背景*/
+.vic-red{background-color: indianred;}
+
+
+/*多文件上传预览*/
+.preview > .preview-item{
+    width:10em;
+    float:left;
+    margin:0px 0.5em 0.5em;
+}
+.preview > .preview-item > .close{
+    color:red;
+}
+
+
+.alert{
+    width:98%;
+    margin-left:auto;
+    margin-right:auto;
+}

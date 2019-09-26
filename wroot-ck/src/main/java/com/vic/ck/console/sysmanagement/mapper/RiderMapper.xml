@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.console.sysmanagement.mapper.RiderMapper">
+    <sql id="base_list">
+        a.`id` AS id ,
+        a.`type` AS type ,
+        a.`rider_invite` AS rider_invite ,
+        a.`rider_service_standard` AS rider_service_standard
+	</sql>
+    <!-- 查询骑手端管理列表 -->
+    <select id="list" resultType="com.vic.ck.entity.SysManagement">
+        select
+        <include refid="base_list"></include>
+        from
+        sys_management a
+        where
+        a.type = 'rider'
+    </select>
+    <!-- 根据id查询第三方接口信息 -->
+    <select id="findById" resultType="com.vic.ck.entity.SysManagement">
+        select
+        <include refid="base_list"></include>
+        from
+        sys_management a
+        where 1=1
+        and a.id=#{id}
+    </select>
+
+    <!-- 修改基础配置 -->
+    <update id="update" parameterType="com.vic.ck.entity.SysManagement">
+        update sys_management set
+        rider_invite=#{rider_invite},
+        rider_service_standard=#{rider_service_standard}
+        where id=#{id};
+    </update>
+
+
+</mapper>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.platform.mapper.PlatformBankMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`icon` AS icon ,
+		a.`name` AS name
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.PlatformBank">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_bank a
+		WHERE 1=1
+		<if test="name != null and name != ''">
+			AND a.name LIKE CONCAT('%', #{name}, '%')
+		</if>
+		ORDER BY id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.PlatformBank">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_bank a
+		WHERE id = #{id}
+	</select>
+	
+	<!--批量查询对象 -->
+	<select id="findByIds" resultType="com.vic.ck.entity.PlatformBank">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_bank a
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into platform_bank( `name`, `icon`)	values
+		( #{name}, #{icon})
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.PlatformBank">
+		update platform_bank
+		<set>
+			<if test="name != null">`name` = #{name},</if>
+			<if test="icon != null">`icon` = #{icon}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from platform_bank where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

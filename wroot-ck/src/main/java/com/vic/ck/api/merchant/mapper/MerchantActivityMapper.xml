@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vic.ck.api.merchant.mapper.MerchantActivityMapper">
+
+	<!-- 活动列表 -->
+	<select id="activities" resultType="com.vic.ck.entity.MerchantActivity">
+        SELECT a.`id`, a.`start_date` AS startDate, a.`end_date` AS endDate, a.`types` , a.`statuss` ,a.`rules`,
+        a.`minus`, a.`limited`, a.`limit_num` AS limitNum,
+		a.`min_amount` AS minAmount, a.`discount`
+		FROM merchant_activity a
+		WHERE a.`merchant_id` = #{merchantId}
+		ORDER BY a.`create_time` DESC 
+	</select>
+	
+	<!-- 商家当前的活动 最多各取一条 -->
+	<select id="currentActivities" resultType="com.vic.ck.entity.MerchantActivity">
+		<!-- (SELECT a.`id`, a.`start_date` AS startDate, a.`end_date` AS endDate, a.`type` , a.`status` ,a.`rules`, a.`minus`, a.`limited`, a.`limit_num` AS limitNum, 
+		a.`min_amount` AS minAmount, a.`discount`
+		FROM merchant_activity a
+		WHERE a.`status` = 1 AND  DATE(NOW())  BETWEEN a.`start_date` AND a.`end_date` 
+		AND a.`type` =1 AND a.`merchant_id` = #{merchantId}
+		LIMIT 1)
+		UNION 
+		(SELECT a.`id`, a.`start_date` AS startDate, a.`end_date` AS endDate, a.`type` , a.`status` ,a.`rules`, a.`minus`, a.`limited`, a.`limit_num` AS limitNum, 
+		a.`min_amount` AS minAmount, a.`discount`
+		FROM merchant_activity a
+		WHERE a.`status` = 1 AND  DATE(NOW())  BETWEEN a.`start_date` AND a.`end_date` 
+		AND a.`type` =2  AND a.`merchant_id` = #{merchantId}
+		LIMIT 1) -->
+        SELECT a.`id`, a.`start_date` AS startDate, a.`end_date` AS endDate, a.`types` , a.`statuss` ,a.`rules`,
+        a.`minus`, a.`limited`, a.`limit_num` AS limitNum,
+		a.`min_amount` AS minAmount, a.`discount`  
+		FROM merchant_activity a
+        WHERE a.`statuss` = 1 AND DATE(NOW()) BETWEEN a.`start_date` AND a.`end_date`
+        AND NOT EXISTS (SELECT 1 FROM merchant_activity b WHERE b.`statuss` = 1 AND DATE(NOW()) BETWEEN b.`start_date`
+        AND b.`end_date`
+        AND a.`types` = b.`types` AND a.`start_date` &lt; b.`start_date` AND a.`merchant_id` = b.`merchant_id`)
+		AND a.`merchant_id` = #{merchantId}
+        ORDER BY a.`types`
+	</select>
+	
+	<!-- 当前商家的当前类型的活动 -->
+	<select id="currentTypeActivitie" resultType="com.vic.ck.entity.MerchantActivity">
+        SELECT a.`id`, a.`start_date` AS startDate, a.`end_date` AS endDate, a.`types` , a.`status` ,a.`rules`,
+        a.`minus`, a.`limited`, a.`limit_num` AS limitNum,
+		a.`min_amount` AS minAmount, a.`discount`  
+		FROM merchant_activity a
+        WHERE a.`status` = 1 AND DATE(NOW()) BETWEEN a.`start_date` AND a.`end_date`
+        AND a.`merchant_id` = #{merchantId} AND a.`types` = #{types}
+	</select>
+	
+	
+	<!-- 删除活动 -->
+	<delete id="deleteMerchantActivity">
+		DELETE FROM merchant_activity WHERE id = #{id}
+	</delete>
+	
+	<!-- 活动详情  -->
+	<select id="findMerchantActivityById" resultType="com.vic.ck.entity.MerchantActivity">
+        SELECT a.`id`, a.`start_date` AS startDate, a.`end_date` AS endDate, a.`types` , a.`statuss` ,a.`rules`,
+        a.`minus`, a.`limited`, a.`limit_num` AS limitNum,
+		a.`min_amount` AS minAmount, a.`discount`, a.`merchant_id` AS merchantId, a.`create_time` AS createTime, b.`name` AS merchantName
+		FROM merchant_activity a LEFT JOIN merchant b ON a.`merchant_id` = b.`id`
+		WHERE a.`id` = #{id}
+	</select>
+
+
+	<!-- 插入merchant Activitie 空的字段也不插入 方便多处调用 -->
+	<insert id="insertActivity" parameterType="com.vic.ck.entity.MerchantActivity"	useGeneratedKeys="true">
+		insert into merchant_activity
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="merchantId != null">
+				merchant_id,
+			</if>
+			<if test="startDate != null">
+				start_date,
+			</if>
+			<if test="endDate != null">
+				end_date,
+			</if>
+			<if test="rules != null">
+				rules,
+			</if>
+			<if test="minus != null">
+				minus,
+			</if>
+			<if test="limited != null">
+				limited,
+			</if>
+			<if test="limitNum != null">
+				limit_num,
+			</if>
+			<if test="minAmount != null">
+				min_amount,
+			</if>
+			<if test="discount != null">
+				discount,
+            </if>
+            <if test="types != null">
+                types,
+            </if>
+            statuss
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="merchantId != null">
+				#{merchantId},
+			</if>
+			<if test="startDate != null">
+				#{startDate},
+			</if>
+			<if test="endDate != null">
+				#{endDate},
+			</if>
+			<if test="rules != null">
+				#{rules},
+			</if>
+			<if test="minus != null">
+				#{minus},
+			</if>
+			<if test="limited != null">
+				#{limited},
+			</if>
+			<if test="limitNum != null">
+				#{limitNum},
+			</if>
+			<if test="minAmount != null">
+				#{minAmount},
+			</if>
+			<if test="discount != null">
+				#{discount},
+			</if>
+            <if test="types != null">
+                #{types},
+            </if>
+			0
+		</trim>
+	</insert>
+
+	<!-- 修改活动 空字段不修改 因为前段会不传一些数据来 -->
+	<update id="updateActivity" parameterType="com.vic.ck.entity.MerchantActivity">
+		update merchant_activity
+		<set>
+			<if test="startDate != null">
+				start_date = #{startDate},
+			</if>
+			<if test="endDate != null">
+				end_date = #{endDate},
+			</if>
+			<if test="rules != null">
+				rules = #{rules},
+			</if>
+			<if test="minus !=null">
+				minus = #{minus},
+			</if>
+			<if test="limited != null">
+				limited = #{limited},
+			</if>
+			<if test="limitNum != null">
+				limit_num = #{limitNum},
+			</if>
+			<if test="minAmount != null">
+				min_amount = #{minAmount},
+			</if>
+			<if test="discount != null">
+				discount = #{discount},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 发布或者关闭活动 -->
+	<update id="updateStatus">
+        update merchant_activity SET statuss = #{statuss} WHERE id = #{id}
+	</update>
+	
+	<!-- 关闭这个活动对应的商家的其他活动 -->
+	<update id="closeOthers">
+        UPDATE merchant_activity a LEFT JOIN merchant_activity b ON a.`merchant_id` = b.`merchant_id` AND a.`id` !=
+        b.`id`
+        SET a.`statuss` = 2
+		WHERE b.`id` = #{id}
+	</update>
+
+    <!-- 减少库存  -->
+	<update id="minusStock">
+        UPDATE platform_activity_yhq SET num = num-1 WHERE id = #{id}
+	</update>
+	
+	<!-- 更新商家活动是否过期 -->
+	<update id="autoUpdateStatus">
+        UPDATE merchant_activity a SET a.`statuss` = 2 WHERE a.`statuss` !=2 AND a.`end_date` &lt; DATE(NOW())
+	</update>
+	
+	<!-- 根据当前商家的活动更新商家表里的当前活动字段 -->
+	<update id="updateMerchantCurrentActivity">
+		UPDATE merchant a
+		LEFT JOIN (
+        SELECT a.`id`, GROUP_CONCAT( DISTINCT b.`types` ORDER BY b.`types`) AS current_activity
+        FROM merchant a LEFT JOIN merchant_activity b ON a.`id` = b.`merchant_id` AND b.`statuss` = 1 AND DATE(NOW())
+        BETWEEN b.`start_date` AND b.`end_date`
+		WHERE 1=1 
+		GROUP BY a.`id`) t ON a.`id` = t.id SET a.`current_activity` =  t.current_activity
+		WHERE 1=1
+		<!-- 可能是全量更新  可能是单个更新  -->
+		<if test="merchantId != null">
+			AND a.`id` = #{merchantId}	
+		</if>
+	</update>
+	
+
+
+</mapper>

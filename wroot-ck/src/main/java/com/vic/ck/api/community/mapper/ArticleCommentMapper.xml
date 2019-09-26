@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.api.community.mapper.ArticleCommentMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`article_id` AS articleId ,
+		a.`customer_id` AS customerId ,
+		a.`images` AS images ,
+		a.`content` AS content ,
+		a.`reply` AS reply ,
+		a.`create_time` AS createTime,
+		a.`praise` AS praise
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.ArticleComment">
+		SELECT
+		<include refid="base_list" />
+		,a.`create_time` AS createTime
+		,b.`headpic` AS headpic
+		,b.`nickname` AS customerName
+		FROM article_comment a
+		LEFT JOIN customer b ON a.`customer_id` = b.`id`
+		WHERE 1=1 AND a.`article_id` =#{articleId} 
+		ORDER BY a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.ArticleComment">
+		SELECT
+		<include refid="base_list" />
+		,a.`create_time` AS createTime
+		,b.`headpic` AS headpic
+		,b.`nickname` AS customerName
+		FROM article_comment a
+		LEFT JOIN customer b ON a.`customer_id` = b.`id`
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 查询一个文章的2条评论 -->
+	<select id="find2ArticleComments" resultType="com.vic.ck.entity.ArticleComment">
+		SELECT
+		<include refid="base_list" />
+		,a.`create_time` AS createTime
+		,b.`headpic` AS headpic
+		,b.`nickname` AS customerName
+		FROM article_comment a
+		LEFT JOIN customer b ON a.`customer_id` = b.`id`
+		WHERE 1=1 AND a.`article_id` =#{articleId} 
+		ORDER BY a.id DESC
+		LIMIT 2
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into article_comment
+		(
+		<trim suffixOverrides=",">
+			<if test="articleId !=null and articleId !='' ">`article_id`, </if>
+			<if test="customerId !=null and customerId !='' ">`customer_id`, </if>
+			<if test="images !=null and images !='' ">`images`, </if>
+			<if test="content !=null and content !='' ">`content`, </if>
+			<if test="reply !=null and reply !='' ">`reply`, </if>
+			<if test="praise !=null and praise !='' ">`praise`,</if>
+			create_time
+		</trim>
+		)
+		values
+		(
+		<trim suffixOverrides=",">
+			<if test="articleId !=null and articleId !='' ">#{articleId}, </if>
+			<if test="customerId !=null and customerId !='' ">#{customerId}, </if>
+			<if test="images !=null and images !='' ">#{images}, </if>
+			<if test="content !=null and content !='' ">#{content}, </if>
+			<if test="reply !=null and reply !='' ">#{reply}, </if>
+			<if test="praise !=null and praise !='' ">#{praise},</if>
+			sysdate()
+		</trim>
+		)
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.ArticleComment">
+		update article_comment
+		<set>
+			<if test="articleId != null">`article_id` = #{articleId}, </if>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="images != null">`images` = #{images}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="reply != null">`reply` = #{reply}, </if>
+			<if test="praise != null">`praise` = #{praise}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from article_comment where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

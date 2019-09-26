@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.api.community.mapper.PhoneChargeBalanceMapper">
+
+
+	<!-- 用户话费余额 -->
+	<select id="getCustomerBalance" resultType="com.vic.ck.entity.PhoneChargeBalance" >
+		SELECT a.`id`, a.`balance`, a.`customer_id` AS customerId, a.`version`  
+		FROM phone_charge_balance a 
+		WHERE a.`customer_id`= #{customerId}
+		LIMIT 1
+	</select>
+	
+	<select id="balances" resultType="com.vic.ck.entity.PhoneChargeBalance" >
+		SELECT a.`id`, a.`balance`, a.`customer_id` AS customerId, a.`version`  
+		FROM phone_charge_balance a 
+		WHERE a.`balance` &gt; 0
+	</select>
+	
+	
+	<insert id="inserBalance" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO phone_charge_balance(customer_id) VALUES (#{customerId})
+	</insert>
+	
+	 <!-- 修改话费余额 -->
+	<update id="updateCustomerBalance">
+		UPDATE phone_charge_balance 
+		SET balance = #{balance} , `version` = `version`+1 
+		WHERE customer_id = #{customerId} AND `version` = #{version}
+	</update>
+
+
+	<!-- 话费余额详情 -->
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`customer_id` AS customerId ,
+		a.`money` AS money ,
+		a.`create_time` AS createTime ,
+		a.`type` AS type ,
+		a.`describe` AS `describe` ,
+		a.`activity_id` AS activityId ,
+		a.`level` AS level
+	</sql>
+	
+	
+	<!-- 用户在此活动中抢到的余额 -->
+	<select id="phoneChargeBalanceRecords" resultType="com.vic.ck.entity.PhoneChargeBalanceRecord">
+		SELECT
+		<include refid="base_list" />
+		FROM phone_charge_balance_record a
+		WHERE 1=1 AND 	a.`activity_id` = #{activityId} AND a.`customer_id` = #{customerId}
+		ORDER BY id DESC
+	</select>
+	
+	<!-- 获得用户在此活动中获取到的不同级别的红包的次数 -->
+	<select id="phoneChargeBalanceLevelTimes" resultType="com.vic.ck.entity.PhoneChargeBalanceRecord">
+		SELECT
+		a.`level`, COUNT(*) AS `time`
+		FROM phone_charge_balance_record a
+		WHERE 1=1 AND 	a.`activity_id` = #{activityId} AND a.`customer_id` = #{customerId}
+		GROUP BY a.`level`
+	</select>
+	
+	<!-- 用户在当前活动时间内推荐注册多用户数 -->
+	<select id="currentActivityRecommentNumber" resultType="int">
+		SELECT COUNT(1)
+		FROM  customer a
+		WHERE DATE(a.`create_time`) &lt;=  DATE((SELECT b.`end_date` FROM platform_activity b WHERE b.`id` = #{activityId} ))
+		AND DATE(a.`create_time`) &gt;= DATE((SELECT c.`start_date` FROM platform_activity c WHERE c.`id` = #{activityId} ))
+		AND a.`recommend_id` = #{customerId}
+	</select>
+	
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.PhoneChargeBalanceRecord">
+		SELECT
+		<include refid="base_list" />
+		FROM phone_charge_balance_record a
+		WHERE 1=1
+		ORDER BY id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.PhoneChargeBalanceRecord">
+		SELECT
+		<include refid="base_list" />
+		FROM phone_charge_balance_record a
+		WHERE id = #{id}
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into phone_charge_balance_record
+		(
+		<trim suffixOverrides=",">
+			<if test="customerId !=null and customerId !='' ">`customer_id`, </if>
+			<if test="money !=null and money !='' ">`money`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`, </if>
+			<if test="type !=null and type !='' ">`type`, </if>
+			<if test="describe !=null and describe !='' ">`describe`, </if>
+			<if test="activityId !=null and activityId !='' ">`activity_id`, </if>
+			<if test="level !=null and level !='' ">`level`</if>
+		</trim>
+		)
+		values
+		(
+		<trim suffixOverrides=",">
+			<if test="customerId !=null and customerId !='' ">#{customerId}, </if>
+			<if test="money !=null and money !='' ">#{money}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}, </if>
+			<if test="type !=null and type !='' ">#{type}, </if>
+			<if test="describe !=null and describe !='' ">#{describe}, </if>
+			<if test="activityId !=null and activityId !='' ">#{activityId}, </if>
+			<if test="level !=null and level !='' ">#{level}</if>
+		</trim>
+		)
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.PhoneChargeBalanceRecord">
+		update phone_charge_balance_record
+		<set>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="money != null">`money` = #{money}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="describe != null">`describe` = #{describe}, </if>
+			<if test="activityId != null">`activity_id` = #{activityId}, </if>
+			<if test="level != null">`level` = #{level}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from phone_charge_balance_record where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

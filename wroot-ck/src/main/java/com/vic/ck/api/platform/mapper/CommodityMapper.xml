@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.api.platform.mapper.CommodityMapper">
+
+	<!-- 商家查询基本列 -->
+	<sql id="merchantBaseColumn">
+		 a.`id`, a.`name`, a.`out_pic` AS icon, a.`star`, a.`price`, a.`sell_num` AS sellNum, a.`current_activity` AS activity, 
+		 a.`category_id` AS categoryId, b.`name` AS categoryName,  c.`name` AS areaName, a.`type`, z.distance
+		 <!-- 后来的需求是把就酒店商家揉在一起 so有了下面一段 -->
+		 , a.`nice_comment_num` AS niceCommentNum, a.`hotel_level` AS hotelLevel
+	</sql>
+	
+	<!-- 商家查询基本表 需要传入经纬度-->
+	<sql id="merchantBaseFrom">
+		merchant a 
+		LEFT JOIN platform_merchant_category b ON a.`category_id` = b.`id`
+		LEFT JOIN sys_area c ON a.`area_id` = c.`id` 
+		LEFT JOIN (SELECT z.id,  ROUND(6378.138*2*ASIN(SQRT(POW(SIN((#{latitude}*PI()/180-z.`latitude`*PI()/180)/2),2)+COS(#{latitude}*PI()/180)*COS(z.`latitude`*PI()/180)*POW(SIN((#{longitude}*PI()/180-z.`longitude`*PI()/180)/2),2)))*1000) AS distance 
+		FROM merchant z ) z ON a.`id` = z.id
+	</sql>
+	
+	<!-- 平台分类商家列表 -->
+	<select id="merchants" resultType="com.vic.ck.vo.MerchantVo">
+		SELECT <include refid="merchantBaseColumn"></include>
+		FROM <include refid="merchantBaseFrom"></include>
+		WHERE a.`status` = 2 AND a.`city_id` = #{cityId}   AND a.`category_id` = #{merchantCategory}
+		<if test="distance != null">
+			AND distance &lt;= #{distance}
+		</if>
+ 		ORDER BY ${sortType} ${orderType}
+	</select>
+	
+	<!-- 平台特色分类商家列表 -->
+	<select id="uniqueMerchants" resultType="com.vic.ck.vo.MerchantVo">
+		SELECT <include refid="merchantBaseColumn"></include>
+		FROM <include refid="merchantBaseFrom"></include>
+		RIGHT JOIN platform_merchant_category_rel d ON a.`id` = d.`merchant_id`
+		WHERE a.`status` = 2 AND a.`city_id` = #{cityId}   AND d.`category_id` = #{merchantCategory}
+		<if test="distance != null">
+			AND distance &lt;= #{distance}
+		</if>
+ 		ORDER BY ${sortType} ${orderType}
+	</select>
+	
+	<!-- 镗镗锣精选列表 -->
+	<select id="wellChosenes"  resultType="com.vic.ck.vo.MerchantVo">
+		SELECT <include refid="merchantBaseColumn"></include>
+		FROM <include refid="merchantBaseFrom"></include>
+		WHERE a.`status` = 2 AND a.`city_id` = #{cityId} AND a.`well_chosened` = 1  
+		ORDER BY a.`well_chosen_sort`
+	
+		<!-- SELECT	 a.`id`, a.`name`, a.`out_pic` AS icon, a.`star`, a.`price`, a.`sell_num` AS sellNum, a.`current_activity` AS activity, 
+		a.`category_id` AS categoryId, b.`name` AS categoryName,  c.`name` AS areaName, a.`type`, a.`nice_comment_num` AS niceCommentNum, a.`hotel_level` AS hotelLevel
+		FROM merchant a 
+		LEFT JOIN platform_merchant_category b ON a.`category_id` = b.`id`
+		LEFT JOIN sys_area c ON a.`area_id` = c.`id` 
+		WHERE a.`status` = 2 AND a.`city_id` = #{cityId} AND a.`well_chosened` = 1  
+		ORDER BY a.`well_chosen_sort`  -->
+	</select>
+	
+	<!-- 为你推荐列表 -->
+	<select id="recommends" resultType="com.vic.ck.vo.MerchantVo">
+		SELECT <include refid="merchantBaseColumn"></include>
+		FROM <include refid="merchantBaseFrom"></include>
+		WHERE a.`status` = 2 AND a.`city_id` = #{cityId}  
+		AND distance &lt;= 5000
+ 		ORDER BY distance ASC
+	</select>
+	
+	<!-- 人气榜单 -->
+	<select id="bestBills"  resultType="com.vic.ck.vo.MerchantVo">
+		SELECT <include refid="merchantBaseColumn"></include>
+		FROM <include refid="merchantBaseFrom"></include>
+		WHERE a.`status` = 2 AND a.`city_id` = #{cityId}
+		ORDER BY a.`view_num` DESC, a.`sell_num` DESC
+		<!-- SELECT	 a.`id`, a.`name`, a.`out_pic` AS icon, a.`star`, a.`price`, a.`sell_num` AS sellNum, a.`current_activity` AS activity, 
+		a.`category_id` AS categoryId, b.`name` AS categoryName,  c.`name` AS areaName, a.`type`, a.`nice_comment_num` AS niceCommentNum, a.`hotel_level` AS hotelLevel
+		FROM merchant a 
+		LEFT JOIN platform_merchant_category b ON a.`category_id` = b.`id`
+		LEFT JOIN sys_area c ON a.`area_id` = c.`id` 
+		WHERE a.`status` = 2 AND a.`city_id` = #{cityId}
+		ORDER BY a.`view_num` DESC, a.`sell_num` DESC -->
+	</select>
+	
+	<!-- 猜你喜欢 -->
+	<select id="guesses" resultType="com.vic.ck.vo.MerchantVo">
+		SELECT <include refid="merchantBaseColumn"></include>
+		FROM <include refid="merchantBaseFrom"></include>
+		RIGHT JOIN `order` e ON a.`id` = e.`merchant_id`
+		WHERE a.`status` = 2 AND a.`city_id` = #{cityId}   AND e.`customer_id` = #{userId}
+		AND distance &lt;= 10000
+		GROUP BY a.`id`
+ 		ORDER BY distance, COUNT(e.`id`) DESC
+	</select>
+	
+	<!-- 搜索商家 search-->
+	<select id="search" resultType="com.vic.ck.vo.MerchantVo">
+		SELECT <include refid="merchantBaseColumn"></include>
+		FROM <include refid="merchantBaseFrom"></include>
+		WHERE a.`status` = 2 AND a.`city_id` = #{cityId}  
+		<if test="keywords !=null and keywords !=''">
+			AND ( 
+			a.`name` LIKE CONCAT('%', #{keywords}, '%') 
+			OR  a.`describe` LIKE CONCAT('%', #{keywords}, '%') 
+			OR  a.`address` LIKE CONCAT('%', #{keywords}, '%') 
+			OR  a.`landmarks`  LIKE CONCAT('%', #{keywords}, '%')  
+			 )
+		</if>
+ 		ORDER BY distance
+	</select>
+
+	<!--特色商家分类列表 -->
+	<select id="platformCategories" resultType="com.vic.ck.entity.PlatformCategory">
+		SELECT
+		a.`id` AS id ,
+		a.`type` AS type ,
+		a.`name` AS name ,
+		a.`icon` AS icon ,
+		a.`city_id` AS cityId ,
+		a.`sort` AS sort ,
+		a.`enabled` AS enabled ,
+		a.`create_time` AS	createTime
+		FROM platform_category a
+		WHERE  a.city_id = #{cityId}	AND a.type = #{type} AND a.enabled = 1
+		ORDER BY a.sort
+	</select>
+
+	<!-- 平台广告位 -->
+	<select id="adPositions" resultType="com.vic.ck.entity.PlatformAdPosition">
+		SELECT
+		a.`id` AS id ,
+		a.`city_id` AS cityId ,
+		a.`merchant_id` AS merchantId ,
+		b.`name` AS merchantName,
+		b.`type` AS merchantType,
+		a.`platform_desc` AS platformDesc ,
+		a.`type` AS type ,
+		a.`enabled` AS enabled ,
+		a.`create_time` AS createTime ,
+		a.`icon` AS icon
+		FROM platform_ad_position a
+		LEFT JOIN merchant b on a.merchant_id = b.id
+		WHERE 1=1 AND a.city_id = #{cityId} AND a.type = #{type} AND a.enabled = 1
+		ORDER BY a.sort 
+	</select>
+
+	<!-- 平台商品分类商家广告位 -->
+	<select id="categoryAdPosition" resultType="com.vic.ck.entity.PlatformCategoryAdPosition">
+		SELECT
+		a.`id` AS id ,
+		a.`city_id` AS cityId ,
+		a.`merchant_category` AS merchantCategory ,
+		a.`merchant_id` AS merchantId ,
+		b.`name` AS merchantName,
+		b.`type` AS merchantType,
+		a.`platform_desc` AS platformDesc ,
+		a.`icon` AS icon ,
+		a.`enabled` AS enabled ,
+		a.`create_time` AS createTime 
+		FROM platform_category_ad_position a 
+		LEFT JOIN merchant b on a.merchant_id = b.id
+		WHERE 1=1 AND a.enabled = 1 AND a.city_id = #{cityId}
+		AND a.`merchant_category` = #{merchantCategory}
+		LIMIT 1
+	</select>
+	
+	<!-- 商家基本信息详情  -->
+	<select id="merchantDetailBase" resultType="com.vic.ck.vo.MerchantDetailVo">
+		SELECT a.`id`, a.`name`, a.`star`, a.`type`, a.`in_pic` AS inPic, a.`flavor_star` AS flavorStar, a.`environment_star` AS environmentStar,
+		a.`service_star` AS serviceStar, b.`name` AS areaName, a.`address`, a.`landmarks`,a.`longitude`, a.`latitude`,a.`mobile`, a.`comment_num` AS commentNum,
+		a.`view_num` AS viewNum, a.`business_hours` AS businessHours, a.`facility`, a.`hotel_in_time` AS hotelInTime, a.`hotel_out_time` AS hotelOutTime,a.`hotel_pledge` AS hotelPledge
+		FROM merchant a
+		LEFT JOIN sys_area b ON a.`area_id` = b.`id`
+		WHERE a.`id` = #{id}
+	</select>
+	
+	<!-- 一般商家描述详情 -->
+	<select id="merchantDescribe" resultType="string">
+		SELECT a.`describe`  FROM merchant a WHERE a.`id` = #{id}
+	</select>
+	
+	<!-- 酒店商家描述详情 hotelDescribe -->
+	<select id="hotelDescribe" resultType="com.vic.ck.vo.HotelMerchantDescribeVo">
+		SELECT a.`id`, a.`describe`, a.`hotel_in_time` AS hotelInTime, a.`hotel_out_time` AS hotelOutTime, a.`hotel_can_add_bed` AS hotelCanAddBed, a.`hotel_add_bed_price` AS hotelAddBedPrice,
+		a.`hotel_foreigned` AS hotelForeigned, a.`hotel_peted` AS hotelPeted, a.`hotel_pledge` AS hotelPledge
+		FROM merchant a
+		WHERE a.`id` = #{id}
+	</select>
+	
+	
+	<!-- 商家两条团购信息 -->
+	<select id="twoGroupBuys" resultType="com.vic.ck.vo.CommodityVo">
+		SELECT a.`id`, a.`name`, a.`icon`, a.`price`, a.`sell_num` AS sellNum
+		FROM merchant_groupbuy a
+		WHERE a.`merchant_id` = #{merchantId}  AND a.`status` = 1 AND a.`is_delete` = 0
+		ORDER BY a.`sell_num` DESC , a.`create_time` DESC
+		LIMIT 3	
+	</select>
+	
+	<!-- 商家团购列表 -->
+	<select id="groupbuys" resultType="com.vic.ck.vo.CommodityVo">
+		SELECT a.`id`, a.`name`, a.`icon`, a.`price`, a.`sell_num` AS sellNum
+		FROM merchant_groupbuy a
+		WHERE a.`merchant_id` = #{merchantId} AND a.`status` = 1 AND a.`is_delete` = 0
+		ORDER BY a.`sell_num` DESC , a.`create_time` DESC
+	</select>
+	
+	<!-- 商家团购详情 -->
+	<select id="groupbuyDetail" resultType="com.vic.ck.vo.GroupbuyDetailVo">
+		SELECT a.`id`, a.`star`, a.`name`, a.`price`, a.`images`, a.`labels`, a.`tips`,a.`start_time` AS startTime, a.`end_time` AS endTime,
+		a.`consumed_all_hours` AS  consumedAllHours, a.`consume_start_time` AS consumeStartTime, a.`consume_end_time` AS consumeEndTime, a.`star`,a.`describe`
+		FROM merchant_groupbuy a
+		WHERE a.`id` = #{id}
+	</select>
+	
+	<!-- 酒店商家列表 -->
+	<select id="hotels" resultType="com.vic.ck.vo.MerchantVo">
+		SELECT <include refid="merchantBaseColumn"></include>
+		<!-- , a.`nice_comment_num` AS niceCommentNum, a.`hotel_level` AS hotelLevel -->
+		FROM <include refid="merchantBaseFrom"></include>
+		WHERE a.`status` = 2 AND a.`city_id` = #{cityId}   AND a.`type` = 2
+		<if test="distance != null">
+			AND distance &lt;= #{distance}
+		</if>
+		
+		<if test="upPrice != null">
+			AND a.`price` &lt;= #{upPrice}
+		</if>
+		<if test="downPrice != null">
+			AND a.`price` &gt;= #{downPrice}
+		</if>
+		<if test="hotelLevel !=null">
+			AND a.`hotel_level` = #{hotelLevel}
+		</if>
+		<if test="keywords !=null and keywords !=''">
+			AND ( 
+			a.`name` LIKE CONCAT('%', #{keywords}, '%') 
+			OR  a.`describe` LIKE CONCAT('%', #{keywords}, '%') 
+			OR  a.`address` LIKE CONCAT('%', #{keywords}, '%') 
+			OR  a.`landmarks`  LIKE CONCAT('%', #{keywords}, '%')  
+			 )
+		</if>
+ 		ORDER BY ${sortType} ${orderType}
+	</select>
+	
+	<!-- 酒店房间列表 -->
+	<select id="rooms" resultType="com.vic.ck.vo.HotelVo">
+		SELECT a.`id`, a.`name`, a.`icon`, a.`price`, a.`room_window` AS roomWindow, a.`room_breakfast` AS roomBreakfast, a.`room_bed` AS roomBed, 
+		a.`room_person_num` AS roomPersonNum, a.`unsubscribe_way` AS unsubscribeWay, a.`verify_way` AS verifyWay
+		FROM merchant_hotel a
+		WHERE  a.`merchant_id` = #{merchantId} AND a.`status` = 1 AND a.`is_delete` = 0
+		ORDER BY a.`stock` DESC, a.`create_time` DESC 
+	</select>
+	
+	<!-- 酒店房间详情 -->
+	<select id="roomDetail" resultType="com.vic.ck.vo.HotelDetailVo">
+		SELECT a.`id`, a.`name`, a.`icon`, a.`price`, a.`room_window` AS roomWindow, a.`room_breakfast` AS roomBreakfast, a.`room_bed` AS roomBed,  a.`images`,
+		a.`room_person_num` AS roomPersonNum, a.`unsubscribe_way` AS unsubscribeWay, a.`verify_way` AS verifyWay,a.`stock`, a.`room_area` AS roomArea, 
+		a.`room_network` AS roomNetwork, a.`room_tel` AS roomTel, a.`room_floor` AS roomFloor,a.`room_windowm_view` AS roomWindowmView
+		,a.`room_add_beded` AS roomAddBeded, a.`room_smoke` AS roomSmoke, a.`room_bed_wide` AS roomBedWide
+		FROM merchant_hotel a
+		WHERE a.`id` = #{id}
+	</select>
+</mapper>

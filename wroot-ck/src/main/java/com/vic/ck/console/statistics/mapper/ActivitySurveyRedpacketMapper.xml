@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.vic.ck.console.statistics.mapper.ActivitySurveyRedpacketMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`at_date` AS atDate ,
+		a.`total_amount` AS	totalAmount ,
+		a.`activity_id` AS activityId ,
+		a.`total_number` AS	totalNumber ,
+		a.`receive_amount` AS receiveAmount ,
+		a.`receive_number` AS receiveNumber ,
+		a.`enabled` AS enabled ,
+		a.`create_time` AS	createTime
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.ActivitySurveyRedpacket">
+		SELECT
+		<include refid="base_list" />
+		FROM activity_survey_redpacket a
+		WHERE 1=1
+		ORDER BY id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.ActivitySurveyRedpacket">
+		SELECT
+		<include refid="base_list" />
+		FROM activity_survey_redpacket a
+		WHERE id = #{id}
+	</select>
+	<select id="findYestodayRedpacket" resultType="com.vic.ck.entity.ActivitySurveyRedpacket">
+		SELECT
+		<include refid="base_list" />
+		FROM activity_survey_redpacket a
+		WHERE a.`at_date` =
+		DATE_ADD(CURDATE(), INTERVAL -1 DAY)
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into activity_survey_redpacket
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="atDate !=null and atDate !='' ">`at_date`, </if>
+			<if test="totalAmount !=null and totalAmount !='' ">`total_amount`, </if>
+			<if test="activityId !=null and activityId !='' ">`activity_id`, </if>
+			<if test="totalNumber !=null and totalNumber !='' ">`total_number`, </if>
+			<if test="receiveAmount !=null and receiveAmount !='' ">`receive_amount`, </if>
+			<if test="receiveNumber !=null and receiveNumber !='' ">`receive_number`, </if>
+			<if test="enabled !=null and enabled !='' ">`enabled`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="atDate !=null and atDate !='' ">#{atDate}, </if>
+			<if test="totalAmount !=null and totalAmount !='' ">#{totalAmount}, </if>
+			<if test="activityId !=null and activityId !='' ">#{activityId}, </if>
+			<if test="totalNumber !=null and totalNumber !='' ">#{totalNumber}, </if>
+			<if test="receiveAmount !=null and receiveAmount !='' ">#{receiveAmount}, </if>
+			<if test="receiveNumber !=null and receiveNumber !='' ">#{receiveNumber}, </if>
+			<if test="enabled !=null and enabled !='' ">#{enabled}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}</if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.ActivitySurveyRedpacket">
+		update activity_survey_redpacket
+		<set>
+			<if test="atDate != null">`at_date` = #{atDate}, </if>
+			<if test="totalAmount != null">`total_amount` = #{totalAmount}, </if>
+			<if test="activityId != null">`activity_id` = #{activityId}, </if>
+			<if test="totalNumber != null">`total_number` = #{totalNumber}, </if>
+			<if test="receiveAmount != null">`receive_amount` = #{receiveAmount}, </if>
+			<if test="receiveNumber != null">`receive_number` = #{receiveNumber}, </if>
+			<if test="enabled != null">`enabled` = #{enabled}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from activity_survey_redpacket where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

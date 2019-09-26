@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.console.config.mapper.NoticeMapper">
+    <sql id="base_list">
+		a.`id` AS id ,
+		a.`title` AS title ,
+		a.`content` AS content ,
+		a.`issue_user_id` AS issue_user_id ,
+		a.`issue_user_name` AS issue_user_name ,
+		a.`issue_city_id` AS issue_city_id ,
+		a.`issue_time` AS issue_time ,
+		a.`notice_type` AS notice_type ,
+		a.`to_user_mobile` AS to_user_mobile
+	</sql>
+
+    <!-- 查询所有公告数据 -->
+    <select id="list" resultType="com.vic.ck.entity.Notice">
+        select
+          <include refid="base_list"></include>
+        from
+          notice a
+        where 1=1
+        <if test="notice_type != null and notice_type != 0">
+            and a.notice_type = #{notice_type}
+        </if>
+        <if test="title != null and title != ''">
+            and a.title like CONCAT(CONCAT('%',#{title}),'%')
+        </if>
+        ORDER BY a.id DESC
+    </select>
+
+    <!-- 根据主键查询公告对象 -->
+    <select id="findById" resultType="com.vic.ck.entity.Notice">
+        select
+          <include refid="base_list"></include>
+        from
+          notice a
+        where 1=1
+        and a.id = #{id}
+    </select>
+
+    <!-- 新增一条公告信息 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into notice
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">title,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="issue_user_id != null and issue_user_id != ''">issue_user_id,</if>
+            <if test="issue_user_name != null and issue_user_name != ''">issue_user_name,</if>
+            <if test="issue_city_id != null and issue_city_id != ''">issue_city_id,</if>
+            <if test="issue_time != null and issue_time != ''">issue_time,</if>
+            <if test="notice_type != null and notice_type != ''">notice_type,</if>
+            <if test="to_user_mobile != null and to_user_mobile != ''">to_user_mobile</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="issue_user_id != null and issue_user_id != ''">#{issue_user_id},</if>
+            <if test="issue_user_name != null and issue_user_name != ''">#{issue_user_name},</if>
+            <if test="issue_city_id != null and issue_city_id != ''">#{issue_city_id},</if>
+            <if test="issue_time != null and issue_time != ''">#{issue_time},</if>
+            <if test="notice_type != null and notice_type != ''">#{notice_type},</if>
+            <if test="to_user_mobile != null and to_user_mobile != ''">#{to_user_mobile}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.vic.ck.entity.Notice">
+        update notice
+        <set>
+            title=#{title},
+            content=#{content},
+            issue_user_id=#{issue_user_id},
+            issue_user_name=#{issue_user_name},
+            issue_city_id=#{issue_city_id},
+            issue_time=#{issue_time},
+            notice_type=#{notice_type},
+            to_user_mobile=#{to_user_mobile}
+        </set>
+        where
+          id = #{id}
+    </update>
+
+    <!--删除公告数据 -->
+    <delete id="delete">
+        delete from notice where id in
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+</mapper>

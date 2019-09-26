@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.community.mapper.ArticleCategoryMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`name` AS name
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.ArticleCategory">
+		SELECT
+		<include refid="base_list" />
+		FROM article_category a
+		WHERE 1=1
+		<if test="name != null and name != ''">
+			AND a.name LIKE CONCAT('%', #{name}, '%')
+		</if>
+		ORDER BY a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.ArticleCategory">
+		SELECT
+		<include refid="base_list" />
+		FROM article_category a
+		WHERE a.id = #{id}
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into article_category
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="name !=null and name !='' ">`name`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="name !=null and name !='' ">#{name}</if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.ArticleCategory">
+		update article_category
+		<set>
+			<if test="name != null">`name` = #{name}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from article_category where id in
+		<foreach item="item" collection="ids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

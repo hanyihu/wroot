@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.api.platform.mapper.OrderMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`orderno` AS orderno ,
+		a.`customer_id` AS customerId ,
+		a.`merchant_id` AS merchantId ,
+		a.`commodity_id` AS	commodityId ,
+		a.`order_type` AS orderType ,
+		a.`total_fee` AS totalFee ,
+		a.`amount` AS amount ,
+		a.`ticket_id` AS ticketId ,
+		a.`ticket_discount` AS ticketDiscount ,
+		a.`ticket_discount_money` AS ticketDiscountMoney ,
+		a.`minus_money` AS minusMoney ,
+		a.`reach_money` AS reachMoney ,
+		a.`discounts_desc` AS discountsDesc ,
+		a.`quantity` AS quantity ,
+		a.`status` AS status ,
+		a.`is_comment` AS isComment ,
+		a.`order_image` AS orderImage ,
+		a.`order_name` AS orderName,
+		a.`mobile` AS mobile ,
+		a.`pay_type` AS payType ,
+		a.`pay_time` AS payTime ,
+		a.`pay_out_no` AS payOutNo ,
+		a.`create_time` AS createTime ,
+		
+		a.`refund_reason` AS refundReason ,
+		a.`is_delete` AS isDelete ,
+		a.`merchant_type` AS merchantType ,
+		a.`remark` AS remark,
+		
+		a.`room_number` AS roomNumber ,
+		a.`check_person` AS checkPerson ,
+		a.`check_start_date` AS checkStartDate ,
+		a.`check_end_date` AS
+		checkEndDate ,
+		a.`check_last_time` AS checkLastTime
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.Order">
+		SELECT
+		<include refid="base_list" />
+		FROM `order` a
+		WHERE 1=1
+		ORDER BY id desc
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.Order">
+		SELECT
+		<include refid="base_list" />
+		FROM `order` a
+		WHERE id = #{id}
+	</select>
+	
+	<select id="findOrderByOrderno" resultType="com.vic.ck.entity.Order">
+		SELECT
+		<include refid="base_list" />
+		FROM `order` a
+		WHERE orderno = #{orderno}
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into `order`
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="orderno !=null and  orderno !='' ">`orderno`, </if>
+			<if test="customerId !=null and  customerId !='' ">`customer_id`, </if>
+			<if test="merchantId !=null and  merchantId !='' ">`merchant_id`, </if>
+			<if test="commodityId !=null and  commodityId !='' ">`commodity_id`, </if>
+			<if test="orderType !=null and  orderType !='' ">`order_type`, </if>
+			<if test="totalFee !=null and  totalFee !='' ">`total_fee`, </if>
+			<if test="amount !=null and  amount !='' ">`amount`, </if>
+			<if test="discountsDesc !=null and  discountsDesc !='' ">`discounts_desc`, </if>
+			<if test="quantity !=null and  quantity !='' ">`quantity`, </if>
+			<if test="status !=null and  status !='' ">`status`, </if>
+			<if test="isComment !=null and  isComment !='' ">`is_comment`, </if>
+			<if test="orderImage !=null and  orderImage !='' ">`order_image`, </if>
+			<if test="orderName !=null and  orderName !='' ">`order_name`, </if>
+			<if test="mobile !=null and  mobile !='' ">`mobile`, </if>
+			<if test="payType !=null and  payType !='' ">`pay_type`, </if>
+			<if test="payTime !=null and  payTime !='' ">`pay_time`, </if>
+			<if test="payOutNo !=null and  payOutNo !='' ">`pay_out_no`, </if>
+			<if test="createTime !=null and  createTime !='' ">`create_time`, </if>
+			<if test="ticketId !=null and  ticketId !='' ">`ticket_id`, </if>
+			<if test="ticketDiscount !=null and  ticketDiscount !='' ">`ticket_discount`, </if>
+			<if test="ticketDiscountMoney !=null and  ticketDiscountMoney !='' ">`ticket_discount_money`, </if>
+			<if test="minusMoney !=null and  minusMoney !='' ">`minus_money`, </if>
+			<if test="reachMoney !=null and  reachMoney !='' ">`reach_money`, </if>
+			<if test="refundReason !=null and  refundReason !='' ">`refund_reason`, </if>
+			<if test="isDelete !=null and  isDelete !='' ">`is_delete`, </if>
+			<if test="merchantType !=null and  merchantType !='' ">`merchant_type`, </if>
+			<if test="remark !=null and  remark !='' ">`remark`, </if>
+			<if test="roomNumber !=null and  roomNumber !='' ">`room_number`, </if>
+			<if test="checkPerson !=null and  checkPerson !='' ">`check_person`, </if>
+			<if test="checkStartDate !=null and  checkStartDate !='' ">`check_start_date`, </if>
+			<if test="checkEndDate !=null and  checkEndDate !='' ">`check_end_date`, </if>
+            <if test="checkLastTime !=null and  checkLastTime !='' ">`check_last_time`,</if>
+            <if test="addressId !=null and  addressId !='' ">`addressId`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="orderno !=null and  orderno !='' ">#{orderno}, </if>
+			<if test="customerId !=null and  customerId !='' ">#{customerId}, </if>
+			<if test="merchantId !=null and  merchantId !='' ">#{merchantId}, </if>
+			<if test="commodityId !=null and  commodityId !='' ">#{commodityId}, </if>
+			<if test="orderType !=null and  orderType !='' ">#{orderType}, </if>
+			<if test="totalFee !=null and  totalFee !='' ">#{totalFee}, </if>
+			<if test="amount !=null and  amount !='' ">#{amount}, </if>
+			<if test="discountsDesc !=null and  discountsDesc !='' ">#{discountsDesc}, </if>
+			<if test="quantity !=null and  quantity !='' ">#{quantity}, </if>
+			<if test="status !=null and  status !='' ">#{status}, </if>
+			<if test="isComment !=null and  isComment !='' ">#{isComment}, </if>
+			<if test="orderImage !=null and  orderImage !='' ">#{orderImage}, </if>
+			<if test="orderName !=null and  orderName !='' ">#{orderName}, </if>
+			<if test="mobile !=null and  mobile !='' ">#{mobile}, </if>
+			<if test="payType !=null and  payType !='' ">#{payType}, </if>
+			<if test="payTime !=null and  payTime !='' ">#{payTime}, </if>
+			<if test="payOutNo !=null and  payOutNo !='' ">#{payOutNo}, </if>
+			<if test="createTime !=null and  createTime !='' ">#{createTime}, </if>
+			<if test="ticketId !=null and  ticketId !='' ">#{ticketId}, </if>
+			<if test="ticketDiscount !=null and  ticketDiscount !='' ">#{ticketDiscount},  </if>
+			<if test="ticketDiscountMoney !=null and  ticketDiscountMoney !='' ">#{ticketDiscountMoney},  </if>
+			<if test="minusMoney !=null and  minusMoney !='' ">#{minusMoney}, </if>
+			<if test="reachMoney !=null and  reachMoney !='' ">#{reachMoney}, </if>
+			<if test="refundReason !=null and  refundReason !='' ">#{refundReason}, </if>
+			<if test="isDelete !=null and  isDelete !='' ">#{isDelete}, </if>
+			<if test="merchantType !=null and  merchantType !='' ">#{merchantType}, </if>
+			<if test="remark !=null and  remark !='' ">#{remark}, </if>
+			<if test="roomNumber !=null and  roomNumber !='' ">#{roomNumber}, </if>
+			<if test="checkPerson !=null and  checkPerson !='' ">#{checkPerson}, </if>
+			<if test="checkStartDate !=null and  checkStartDate !='' ">#{checkStartDate}, </if>
+			<if test="checkEndDate !=null and  checkEndDate !='' ">#{checkEndDate}, </if>
+            <if test="checkLastTime !=null and  checkLastTime !='' ">#{checkLastTime},</if>
+            <if test="addressId !=null and  addressId !='' ">#{addressId}</if>
+		</trim>
+	</insert>
+	
+	<!--新增订单状态记录变 -->
+	<insert id="insertOrderStatusRecord" useGeneratedKeys="true" keyProperty="id">
+		insert into order_status_record
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="orderno !=null and orderno !='' ">`orderno`, </if>
+			<if test="status !=null ">`status`, </if>
+			<if test="describe !=null and describe !='' ">`describe`, </if>
+            create_time
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="orderno !=null and orderno !='' ">#{orderno}, </if>
+			<if test="status !=null ">#{status}, </if>
+			<if test="describe !=null and describe !='' ">#{describe}, </if>
+            now()
+        </trim>
+    </insert>
+
+    <!--新增用户退款申请 -->
+    <insert id="insertorderout" useGeneratedKeys="true" keyProperty="id">
+        insert into order_out
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderno_id !=null  ">`orderno_id`,</if>
+            <if test="refundReason !=null  ">`refundReason`,</if>
+            <if test="customer_id !=null  ">`customer_id`,</if>
+            <if test="merchant_id !=null  ">`merchant_id`,</if>
+            status,
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderno_id !=null and orderno_id !='' ">#{orderno_id},</if>
+            <if test="refundReason !=null and refundReason !='' ">#{refundReason},</if>
+            <if test="customer_id !=null and orderno_id !='' ">#{customer_id},</if>
+            <if test="merchant_id !=null and orderno_id !='' ">#{merchant_id},</if>
+            1,
+            now()
+        </trim>
+    </insert>
+
+
+    <!--新增订单产品集 -->
+    <insert id="insertddsp" useGeneratedKeys="true" keyProperty="id">
+        insert into order_commodity
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderno_id !=null and orderno_id !='' ">`orderno_id`,</if>
+            <if test="number !=null ">`number`,</if>
+            <if test="commodity_id !=null ">`commodity_id`,</if>
+            <if test="merchant_id !=null and merchant_id !='' ">`merchant_id`,</if>
+            <if test="customer_id !=null and customer_id !='' ">`customer_id`,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderno_id !=null and orderno_id !='' ">#{orderno_id},</if>
+            <if test="num !=null ">#{num},</if>
+            <if test="commodity_id !=null ">#{commodity_id},</if>
+            <if test="merchant_id !=null and merchant_id !='' ">#{merchant_id},</if>
+            <if test="customer_id !=null and customer_id !='' ">#{customer_id},</if>
+            now()
+        </trim>
+    </insert>
+
+
+    <!-- 修改订单状态 -->
+	<update id="alterOrderStatus">
+		update `order` set status = #{status} 
+		<if test="status ==1 or status ==2 or status ==3">
+			,pay_time = now()
+		</if>
+		where orderno = #{orderno}
+	</update>
+	
+	<!-- 插入第三方支付单号 -->
+	<update id="alterOrderPayOutNo">
+		UPDATE `order` SET pay_out_no = #{payOutNo},pay_time = now()
+		WHERE orderno = #{orderno}
+	</update>
+	
+	<!-- 修改订单支付方式 -->	
+	<update id="alterOrderPayType">
+			update `order` set pay_type = #{payType} where orderno = #{orderno}
+	</update>
+	
+	<!-- 修改退款原因 -->
+	<update id="updateRefundReason">
+		UPDATE `order` a SET a.`refund_reason` = #{refundReason} WHERE a.`orderno` =  #{orderno}
+	</update>
+	
+	<!-- 标记删除订单 -->
+	<update id="deleteOrder">
+		update `order` set is_delete = 1 where orderno = #{orderno}
+	</update>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.Order">
+		update `order`
+		<set>
+			<if test="orderno != null">`orderno` = #{orderno}, </if>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="merchantId != null">`merchant_id` = #{merchantId}, </if>
+			<if test="commodityId != null">`commodity_id` = #{commodityId}, </if>
+			<if test="orderType != null">`order_type` = #{orderType}, </if>
+			<if test="totalFee != null">`total_fee` = #{totalFee}, </if>
+			<if test="amount != null">`amount` = #{amount}, </if>
+			<if test="discountsDesc != null">`discounts_desc` = #{discountsDesc}, </if>
+			<if test="quantity != null">`quantity` = #{quantity}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="isComment != null">`is_comment` = #{isComment}, </if>
+			<if test="orderImage != null">`order_image` = #{orderImage}, </if>
+			<if test="orderName != null">`order_name` = #{orderName}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="payType != null">`pay_type` = #{payType}, </if>
+			<if test="payTime != null">`pay_time` = #{payTime}, </if>
+			<if test="payOutNo != null">`pay_out_no` = #{payOutNo}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="ticketId != null">`ticket_id` = #{ticketId}, </if>
+			<if test="ticketDiscount !=null ticketDiscount !='' ">`ticket_discount` = #{ticketDiscount}, </if>
+			<if test="ticketDiscountMoney !=null ticketDiscountMoney !='' ">`ticket_discount_money` = #{ticketDiscountMoney},  </if>
+			<if test="minusMoney !=null minusMoney !='' ">`minus_money` = #{minusMoney}, </if>
+			<if test="reachMoney !=null reachMoney !='' ">`reach_money` = #{reachMoney}, </if>
+			<if test="refundReason != null">`refund_reason` = #{refundReason}, </if>
+			<if test="isDelete != null">`is_delete` = #{isDelete}, </if>
+			<if test="merchantType != null">`merchant_type` = #{merchantType}, </if>
+			<if test="remark != null">`remark` = #{remark}, </if>
+			<if test="roomNumber != null">`room_number` = #{roomNumber}, </if>
+			<if test="checkPerson != null">`check_person` = #{checkPerson}, </if>
+			<if test="checkStartDate != null">`check_start_date` = #{checkStartDate}, </if>
+			<if test="checkEndDate != null">`check_end_date` = #{checkEndDate}, </if>
+			<if test="checkLastTime != null">`check_last_time` = #{checkLastTime}</if>
+            <if test="addressId != null">`addressId` = #{addressId}</if>
+
+        </set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from `order` where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	
+	<!-- 我的订单列表 -->
+	<select id="orders" resultType="com.vic.ck.vo.OrderVo">
+		SELECT a.`id`, a.`orderno`, a.`customer_id` AS customerId, a.`merchant_id` AS merchantId, b.`name` AS merchantName, a.`commodity_id` AS commodityId,
+		a.`order_type` AS orderType, a.`total_fee` AS totalFee, a.`amount`, a.`quantity`, a.`status`, a.`order_image` AS orderImage, a.`order_name` AS orderName,
+		b.`mobile` AS merchantMobile, a.`pay_type` AS payType, a.`create_time` AS createTime, a.`merchant_type` AS merchantType, a.`room_number` AS roomNumber, a.`check_person` AS checkPerson,
+		a.`check_start_date` AS checkStartDate, a.`check_end_date` AS checkEndDate
+		FROM  `order` a
+		LEFT JOIN merchant b ON a.`merchant_id` = b.`id`
+		WHERE 1=1 
+		<!-- 用户的查询 -->
+		<if test="userId != null and userId !=0">
+			AND a.`customer_id` = #{userId} AND a.`is_delete` = 0
+		</if>
+		<if test="statuses != null and statuses.length > 0">
+			AND a.status in
+			<foreach collection="statuses" item="item" separator="," open="(" close=")">
+				#{item}
+			</foreach>
+		</if> 
+		<!-- 商家的查询 -->
+		<if test="merchantId !=null">
+			AND a.`merchant_id` =#{merchantId} 
+		</if>
+		
+		ORDER BY a.`id` DESC 
+	</select>
+	
+	
+	<!-- 订单详情基本情况 -->
+	<select id="orderDetailBase" resultType="com.vic.ck.vo.OrderDetailVo">
+		SELECT a.`id`, a.`orderno`, a.`customer_id` AS customerId, a.`merchant_id` AS merchantId,a.`discounts_desc` AS discountsDesc,
+		a.`commodity_id` AS commodityId, a.`order_type` AS orderType, a.`total_fee` AS totalFee, a.`amount`, 
+		a.`quantity`, a.`status`, a.`order_image` AS orderImage, a.`order_name` AS orderName, a.`pay_time` AS payTime,
+		a.`pay_type` AS payType, a.`create_time` AS createTime, a.`merchant_type` AS merchantType, a.`room_number` AS roomNumber, 
+		a.`check_person` AS checkPerson, a.`check_start_date` AS checkStartDate, a.`check_end_date` AS checkEndDate,
+		a.`refund_reason` AS refundReason, a.`check_last_time` AS checkLastTime, a.`mobile`,  a.`pay_out_no` AS payOutNo,
+		b.`mobile` AS merchantMobile,  b.`name` AS merchantName, b.`mobile` AS merchantMobile,
+		d.`nickname` AS customerName, e.`name` AS cityName
+        ,CONCAT(IFNULL(f.`name`, ""), IFNULL(b.`address`, "")) AS merchantaddress,
+        group_concat(z.commodity_id) as commodityidlist,group_concat(z.number) as commoditynumberlist
+		FROM  `order` a
+		LEFT JOIN merchant b ON a.`merchant_id` = b.`id`
+		LEFT JOIN customer_group_ticket c ON a.`orderno` = c.`order_no` AND a.`order_type` = 2
+		LEFT JOIN customer d ON a.`customer_id` = d.id
+		LEFT JOIN sys_area e ON b.city_id = e.id
+		LEFT JOIN sys_area f ON b.`area_id` = f.`id`
+        LEFT JOIN order_commodity z ON a.commodity_id= z.orderno_id
+        WHERE a.`orderno` = #{orderno}
+        GROUP BY a.orderno
+
+	</select>
+	
+	<!-- *********************后台的一些查询  ↓↓ **************************** -->
+	<!-- 根据订单号查询订单详情-->
+	<select id="orderById" resultType="com.vic.ck.vo.OrderVo">
+		SELECT a.`id`, a.`orderno`, c.nickname AS customerId, a.`merchant_id` AS merchantId,  a.`pay_out_no` AS payOutNo,
+		a.`commodity_id` AS commodityId, a.`order_type` AS orderType, a.`total_fee` AS totalFee, a.`amount`, a.`quantity`, a.`status`,
+		a.`order_image` AS orderImage, a.`order_name` AS orderName, a.`mobile`, a.`pay_type` AS payType, a.`create_time` AS createTime,
+		a.`merchant_type` AS merchantType, a.`room_number` AS roomNumber, a.`check_person` AS checkPerson,
+		a.`check_start_date` AS checkStartDate, a.`check_end_date` AS checkEndDate, a.`is_delete` AS isDelete,
+		b.`name` AS merchantName, b.`mobile` AS merchantMobile,
+		c.nickname AS customerName,
+		d.name as cityName
+		FROM  `order` a
+		LEFT JOIN merchant b ON a.`merchant_id` = b.`id`
+		LEFT JOIN customer c ON a.`customer_id` = c.id
+		LEFT JOIN sys_area d on b.city_id = d.id
+		WHERE a.id=#{id}
+	</select>
+	<!-- 订单列表 -->
+	<select id="orderList" resultType="com.vic.ck.vo.OrderVo">
+		SELECT a.`id`, a.`orderno`, a.`customer_id` AS customerId, a.`merchant_id` AS merchantId,  a.`pay_out_no` AS payOutNo,
+		a.`commodity_id` AS commodityId, a.`order_type` AS orderType, a.`total_fee` AS totalFee, a.`amount`, a.`quantity`, a.`status`,
+		a.`order_image` AS orderImage, a.`order_name` AS orderName, a.`mobile`, a.`pay_type` AS payType, a.`create_time` AS createTime, 
+		a.`merchant_type` AS merchantType, a.`room_number` AS roomNumber, a.`check_person` AS checkPerson,
+		a.`check_start_date` AS checkStartDate, a.`check_end_date` AS checkEndDate, a.`is_delete` AS isDelete,
+		b.`name` AS merchantName, b.`mobile` AS merchantMobile,
+		c.nickname AS customerName, 
+		d.name as cityName
+		FROM  `order` a
+		LEFT JOIN merchant b ON a.`merchant_id` = b.`id`
+		LEFT JOIN customer c ON a.`customer_id` = c.id
+		LEFT JOIN sys_area d on b.city_id = d.id
+		WHERE 1=1 
+		
+		<!-- 管辖城市 -->
+		<if test="managerCityId !=null and managerCityId !=0">
+			AND b.city_id = #{managerCityId}
+		</if>
+		<!-- 用户的查询 -->
+		<if test="orderno != null and orderno !=''">
+			AND a.`orderno` LIKE  CONCAT('%',#{orderno}, '%')
+		</if>
+		
+		<if test="status != null">
+			AND a.status = #{status}
+		</if>
+		
+		<if test="isDelete != null">
+			AND a.is_delete = #{isDelete}
+		</if>
+		<if test="type != null">
+			AND a.order_type = #{type}
+		</if>
+		<if test="payType != null">
+			AND a.pay_type = #{payType}
+		</if>
+		
+		<if test="cityId != null">
+			AND b.city_id = #{cityId}
+		</if>
+		
+		<if test="mobile !=null and mobile !=''">
+			AND (a.`mobile` LIKE  CONCAT('%',#{mobile}, '%')  OR c.`mobile` LIKE  CONCAT('%',#{mobile}, '%') )
+		</if>
+		
+		<if test="name !=null and name !=''">
+			AND c.`nickname` LIKE  CONCAT('%',#{name}, '%')
+		</if>
+		
+		<if test="merchantName !=null and merchantName !=''">
+			AND b.`name`  LIKE  CONCAT('%',#{merchantName}, '%')
+		</if>
+		
+		<if test="merchantMobile !=null and merchantMobile !=''">
+			AND b.`mobile`  LIKE  CONCAT('%',#{merchantMobile}, '%')
+		</if>
+		ORDER BY a.`id` DESC 
+	</select>
+	
+	<!-- 订单记录时间轴 -->
+	<select id="orderStatusRecords" resultType="com.vic.ck.entity.OrderStatusRecord">
+		SELECT a.`id`, a.`orderno`, a.`status`, a.`describe`, a.`create_time` AS createTime
+		FROM  order_status_record a
+		WHERE a.`orderno` = #{orderno}
+		ORDER BY a.id DESC 
+	</select>
+	
+	<!-- 查询订单的团购券号 -->
+	<select id="findGroupbutTicketNo" resultType="string">
+		SELECT a.`ticket_no`  FROM customer_group_ticket a WHERE a.`order_no` = #{orderno} LIMIT 1
+	</select>
+
+    <!--查询列表 -->
+    <select id="listddsp" resultType="com.vic.ck.entity.Commodity">
+		SELECT
+		 b.id,b.name
+		FROM `order_commodity` a
+		LEFT JOIN commodity b ON a.`commodity_id` = b.`id`
+		WHERE  a.orderno_id = #{orderno_id}
+	</select>
+
+
+</mapper>

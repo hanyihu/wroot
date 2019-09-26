@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.system.area.mapper.SysAreaMapper">
+
+	<sql id="base_list">
+		`id` AS id,
+		`parent_id` AS parentId,
+		`name` AS name ,
+		`short_name` AS shortName ,
+		`level_type` AS levelType ,
+		`merger_name`
+		ASmergerName ,
+		`merger_short_name` AS mergerShortName ,
+		`area_code` AS
+		areaCode ,
+		`postal_code` AS postalCode ,
+		`pinyin` AS pinyin ,
+		`jianpin`
+		AS jianpin ,
+		`first_char` AS firstChar ,
+		`lng` AS lng,
+		`Lat` AS lat,
+		`opened`AS opened ,
+		`hot` AS hot
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.SysArea">
+		SELECT
+		<include refid="base_list" />
+		FROM sys_area a
+		WHERE 1=1 AND a.`level_type` = 2
+		<if test="name != null and name !=''">
+			AND a.`name` LIKE CONCAT('%', #{name}, '%')
+		</if>
+		<if test="pid !=null">
+			AND a.parent_id = #{pid}
+		</if>
+		<if test="hot !=null">
+			AND a.hot = #{hot}
+		</if>
+
+		<if test="opened !=null">
+			AND a.opened = #{opened}
+		</if>
+
+		ORDER BY id desc
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.SysArea">
+		SELECT
+		<include refid="base_list" />
+		FROM sys_area
+		WHERE id = #{id}
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert">
+		insert into sys_area
+		(
+		`id`, `parent_id`, `name`,
+		`short_name`, `level_type`, `merger_name`,
+		`merger_short_name`,
+		`area_code`, `postal_code`, `pinyin`, `jianpin`,
+		`first_char`, `lng`,
+		`Lat`, `opened`, `hot` )
+		values
+		(
+		#{id},
+		#{parentId},
+		#{name},
+		#{shortName},
+		#{levelType},
+		#{mergerName},
+		#{mergerShortName},
+		#{areaCode},
+		#{postalCode},
+		#{pinyin},
+		#{jianpin},
+		#{firstChar},
+		#{lng},
+		#{lat},
+		#{opened},
+		#{hot}
+		)
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.SysArea">
+		update sys_area
+		<set>
+			<if test="parentId != null">`parent_id` = #{parentId}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="shortName != null">`short_name` = #{shortName}, </if>
+			<if test="levelType != null">`level_type` = #{levelType}, </if>
+			<if test="mergerName != null">`merger_name` = #{mergerName}, </if>
+			<if test="mergerShortName != null">`merger_short_name` = #{mergerShortName}, </if>
+			<if test="areaCode != null">`area_code` = #{areaCode}, </if>
+			<if test="postalCode != null">`postal_code` = #{postalCode}, </if>
+			<if test="pinyin != null">`pinyin` = #{pinyin}, </if>
+			<if test="jianpin != null">`jianpin` = #{jianpin}, </if>
+			<if test="firstChar != null">`first_char` = #{firstChar}, </if>
+			<if test="lng != null">`lng` = #{lng}, </if>
+			<if test="lat != null">`Lat` = #{lat}, </if>
+			<if test="opened != null">`opened` = #{opened}, </if>
+			<if test="hot != null">`hot` = #{hot}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from sys_area where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<!-- 全部的省 -->
+	<select id="provinces" resultType="com.vic.base.model.BaseModel">
+		SELECT a.id, a.name
+		FROM
+		sys_area a
+		WHERE a.`level_type` = 1
+	</select>
+	<select id="findChildren" resultType="com.vic.base.model.BaseModel">
+		SELECT a.id, a.name
+		FROM
+		sys_area a
+		WHERE a.`parent_id` =  #{parentId}
+	</select>
+	
+	
+	
+	<!-- 全部开放的城市 -->
+	<select id="opendCityList" resultType="com.vic.base.model.BaseModel">
+		SELECT a.id, a.name
+		FROM
+		sys_area a
+		WHERE a.`level_type` = 2 AND a.`opened` = 1
+	</select>
+
+
+</mapper>

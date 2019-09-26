@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.api.system.mapper.SystemMapper">
+	<!-- 可使用的银行列表 -->
+	<select id="banks" resultType="com.vic.base.model.BaseModel">
+		SELECT a.`id`, a.`name`, a.`icon`  FROM platform_bank a 
+	</select>
+	
+	<!--启动页  -->
+	<select id="bootPages" resultType="com.vic.ck.entity.BootPage">
+		SELECT a.`id`, a.`image`, a.`title` FROM platform_boot_page a WHERE a.`status` = 1 ORDER BY a.`sort`
+	</select>
+	
+	<!--城市匹配查询  level_type =2   -->
+	<select id="matchCity" resultType="com.vic.ck.entity.Area">
+		SELECT a.`id`, a.`parent_id` AS parentId, a.`name`,a.`short_name`, a.`level_type` AS levelType, a.`first_char` AS  firstChar, a.`opened`, a.`hot`
+		FROM sys_area a
+		WHERE a.`level_type`=2
+		<trim prefix="AND (" prefixOverrides="OR" suffix=")" >
+			<if test="id != null and  id !=''">
+				 OR a.`id` = #{id}
+			</if>
+			<if test="short_name != null and  short_name !=''">
+                OR a.`short_name` LIKE CONCAT('%', #{short_name},'%')
+			</if>
+		</trim>
+		LIMIT 1
+	</select>
+	
+	<!-- 热门市 -->
+	<select id="hotCities" resultType="com.vic.ck.entity.Area">
+		SELECT a.`id`, a.`parent_id` AS parentId, a.`name`, a.`level_type` AS levelType, a.`first_char` AS  firstChar, a.`opened`, a.`hot`
+		FROM sys_area a
+		WHERE a.`level_type`=2 AND a.`opened` =1 AND a.`hot` = 1 
+	</select>
+	
+	
+	<!-- 所有市-->
+	<select id="allCities" resultType="com.vic.ck.entity.Area">
+		SELECT a.`id`, a.`parent_id` AS parentId, a.`name`, a.`level_type` AS levelType, a.`first_char` AS  firstChar, a.`opened`, a.`hot`
+		FROM sys_area a
+		WHERE a.`level_type`=2
+		ORDER BY a.`first_char`
+		
+	</select>
+	<!-- 开放市 -->
+	<select id="openedCities" resultType="com.vic.ck.entity.Area">
+		SELECT a.`id`, a.`parent_id` AS parentId, a.`name`, a.`level_type` AS levelType, a.`first_char` AS  firstChar, a.`opened`, a.`hot`
+		FROM sys_area a
+		WHERE a.`level_type`=2 AND a.`opened` =1 
+	</select>
+	
+	<!-- 省市区下拉查询 -->
+	<select id="selectCities" resultType="com.vic.ck.entity.Area">
+		SELECT a.`id`, a.`parent_id` AS parentId, a.`name`, a.`level_type` AS levelType, a.`first_char` AS  firstChar, a.`opened`, a.`hot`
+		FROM sys_area a
+		WHERE a.`level_type`=#{levelType} AND a.`parent_id` = #{parentId} 
+	</select>
+	
+	<!-- 查询所有省市区 -->
+	<select id="selectAllCities" resultType="com.vic.ck.entity.Area">
+		SELECT a.`id`, a.`parent_id` AS parentId, a.`name`, a.`level_type` AS levelType, a.`first_char` AS  firstChar, a.`opened`, a.`hot`
+		FROM sys_area a 
+	</select>
+	
+	<select id="selectCity" resultType="com.vic.ck.entity.Area">
+		SELECT a.`id`, a.`parent_id` AS parentId, a.`name`, a.`level_type` AS levelType, a.`first_char` AS  firstChar, a.`opened`, a.`hot`
+		FROM sys_area a where 
+		<if test="parentId != null">
+			AND a.`parent_id`=#{parentId} 
+		</if>
+	</select>
+	
+		<!-- 入驻省市区下拉查询 -->
+	<select id="enterSelectCities" resultType="com.vic.ck.entity.Area">
+		SELECT a.`id`, a.`parent_id` AS parentId, a.`name`, a.`level_type` AS levelType, a.`first_char` AS  firstChar, a.`opened`, a.`hot`
+		FROM sys_area a
+		WHERE 
+			<if test="levelType != null">
+				 a.`level_type`=#{levelType} 
+			</if>
+			<if test="parentId != null">
+				AND a.`parent_id`=#{parentId} 
+			</if>
+	</select>
+	
+	<!-- banners -->
+	<select id="banners"  resultType="com.vic.ck.entity.Banner">
+		SELECT a.`id`,a.`image`, a.`url_type` AS urlType, a.`target`, a.`title`, a.`type`
+		FROM platform_banner a
+		WHERE (a.`city_id` = #{cityId} OR a.`city_id` = 0) AND a.`enabled` = 1 AND a.`type` = #{type}  
+		ORDER BY a.`sort`
+	</select>
+	
+	
+	<!-- 全局配置 -->
+	<select id="getSysConfig" resultType="com.vic.ck.entity.SysConfig"> 
+		SELECT a.`code`, a.`type`, a.`name`, a.`content`, a.`remark` FROM sys_config a WHERE a.`code` = #{code}
+	</select>
+	
+	<!-- 全局配置列表 -->
+	<select id="sysConfigs" resultType="com.vic.ck.entity.SysConfig"> 
+		SELECT a.`code`, a.`name`, a.`remark`,a.`type`, CASE a.`type` WHEN 3 THEN '见编辑详情' ELSE a.content END AS   content
+		FROM sys_config a 
+		WHERE 1=1 
+	</select>
+	
+	<!-- 编辑全局配置 -->
+	<update id="updateSysConfig" >
+		UPDATE sys_config SET `content` = #{content} WHERE `code` = #{code}
+	</update>
+	
+</mapper>

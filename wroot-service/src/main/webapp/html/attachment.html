@@ -1,0 +1,203 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>COMMON附件相关接口</title>
+		<link href="https://www.zybuluo.com/static/img/favicon.png" type="image/x-icon" rel="icon">
+		<link rel="stylesheet" href="base.lib.min.css" media="screen" />
+		<!--<link id="prettify-style" rel="stylesheet" href="prettify-cmd.css" />-->
+		<link rel="stylesheet" href="layout.min.css" media="screen" />
+		<link href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+	</head>
+
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-md12">
+					<!--********************************-->
+
+					<div id="wmd-preview" class="wmd-preview">
+						<div class="md-section-divider"></div>
+						<p data-anchor-id="w50k">
+							<div class="toc">
+								<ul>
+									<li>
+										<a href="#common附件相关接口">COMMON附件相关接口</a>
+										<ul>
+											<li>
+												<a href="#接口文档">接口文档</a>
+											</li>
+										</ul>
+									</li>
+									<li>
+										<a href="#说明">说明</a>
+										<ul>
+											<li>
+												<a href="#1上传附件">1、上传附件</a>
+											</li>
+											<li>
+												<a href="#2修改单附件的文件的状态">2、修改单附件的文件的状态</a>
+											</li>
+											<li>
+												<a href="#3修改多附件的文件的状态">3、修改多附件的文件的状态</a>
+											</li>
+											<li>
+												<a href="#4访问附件">4、访问附件</a>
+											</li>
+											<li>
+												<a href="#6访问附件缩略图尚未写">6、访问附件缩略图——尚未写</a>
+											</li>
+											<li>
+												<a href="#7访问空附件">7、访问空附件</a>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</div>
+						</p>
+						<ol data-anchor-id="ww8r">
+							<li>列表项</li>
+						</ol>
+						<div class="md-section-divider"></div>
+						<h1 data-anchor-id="2sfm" id="common附件相关接口">COMMON附件相关接口</h1>
+						<p data-anchor-id="h1iw"><em>2016年3月4日</em></p>
+						<div class="md-section-divider"></div>
+						<h2 data-anchor-id="7cnc" id="接口文档"><code>接口文档</code></h2>
+						<div class="md-section-divider"></div>
+						<h1 data-anchor-id="e6ly" id="说明">说明</h1>
+						<hr>
+						<ol data-anchor-id="ijuu">
+							<li><code>base_url</code>:
+								<a href="http://60.166.4.237:10083/commons" target="_blank">http://60.166.4.237:10083/commons</a>
+							</li>
+							<li>本项目为单附件上传，如客户端需要多附件上传，请分别调用接口</li>
+							<li>上传成功后此附件为临时态，如不修改状态将在适当时机删除该附件</li>
+						</ol>
+						<hr>
+						<div class="md-section-divider"></div>
+						<h2 data-anchor-id="s75b" id="1上传附件">1、上传附件</h2>
+						<p data-anchor-id="ebfy"><strong>接口地址</strong> <br>
+							<code>POST</code> <code>/ajax/upfile</code> <br>
+							<strong>请求参数</strong> </p>
+						<table data-anchor-id="17hn" class="table table-striped-white table-bordered">
+							<thead>
+								<tr>
+									<th>参数</th>
+									<th>数据类型</th>
+									<th>必填</th>
+									<th>参数说明</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>upfile</td>
+									<td>File</td>
+									<td></td>
+									<td>文件</td>
+								</tr>
+							</tbody>
+						</table>
+						<p data-anchor-id="i316"><strong>响应结果</strong></p>
+						<div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="b0ho" style=""><ol class="linenums"><li class="L0"><code class="language-javascript"><span class="pun">{</span></code></li><li class="L1"><code class="language-javascript"><span class="pln">   </span><span class="str">"id"</span><span class="pun">:</span><span class="lit">1</span><span class="pun">,</span><span class="com">//本次上传的附件id</span></code></li><li class="L2"><code class="language-javascript"><span class="pln">    code</span><span class="pun">:</span><span class="lit">0</span><span class="pun">;</span><span class="com">//0表示成功</span></code></li><li class="L3"><code class="language-javascript"><span class="pln">    message</span><span class="pun">:</span><span class="str">""</span><span class="pun">,</span><span class="com">//不成功的时候返回的说明</span></code></li><li class="L4"><code class="language-javascript"><span class="pln">    value</span><span class="pun">:</span><span class="str">""</span><span class="pun">,</span><span class="com">//本附件的相对地址</span></code></li><li class="L5"><code class="language-javascript"><span class="pln">    size</span><span class="pun">:</span><span class="lit">2048</span><span class="com">//文件大小</span></code></li><li class="L6"><code class="language-javascript"><span class="pun">}</span></code></li></ol></pre>
+						<div class="md-section-divider"></div>
+						<h2 data-anchor-id="hpbm" id="2修改单附件的文件的状态">2、修改单附件的文件的状态</h2>
+						<p data-anchor-id="eilm"><strong>接口地址</strong> <br>
+							<code>POST</code> <code>/single/change</code> <br>
+							<strong>请求参数</strong> </p>
+						<table data-anchor-id="isue" class="table table-striped-white table-bordered">
+							<thead>
+								<tr>
+									<th>参数</th>
+									<th>数据类型</th>
+									<th>必填</th>
+									<th>参数说明</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>id</td>
+									<td>int</td>
+									<td></td>
+									<td>文件id</td>
+								</tr>
+								<tr>
+									<td>temporary</td>
+									<td>boolean</td>
+									<td></td>
+									<td>修改为何种状态 false：非临时态，true：临时态；</td>
+								</tr>
+							</tbody>
+						</table>
+						<p data-anchor-id="xs6t"><strong>响应结果</strong></p>
+						<div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="47p0" style=""><ol class="linenums"><li class="L0"><code class="language-text"><span class="pln">   </span><span class="kwd">true</span><span class="com">//未做特殊处理</span></code></li></ol></pre>
+						<div class="md-section-divider"></div>
+						<h2 data-anchor-id="svrd" id="3修改多附件的文件的状态">3、修改多附件的文件的状态</h2>
+						<p data-anchor-id="746c"><strong>接口地址</strong> <br>
+							<code>POST</code> <code>/multiple/change</code> <br>
+							<strong>请求参数</strong> </p>
+						<table data-anchor-id="d8tg" class="table table-striped-white table-bordered">
+							<thead>
+								<tr>
+									<th>参数</th>
+									<th>数据类型</th>
+									<th>必填</th>
+									<th>参数说明</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>ids</td>
+									<td>String</td>
+									<td></td>
+									<td>文件id以英文逗号拼接而成的字符串如1,2,3;如不符合此标准不予操作</td>
+								</tr>
+								<tr>
+									<td>temporary</td>
+									<td>boolean</td>
+									<td></td>
+									<td>修改为何种状态 false：非临时态，true：临时态；</td>
+								</tr>
+							</tbody>
+						</table>
+						<p data-anchor-id="avcm"><strong>响应结果</strong></p>
+						<div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="ryxq" style=""><ol class="linenums"><li class="L0"><code class="language-text"><span class="pln">   </span><span class="kwd">true</span><span class="com">//成功，false为失败</span></code></li></ol></pre>
+						<div class="md-section-divider"></div>
+						<h2 data-anchor-id="em43" id="4访问附件">4、访问附件</h2>
+						<p data-anchor-id="qmtm"><strong>接口地址</strong> <br>
+							<code>GET</code> <code>/ajax/upfile/{id}</code> <br>
+							<strong>路径参数</strong> <br>
+							<code>id</code>： 访问附件的id <br>
+							<strong>请求参数</strong> <br>
+							<em>无</em></p>
+						<p data-anchor-id="vl8s"><strong>响应结果</strong></p>
+						<div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="3c2b" style=""><ol class="linenums"><li class="L0"><code class="language-text"><span class="pln">   http</span><span class="pun">:</span><span class="com">//......//一个url,不存在的附件则抛出异常</span></code></li></ol></pre>
+						<div class="md-section-divider"></div>
+						<h2 data-anchor-id="ct6o" id="6访问附件缩略图尚未写">6、访问附件缩略图——尚未写</h2>
+						<p data-anchor-id="r2xn"><strong>接口地址</strong> <br>
+							<code>GET</code> <code>/attachment/{id}</code> <br>
+							<strong>路径参数</strong> <br>
+							<code>id</code>： 访问附件的id <br>
+							<strong>请求参数</strong> <br> ---|-------|----|----- <br> width |int ||宽度百分比 <br> height |int ||高度百分比</p>
+						<p data-anchor-id="xn5d"><strong>响应结果</strong></p>
+						<div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="m6om" style=""><ol class="linenums"><li class="L0"><code class="language-text"><span class="pln">   http</span><span class="pun">:</span><span class="com">//......//一个url,不存在的附件在指向一个固定的图片</span></code></li></ol></pre>
+						<div class="md-section-divider"></div>
+						<h2 data-anchor-id="8m57" id="7访问空附件">7、访问空附件</h2>
+						<p data-anchor-id="wfu1"><strong>接口地址</strong> <br>
+							<code>GET</code> <code>/attachment/null</code> <br>
+							<strong>路径参数</strong> <br>
+							<code>id</code>： 访问附件的id <br>
+							<strong>请求参数</strong> <br>
+							<em>无</em></p>
+						<p data-anchor-id="pb9w"><strong>响应结果</strong></p>
+						<div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="543c" style=""><ol class="linenums"><li class="L0"><code class="language-text"><span class="pln">   http</span><span class="pun">:</span><span class="com">//......//指向一个固定的图片</span></code></li></ol></pre>
+						<div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="1ve8" style=""><ol class="linenums"><li class="L0"><code><span class="com">### AjaxResponse</span></code></li><li class="L1"><code><span class="str">`附件上传返回对象`</span><span class="pln"> </span><span class="pun">对象说明</span></code></li><li class="L2"><code><span class="str">```javascript</span></code></li><li class="L3"><code><span class="str">{</span></code></li><li class="L4"><code><span class="str">   "id":1,//本次上传的附件id</span></code></li><li class="L5"><code><span class="str">    code:0;//0表示成功</span></code></li><li class="L6"><code><span class="str">    message:"",//不成功的时候返回的说明</span></code></li><li class="L7"><code><span class="str">    value:"",//本附件的相对地址</span></code></li><li class="L8"><code><span class="str">    size:2048//文件大小</span></code></li><li class="L9"><code><span class="str">}</span></code></li></ol></pre></div>
+
+					<!--********************************-->
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>

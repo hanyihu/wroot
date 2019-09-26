@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.customer.mapper.CustomerMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`mobile` AS mobile ,
+		a.`password` AS password ,
+		a.`nickname` AS nickname ,
+		a.`gender` AS gender ,
+		a.`birthday` AS birthday ,
+		a.`home_province` AS homeProvince ,
+		a.`home_city` AS homeCity ,
+		a.`live_province` AS liveProvince ,
+		a.`live_city` AS liveCity ,
+		a.`headpic` AS headpic ,
+		a.`third_party_type` AS thirdPartyType ,
+		a.`third_party_uid` AS thirdPartyUid ,
+		a.`recommend_qcode_path` AS recommendQcodePath ,
+		a.`recommend_url` AS recommendUrl ,
+		a.`recommend_id` AS recommendId ,
+		a.`enabled` AS enabled ,
+		a.`create_time` AS createTime ,
+		a.`mobile_code` AS mobileCode ,
+		a.`type` AS type ,
+		a.`score` AS score
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.Customer">
+		SELECT
+		a.`id`, a.`mobile`, a.`nickname`, a.`gender`, a.`type`, a.`enabled`, a.`score`,
+		a.`create_time` AS createTime, b.`name` AS liveCityName, c.`name` AS homeCityName
+		FROM customer a
+		LEFT JOIN sys_area b ON a.`live_city` = b.`id`
+		LEFT JOIN sys_area c ON a.`home_city` = c.`id`
+		WHERE 1=1 
+		<if test="homeCityName != null and homeCityName  !=''">
+			AND c.`name` LIKE CONCAT('%', #{homeCityName}, '%')
+		</if>
+		<if test="liveCityName != null and liveCityName  !=''">
+			AND b.`name` LIKE CONCAT('%', #{liveCityName}, '%')
+		</if>
+		<if test="name != null and name  !=''">
+			AND a.`nickname` LIKE CONCAT('%', #{name}, '%')
+		</if>
+		<if test="mobile != null and mobile  !=''">
+			AND a.`mobile` LIKE CONCAT('%', #{mobile}, '%')
+		</if>
+		<if test="gender != null ">
+			AND a.`gender` = #{gender}
+		</if>
+		<if test="enabled != null ">
+			AND a.`enabled` = #{enabled}
+		</if>
+		<if test="type != null ">
+			AND a.`type` = #{type}
+		</if>
+		ORDER BY a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.Customer">
+		SELECT
+		<include refid="base_list" />
+		FROM customer a
+		WHERE a.id = #{id}
+	</select>
+
+	<!--批量查询对象 -->
+	<select id="findByIds" resultType="com.vic.ck.entity.Customer">
+		SELECT
+		<include refid="base_list" />
+		FROM customer a
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.Customer">
+		update customer
+		<set>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="password != null">`password` = #{password}, </if>
+			<if test="nickname != null">`nickname` = #{nickname}, </if>
+			<if test="gender != null">`gender` = #{gender}, </if>
+			<if test="birthday != null">`birthday` = #{birthday}, </if>
+			<if test="homeProvince != null">`home_province` = #{homeProvince}, </if>
+			<if test="homeCity != null">`home_city` = #{homeCity}, </if>
+			<if test="liveProvince != null">`live_province` = #{liveProvince}, </if>
+			<if test="liveCity != null">`live_city` = #{liveCity}, </if>
+			<if test="headpic != null">`headpic` = #{headpic}, </if>
+			<if test="thirdPartyType != null">`third_party_type` = #{thirdPartyType}, </if>
+			<if test="thirdPartyUid != null">`third_party_uid` = #{thirdPartyUid}, </if>
+			<if test="recommendQcodePath != null">`recommend_qcode_path` = #{recommendQcodePath}, </if>
+			<if test="recommendUrl != null">`recommend_url` = #{recommendUrl}, </if>
+			<if test="recommendId != null">`recommend_id` = #{recommendId}, </if>
+			<if test="enabled != null">`enabled` = #{enabled}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="mobileCode != null">`mobile_code` = #{mobileCode}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+            <if test="diatance != null">`diatance` = #{diatance},</if>
+			<if test="score != null">`score` = #{score}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from customer where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+    <!--根据经纬度查找用户信息-->
+    <select id="findByLat" resultType="com.vic.ck.entity.Customer">
+        select
+        <include refid="base_list"/>
+        ,a.`lng` AS lng
+        ,a.`lat` AS lat
+        ,a.`list_status` AS listStatus
+        ,a.`diatance` AS diatance
+        from customer a
+        where 1=1
+        and a.`isfree`=1
+        and a.`isRider`=1
+        and a.`list_status`=2
+        <if test="lng !=null">
+            and lng like CONCAT(#{lng}, '%')
+        </if>
+        <if test="lat !=null">
+            and lat like CONCAT(#{lat}, '%')
+        </if>
+        ORDER BY a.`diatance`
+    </select>
+
+    <select id="findByLats" resultType="com.vic.ck.entity.Customer">
+        select
+        <include refid="base_list"/>
+        ,a.`lng` AS lng
+        ,a.`lat` AS lat
+        ,a.`list_status` AS listStatus
+
+        from customer a
+        where 1=1
+        and a.`isfree`=1
+        and a.`isRider`=1
+        <if test="lng !=null">
+            and lng like CONCAT(#{lng}, '%')
+        </if>
+        <if test="lat !=null">
+            and lat like CONCAT(#{lat}, '%')
+        </if>
+    </select>
+
+</mapper>

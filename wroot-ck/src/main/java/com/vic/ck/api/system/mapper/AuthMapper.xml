@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.api.system.mapper.AuthMapper">
+
+
+	<!-- 手机号是否重复 -->
+	<select id="existedMobile" resultType="boolean">
+		SELECT COUNT(*) > 0 FROM customer a WHERE a.`mobile` = #{mobile}
+	</select>
+	
+	<!-- 根据手机号查询用户id -->
+	<select id="findCustomerIdByMobile" resultType="int">
+		SELECT a.`id` FROM customer a WHERE a.`mobile` = #{mobile}
+	</select>
+	
+	<select id="findCustomerIdByMerchantId" resultType="int">
+		SELECT a.`customer_id`  FROM merchant a WHERE a.`id` = #{merchantId}
+	</select>
+	
+	<!-- 根据第三方用户信息查询用户id  -->
+	<select id="findThirdPartyCustomerId" resultType="int">
+		SELECT a.`id` FROM customer a WHERE a.`third_party_uid` = #{thirdPartyUid} AND a.`third_party_type` = #{thirdPartyType}
+	</select>
+	
+	<!-- 修改设备号 -->
+	<update id="updateMobileCode">
+		UPDATE customer SET mobile_code = #{mobileCode} WHERE id = #{id}
+	</update>
+	
+	<update id="updateMerchantMobileCode">
+		UPDATE customer SET merchant_mobile_code = #{merchantMobileCode} WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 修改密码 -->
+	<update id="updatePassword">
+		UPDATE customer SET password = #{password} WHERE id = #{id}
+	</update>
+	
+	<update id="updateScore">
+		UPDATE customer SET score = score + #{score} WHERE id = #{id}
+	</update>
+	
+		
+	<!-- 修改手机号 -->
+	<update id="updateMobile">
+		UPDATE customer SET mobile = #{mobile} WHERE id = #{id}
+	</update>
+	
+	
+	<update id="updateCustomer">
+		UPDATE customer a
+		<set>
+			<if test="headpic != null ">a.`headpic` = #{headpic},</if>
+			<if test="nickname != null and nickname != ''">a.`nickname` = #{nickname},</if>
+			<if test="gender != null ">a.`gender` = #{gender},</if>
+			<if test="birthday != null ">a.`birthday` = #{birthday},</if>
+			<if test="homeCity != null ">a.`home_city` = #{homeCity},</if>
+			<if test="homeProvince != null ">a.`home_province` = #{homeProvince},</if>
+			<if test="liveCity != null ">a.`live_city` = #{liveCity},</if>
+			<if test="liveProvince != null ">a.`live_province` = #{liveProvince},</if>
+			<if test="recommendQcodePath != null ">a.`recommend_qcode_path` = #{recommendQcodePath},</if>
+			<if test="recommendUrl != null ">a.`recommend_url` = #{recommendUrl},</if>
+			<if test="recommendId != null ">a.`recommend_id` = #{recommendId},</if>
+            <if test="recommendId != null ">a.`recommend_id` = #{recommendId},</if>
+            <if test="recommendId != null ">a.`recommend_id` = #{recommendId},</if>
+            <if test="recommendId != null ">a.`recommend_id` = #{recommendId},</if>
+
+
+        </set>
+		WHERE a.`id`= #{id}
+	
+	</update>
+	
+	<select id="findCustomerById" resultType="com.vic.ck.entity.Customer">
+		SELECT a.`id`, a.`mobile`, a.`password`, a.`nickname`, a.`gender`, a.`birthday`,a.`home_province` AS homeProvince,
+		b.`name` AS homeProvinceName, a.`home_city` AS homeCity, c.`name` AS homeCityName,
+		a.`live_province` AS liveProvince, d.`name` AS liveProvinceName, a.`live_city` AS liveCity, e.`name` AS liveCityName, a.`headpic`,
+		a.`third_party_type` AS thirdPartyType, a.`third_party_uid` AS thirdPartyUid, a.`third_party_headpic` AS thirdPartyHeadpic, a.`recommend_url` AS recommendUrl, a.`recommend_qcode_path` AS recommendQcodePath,
+        a.`recommend_id` AS recommendId, a.`enabled`, a.`create_time` AS createTime, a.`mobile_code` AS mobileCode,
+        a.`merchant_mobile_code` AS merchantMobileCode, a.`type`, a.`score` ,a.`isRider`
+		
+		FROM customer a 
+		LEFT JOIN sys_area b ON a.`home_province` = b.`id`
+		LEFT JOIN sys_area c ON a.`home_city` = c.`id`
+		LEFT JOIN sys_area d ON a.`live_province` = d.`id`
+		LEFT JOIN sys_area e ON a.`live_city` = e.`id`
+		WHERE a.`id` = #{id}
+	</select>
+
+    <select id="findCustomerByByRider" resultType="com.vic.ck.entity.Customer">
+		SELECT a.rider_id ,b.mobile
+		FROM rider_task a 
+		LEFT JOIN customer b ON a.`rider_id` = b.`id` 
+		WHERE a.`orderno` = #{id} 
+		and order_status = 1
+	</select>
+
+
+    <!-- 注册用户 -->
+	<insert id="insertCustomer" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO customer(mobile, `password`,nickname) VALUES (#{mobile}, #{password}, #{nickname})
+	</insert>
+	
+	<!-- 注册第三方用户 -->
+	<insert id="insertThirdCustomer" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO customer(nickname, third_party_headpic, third_party_type, third_party_uid) VALUES 
+		(#{nickname}, #{thirdPartyHeadpic}, #{thirdPartyType}, #{thirdPartyUid})
+	</insert>
+	
+	<!-- 新建余额记录 -->
+	<insert id="insertCustomerBalance" >
+		INSERT INTO customer_balance(balance, customer_id) VALUES(0,#{id})
+	</insert>
+
+    <!-- 用户已经登陆过 -->
+    <update id="userLogged">
+		UPDATE customer SET logged = 1 WHERE id = #{id}
+	</update>
+	
+	
+	
+</mapper>

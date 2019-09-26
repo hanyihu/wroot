@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.platform.mapper.PlatformFeedbackMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`customer_id` AS customerId ,
+		a.`customer_name` AS customerName ,
+		a.`content` AS content ,
+		a.`type` AS type ,
+		a.`images` AS images ,
+		a.`create_time` AS createTime ,
+		a.`status` AS status ,
+		a.`reply` AS reply
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.PlatformFeedback">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_feedback a
+		WHERE 1=1
+		<if test="name !=null and name !=''">
+			AND a.`customer_name` LIKE CONCAT('%', #{name }, '%')
+		</if>
+		<if test="status != null">
+			AND a.status = #{status}
+		</if>
+		<if test="type != null">
+			AND a.type = #{type}
+		</if>
+		ORDER BY status, id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.PlatformFeedback">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_feedback a
+		WHERE id = #{id}
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into platform_feedback
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="customerId !=null and customerId !='' ">`customer_id`, </if>
+			<if test="customerName !=null and customerName !='' ">`customer_name`, </if>
+			<if test="content !=null and content !='' ">`content`, </if>
+			<if test="type !=null and type !='' ">`type`, </if>
+			<if test="images !=null and images !='' ">`images`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`, </if>
+			<if test="status !=null and status !='' ">`status`, </if>
+			<if test="reply !=null and reply !='' ">`reply`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="customerId !=null and customerId !='' ">#{customerId}, </if>
+			<if test="customerName !=null and customerName !='' ">#{customerName}, </if>
+			<if test="content !=null and content !='' ">#{content}, </if>
+			<if test="type !=null and type !='' ">#{type}, </if>
+			<if test="images !=null and images !='' ">#{images}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}, </if>
+			<if test="status !=null and status !='' ">#{status}, </if>
+			<if test="reply !=null and reply !='' ">#{reply}</if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.PlatformFeedback">
+		update platform_feedback
+		<set>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="customerName != null">`customer_name` = #{customerName}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="images != null">`images` = #{images}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="reply != null">`reply` = #{reply}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from platform_feedback where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

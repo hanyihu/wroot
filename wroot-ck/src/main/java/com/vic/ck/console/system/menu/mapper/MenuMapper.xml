@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.console.system.menu.mapper.MenuMapper">
+
+	<select id="getUserMenus" resultType="com.vic.ck.console.entity.Menu">
+		SELECT a.`id`, a.`name`, a.`label`,a.`parent_id` AS parentId,
+		a.`url`,a.`sort`
+		FROM sys_menu a LEFT JOIN sys_role_menu b ON a.`id` = b.`menu_id`
+		LEFT JOIN sys_user_role_rel c ON c.`role_id` = b.`role_id`
+		WHERE c.`user_id` = #{userId}
+		ORDER BY a.`parent_id`, a.`sort`
+	</select>
+	
+	<select id="authorityTree" resultType="com.vic.ck.console.system.role.po.AuthorityTree">
+		SELECT t.id,t.relId, t.name,t.role, t.parentId, t.checked FROM (
+			SELECT 1 AS role, CONCAT('m-',a.`id`) AS id, a.`name`, CONCAT('m-',a.`parent_id`) AS parentId, b.`id` IS NOT NULL AS checked, a.`sort`, b.`id` as relId
+			FROM sys_menu a
+			LEFT JOIN sys_role_menu b ON a.`id` = b.`menu_id` AND b.`role_id` = #{roleId}
+	
+			UNION ALL
+	
+			SELECT 2 AS role, CONCAT('b-',c.`id`) AS id, e.`name` AS NAME, CONCAT('m-',c.`menu_id`) AS parentId, d.`id` IS NOT NULL AS checked, 999 AS sort, c.`id` as relId 
+			FROM sys_menu_btn_rel c
+			LEFT JOIN sys_role_menu_btn_rel d ON d.`menu_btn_id` = c.`id` AND d.`role_id` = #{roleId}
+			LEFT JOIN sys_btn e ON c.`btn_id` = e.`id`
+			LEFT JOIN sys_menu f ON c.`menu_id` = f.`id`
+			WHERE f.`id` IS NOT NULL
+		) AS t ORDER BY sort
+
+	</select>
+
+	<select id="getUserBtn" resultType="com.vic.ck.console.entity.Button">
+		SELECT d.`name` AS menuName, d.`url` AS menuUrl, c.`name` AS name, c.`code`
+		AS code
+		FROM sys_role_menu_btn_rel a LEFT JOIN sys_menu_btn_rel b ON
+		a.`menu_btn_id` = b.`id`
+		LEFT JOIN sys_btn c ON b.`btn_id` = c.`id`
+		LEFT JOIN sys_menu d ON b.`menu_id` = d.`id`
+		LEFT JOIN sys_user_role_rel e ON a.`role_id` = e.`role_id`
+		WHERE e.`user_id` = #{userId} AND d.`parent_id` != 0
+	</select>
+
+	<select id="list" resultType="com.vic.ck.console.entity.Menu">
+		SELECT a.`id`, a.`parent_id` AS parentId, a.`name`, a.`sort`, a.`url`,
+		GROUP_CONCAT(c.`name`) AS btns
+		FROM sys_menu a LEFT JOIN sys_menu_btn_rel b ON a.`id` = b.`menu_id`
+		LEFT JOIN sys_btn c ON b.`btn_id` = c.`id`
+		WHERE 1=1
+		GROUP BY a.`id` ORDER BY a.`sort`
+	</select>
+
+
+	<select id="getMeunById" resultType="com.vic.ck.console.entity.Menu">
+		SELECT a.`id`, a.`parent_id` AS parentId, a.`name`, a.`sort`, a.`url`, b.`name` AS parentName
+		FROM sys_menu a LEFT JOIN sys_menu b ON a.`parent_id` = b.`id`
+		WHERE 1=1 AND a.`id` = #{id}
+	</select>
+	
+	<select id="findMenuBtn" resultType="com.vic.ck.console.entity.Button">
+	    SELECT a.`id`, a.`name`,b.`menu_id` IS NOT NULL AS checked
+		FROM sys_btn a LEFT JOIN sys_menu_btn_rel b ON a.`id` = b.`btn_id` AND b.`menu_id`= #{menuId}
+		WHERE 1=1
+	</select>
+
+	<select id="checkName" resultType="boolean">
+		SELECT COUNT(1)=0 FROM sys_menu a WHERE a.`name` = #{name}
+		<if test="id !=null">
+			AND a.`id` != #{id}
+		</if>
+		<if test="parentId !=null">
+			AND a.`parent_id` != 0
+		</if>
+	</select>
+	
+	<select id="maxId" resultType="int">
+	    SELECT IFNULL(MAX(id),0)  FROM  sys_menu WHERE parent_id = #{pId};
+	</select>
+	
+	<insert id="add" >
+	    INSERT INTO sys_menu(id,NAME,parent_id,sort,url,label) VALUES(
+	    #{id}, #{name}, #{parentId}, #{sort}, #{url}, #{label}
+	    )
+	</insert>
+	
+	<update id="update">
+	    UPDATE sys_menu SET 
+	    sort = #{sort},
+	    name=#{name},
+	    url=#{url}
+	    WHERE id=#{id}
+	</update>
+	
+	<delete id="delete">
+	    DELETE FROM sys_menu WHERE id in
+	    <foreach collection="ids" item="item" open="(" close=")" separator=",">
+	        #{item}
+	    </foreach>
+	    
+	</delete>
+	
+	<select id="getMenuBtn" resultType="integer">
+	    SELECT a.`id` FROM sys_menu_btn_rel a  WHERE a.`menu_id` = #{mid}
+	</select>
+	
+	<insert id="addMenuBtn" useGeneratedKeys="true">
+		INSERT INTO sys_menu_btn_rel (menu_id, btn_id) VALUES
+		<foreach collection="bids" item="item" index="index"
+			separator=",">
+			(#{mid}, #{item})
+		</foreach>
+	</insert>
+
+	<delete id="deleteMenuBtn">
+		DELETE FROM sys_menu_btn_rel WHERE id in
+		<foreach collection="ids" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteMenuBtnByMenuId">
+	    DELETE FROM sys_menu_btn_rel WHERE menu_id = #{mid}
+	</delete>
+
+	<select id="getRoleMenuIds" resultType="Integer">
+	    SELECT a.`menu_id`  FROM sys_role_menu a WHERE a.`role_id` = #{roleId}
+	</select>
+	
+	<select id="getRoleMenuBtnIds" resultType="Integer">
+	    SELECT a.`menu_btn_id`  FROM sys_role_menu_btn_rel a WHERE a.`role_id` =  #{roleId}
+	</select>
+	
+	
+	
+
+</mapper>

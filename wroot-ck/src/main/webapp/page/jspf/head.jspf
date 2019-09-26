@@ -1,0 +1,105 @@
+<%@page pageEncoding="UTF-8" %>
+<%
+    request.setAttribute("ctx", request.getContextPath());
+	String port = request.getServerPort() + "";
+	if(request.getServerPort() == 80 ) {
+		port = "";
+	}else {
+		port = ":" + port;
+	}
+    request.setAttribute("htx", request.getScheme() + "://" + request.getServerName() + port + request.getContextPath());
+%>
+<script>
+	var ctx = "${ctx}";
+	var htx = "${htx}";
+	var fileprefix = "${fileprefix}"
+	var btnJson;
+	try{
+		btnJson = JSON.parse('${principal.btnJson}');//当前用户的按钮权限
+		
+	}catch(e){
+		btnJson = {};
+	}
+	
+</script>
+<!DOCTYPE html >
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<title><spring:message code="application.title" /></title>
+<meta name="keywords" content="<spring:message code="application.keywords"/>" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+
+<link rel="shortcut icon" href="${ctx}/static/img/lcxm.ico" /> 
+<!-- css start -->
+<link rel="stylesheet"  href="${ctx }/static/css/bootstrap.min.css" /> 
+<!-- <link href="https://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"> -->
+
+<link rel="stylesheet"  href="${ctx }/static/css/bootstrap-datetimepicker.css" />
+<!-- <link href="https://cdn.bootcss.com/bootstrap-datetimepicker/3.1.4/css/bootstrap-datetimepicker.min.css" rel="stylesheet"> -->
+
+<link rel="stylesheet"  href="${ctx }/static/css/jquery-ui-1.10.0.custom.css" />
+<!-- <link href="https://cdn.bootcss.com/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet"> -->
+
+<%-- <link rel="stylesheet"  href="${ctx }/static/css/chosen.css" /> --%>
+
+<link rel="stylesheet"  href="${ctx }/static/css/blog.css" />
+
+<link rel="stylesheet"  href="${ctx }/static/css/menu.css" />
+
+<link rel="stylesheet"  href="${ctx }/static/css/common.css" />
+<!-- css end -->
+
+<!-- ****************************************** -->
+
+<!-- js start -->
+<script type="text/javascript" src="${ctx }/static/js/jquery.js"></script>
+<!-- <script src="https://cdn.bootcss.com/jquery/1.12.2/jquery.js"></script> -->
+
+<script type="text/javascript" src="${ctx }/static/js/jq-extends.js"></script>
+
+
+<script type="text/javascript" src="${ctx }/static/js/bootstrap.min.js"></script>
+<!-- <script src="https://cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> -->
+
+<script type="text/javascript" src="${ctx }/static/js/bootstrap-datetimepicker.js"></script> 
+<!-- <script src="https://cdn.bootcss.com/bootstrap-datetimepicker/3.1.4/js/bootstrap-datetimepicker.min.js"></script> -->
+
+ <script type="text/javascript" src="${ctx }/static/js/bootstrap-datetimepicker.zh-CN.js"></script> 
+
+<script type="text/javascript" src="${ctx }/static/js/jquery-ui-1.9.2.custom.min.js"></script>
+<!-- <script src="https://cdn.bootcss.com/jqueryui/1.12.1/jquery-ui.min.js"></script> -->
+
+<!-- 不作为通用引入 -->
+<%-- <script type="text/javascript" src="${ctx }/static/js/jquery.fileupload.js"></script> --%>
+
+<!-- 上传js需要引入的 -->
+<%-- <script type="text/javascript" src="${ctx }/static/js/jquery.iframe-transport.js"></script> --%>
+
+<script type="text/javascript" src="${ctx }/static/js/jquery-validate/jquery.validate.js"></script>
+<!-- <script src="https://cdn.bootcss.com/jquery-validate/1.17.0/jquery.validate.min.js"></script> -->
+
+<script type="text/javascript" src="${ctx }/static/js/jquery-validate/additional.method.js"></script>
+
+<script type="text/javascript" src="${ctx }/static/js/jquery-validate/messages_zh.js"></script>
+
+<!-- 这个下拉框蛮丑的 -->
+<%-- <script type="text/javascript" src="${ctx }/static/js/chosen.jquery.js"></script> --%>
+
+<script type="text/javascript" src="${ctx }/static/js/jquery-pager.js"></script>
+
+<script type="text/javascript" src="${ctx }/static/js/common.js"></script>
+
+<script type="text/javascript" src="${ctx }/static/js/amplifier.js"></script>
+
+<script type="text/javascript" src="${ctx }/static/js/menu.js"></script>
+
+<script type="text/javascript" src="${ctx }/static/js/nojs.js?i=12"></script>
+
+<script type="text/javascript" src="${ctx }/static/js/nojs-module-file.js"></script>
+
+<script type="text/javascript" src="${ctx }/static/js/nojs-module-customer.js"></script>
+
+
+<script type="text/javascript" src="${ctx }/static/js/btn.authority.js"></script>
+<!-- js end -->
+

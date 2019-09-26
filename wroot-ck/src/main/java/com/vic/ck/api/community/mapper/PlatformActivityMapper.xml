@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.api.community.mapper.PlatformActivityMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`type` AS type ,
+		a.`title` AS title ,
+		a.`icon` AS icon ,
+		a.`content` AS content ,
+		a.`start_date` AS startDate ,
+		a.`end_date` AS endDate ,
+		a.`enabled` AS enabled ,
+		a.`redpacket_rule` AS redpacketRule ,
+		a.`phone_charge_rule` AS phoneChargeRule ,
+		a.`recomment_rule` AS recommentRule ,
+		a.`create_time` AS createTime
+	</sql>
+	
+	<!-- 全部活动  每个类型取一条 -->
+	<select id="currentAcitivities" resultType="com.vic.ck.entity.PlatformActivity">
+		SELECT a.`id`, a.`type`, a.`title`, a.`icon`, a.`start_date` AS startDate, a.`end_date` AS endDate, a.`enabled`, 
+		a.`redpacket_rule` AS redpacketRule, a.`phone_charge_rule` AS phoneChargeRule, a.`create_time` AS createTime, a.`recomment_rule` AS recommentRule
+		FROM platform_activity a 
+		WHERE 1=1  AND a.`enabled` = 1 AND DATE(NOW())  BETWEEN a.`start_date` AND a.`end_date`
+		AND  NOT EXISTS  (SELECT 1 FROM platform_activity b WHERE b.`type` = a.`type` AND a.`start_date` &lt; b.`start_date`    
+		AND b.`enabled` = 1 AND DATE(NOW())  BETWEEN b.`start_date` AND b.`end_date`)
+		ORDER BY a.`type`
+	</select>
+	
+	<!-- 获取当前类型的活动 -->
+	<select id="currentAcitivityByType" resultType="com.vic.ck.entity.PlatformActivity">
+		SELECT a.`id`, a.`type`, a.`title`, a.`icon`, a.`start_date` AS startDate, a.`end_date` AS endDate, a.`enabled`, 
+		a.`redpacket_rule` AS redpacketRule, a.`phone_charge_rule` AS phoneChargeRule, a.`create_time` AS createTime, a.`recomment_rule` AS recommentRule 
+		FROM platform_activity a 
+		WHERE 1=1  AND a.`enabled` = 1 AND DATE(NOW())  BETWEEN a.`start_date` AND a.`end_date`
+		AND a.`type` = #{type} 
+		ORDER BY a.`start_date` DESC 
+		LIMIT 1
+	</select>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.PlatformActivity">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_activity a
+		WHERE 1=1
+		<if test="enabled != null">
+			AND a.`enabled` =  #{enabled}
+		</if>
+		<if test="type !=null">
+			AND a.type = #{type}
+		</if>
+		<if test="name !=null and name !=''">
+			AND a.`title` LIKE CONCAT('%', #{name},'%')
+		</if>  
+		<if test="startDate !=null">
+			AND a.start_date &gt;= #{startDate}
+		</if>
+		<if test="endDate !=null">
+			AND a.end_date &lt;= #{endDate}
+		</if>
+		ORDER BY id DESC
+	</select>
+	
+	
+	<select id="findByIds" resultType="com.vic.ck.entity.PlatformActivity">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_activity a
+		WHERE 1=1 AND a.id in
+		<foreach item="item" collection="ids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.PlatformActivity">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_activity a
+		WHERE id = #{id}
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into platform_activity
+		(
+		<trim suffixOverrides=",">
+			<if test="type !=null and type !='' ">`type`, </if>
+			<if test="title !=null and title !='' ">`title`, </if>
+			<if test="icon !=null and icon !='' ">`icon`, </if>
+			<if test="content !=null and content !='' ">`content`, </if>
+			<if test="startDate !=null and startDate !='' ">`start_date`, </if>
+			<if test="endDate !=null and endDate !='' ">`end_date`, </if>
+			<if test="enabled !=null and enabled !='' ">`enabled`, </if>
+			<if test="redpacketRule !=null and redpacketRule !='' ">`redpacket_rule`, </if>
+			<if test="phoneChargeRule !=null and phoneChargeRule !='' ">`phone_charge_rule`, </if>
+			<if test="recommentRule !=null and recommentRule !='' ">`recomment_rule`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`</if>
+		</trim>
+		)
+		values
+		(
+		<trim suffixOverrides=",">
+			<if test="type !=null and type !='' ">#{type}, </if>
+			<if test="title !=null and title !='' ">#{title}, </if>
+			<if test="icon !=null and icon !='' ">#{icon}, </if>
+			<if test="content !=null and content !='' ">#{content}, </if>
+			<if test="startDate !=null and startDate !='' ">#{startDate}, </if>
+			<if test="endDate !=null and endDate !='' ">#{endDate}, </if>
+			<if test="enabled !=null and enabled !='' ">#{enabled}, </if>
+			<if test="redpacketRule !=null and redpacketRule !='' ">#{redpacketRule}, </if>
+			<if test="phoneChargeRule !=null and phoneChargeRule !='' ">#{phoneChargeRule}, </if>
+			<if test="recommentRule !=null and recommentRule !='' ">#{recommentRule}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}</if>
+		</trim>
+		)
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.PlatformActivity">
+		update platform_activity
+		<set>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="title != null">`title` = #{title}, </if>
+			<if test="icon != null">`icon` = #{icon}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="startDate != null">`start_date` = #{startDate}, </if>
+			<if test="endDate != null">`end_date` = #{endDate}, </if>
+			<if test="enabled != null">`enabled` = #{enabled}, </if>
+			<if test="redpacketRule != null">`redpacket_rule` = #{redpacketRule}, </if>
+			<if test="phoneChargeRule != null">`phone_charge_rule` = #{phoneChargeRule}, </if>
+			<if test="recommentRule != null">`recomment_rule` = #{recommentRule}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from platform_activity where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<!-- 15条红包领取记录 -->
+	<select id="redpacketRecords" resultType="com.vic.base.model.BaseModel">
+		SELECT a.`id`, CONCAT(b.`nickname`, '领取了消费红包',a.`money`, '元!') AS `name` 
+		FROM customer_balance_record a LEFT JOIN customer b ON a.`customer_id` = b.`id`
+		WHERE a.`type` = 3
+		ORDER BY a.`id` DESC 
+		LIMIT 15
+	</select>
+	
+	<!-- 15条话费领取记录 -->
+	<select id="phoneChargeRecords" resultType="com.vic.base.model.BaseModel">
+		SELECT a.`id`, CONCAT(b.`nickname`, '抢到了',a.`money`, '元的话费!') AS `name` 
+		FROM phone_charge_balance_record a LEFT JOIN customer b ON a.`customer_id` = b.`id`
+		WHERE 1=1
+		ORDER BY a.`id` DESC 
+		LIMIT 15
+	</select>
+	
+	
+	
+	<!-- 判断今日是否领取了红包 -->
+	<select id="isReceived" resultType="boolean">
+		SELECT COUNT(1) &gt; 0 
+		FROM customer_balance_record a 
+		WHERE a.`type` = 3 AND a.`customer_id` = #{customerId} AND DATE(a.`create_time`) = CURDATE()
+	</select>
+	
+	 <!-- 昨日是否消费 -->
+	 <select id="isConsume" resultType="boolean">
+		SELECT COUNT(1) &gt; 0 
+		FROM `order` a
+		WHERE a.`customer_id` =  #{customerId} 
+		AND DATE(a.`create_time`) = DATE_ADD( CURDATE(), INTERVAL -1 DAY)
+		AND a.`status` IN (1,4,5)	
+	</select>
+	
+	<select id="yesterdayAmount" resultType="decimal">
+		SELECT  SUM(a.`amount`) FROM `order` a WHERE a.`status` IN (1,4,5) AND DATEDIFF(a.`pay_time`, NOW()) = -1 AND a.`customer_id` = #{customerId}
+	</select>
+	
+	<!-- 话费充值的额一些统计 -->
+	<select id="phoneChargeStatictics" resultType="com.vic.ck.vo.PhoneChargeStaticticsVo">
+		SELECT IFNULL(SUM(a.`money`),0) AS totalAmount,
+		IFNULL((SELECT b.balance FROM phone_charge_balance b WHERE b.customer_id = #{customerId} ),0) AS  currentAmount,
+		(SELECT  IFNULL(SUM(c.`money`), 0)   FROM phone_charge_fetch_money c WHERE c.`customer_id` = #{customerId}  AND c.`status` = 1) AS chargeAmount
+		FROM phone_charge_balance_record a
+		WHERE a.`customer_id` = #{customerId}  AND a.`type` = 1
+	</select>
+
+</mapper>

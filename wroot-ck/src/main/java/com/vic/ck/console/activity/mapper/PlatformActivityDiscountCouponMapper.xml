@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.activity.mapper.PlatformActivityDiscountCouponMapper">
+
+    <sql id="base_list">
+		a.`id` AS id ,
+		a.`type` AS type ,
+		a.`title` AS title ,
+		a.`threshold` AS threshold ,
+		a.`apply` AS apply ,
+		a.`num` AS num ,
+		a.`icon` AS icon ,
+		a.`content` AS content ,
+		a.`start_date` AS startDate ,
+		a.`end_date` AS endDate ,
+		a.`enabled` AS enabled ,
+		a.`rule` AS rule ,
+		a.`user` AS user ,
+		a.`remindday` AS remindday ,
+		a.`getnum` AS getnum ,
+		a.`rule_reduce` AS ruleReduce,
+		a.`rule_discount` AS ruleDiscount,
+		a.`rule_random` AS ruleRandom,
+		a.`create_time` AS createTime,
+		a.`merchant_id` AS merchantId
+
+	</sql>
+
+    <!--查询列表 -->
+    <select id="list" resultType="com.vic.ck.entity.PlatformActivityDiscountcoupon">
+        SELECT
+        <include refid="base_list"/>
+        FROM platform_activity_discountCoupon a
+        WHERE 1=1
+        <if test="enabled != null">
+            AND a.`enabled` = #{enabled}
+        </if>
+        <if test="type !=null">
+            AND a.type = #{type}
+        </if>
+        <if test="name !=null and name !=''">
+            AND a.`title` LIKE CONCAT('%', #{name},'%')
+        </if>
+        <if test="startDate !=null">
+            AND a.start_date &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND a.end_date &lt;= #{endDate}
+        </if>
+        <if test="merchantId !=null">
+            AND a.merchant_Id &lt;= #{merchantId}
+        </if>
+
+        ORDER BY id DESC
+    </select>
+
+    <!--根据主键查询对象 -->
+    <select id="findById" resultType="com.vic.ck.entity.PlatformActivityDiscountcoupon">
+        SELECT
+        <include refid="base_list"/>
+        FROM platform_activity_discountCoupon a
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByIds" resultType="com.vic.ck.entity.PlatformActivityDiscountcoupon">
+        SELECT
+        <include refid="base_list"/>
+        FROM platform_activity_discountCoupon a
+        WHERE 1=1 AND a.id in
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--查询领取对象 -->
+    <select id="listuse" resultType="com.vic.ck.entity.PlatformActivityDiscountcoupon">
+		SELECT
+		activity_id
+		FROM customer_discount_ticket a
+		WHERE id = #{id}
+	</select>
+
+
+    <!-- 优惠券详情  -->
+    <select id="discountCouponById" resultType="com.vic.ck.entity.PlatformActivityDiscountcoupon">
+        SELECT
+        <include refid="base_list"/>
+        FROM platform_activity_discountCoupon
+        WHERE a.`id` = #{id}
+    </select>
+
+
+    <!--  是否所属商家  -->
+    <select id="discountCouponByMerchantId" resultType="java.lang.Integer">
+		SELECT 
+		COUNT(merchant_id)
+		FROM platform_activity_discountCoupon_merchant   
+		WHERE discountCoupon_id = #{id} and merchant_id =  #{merchantid}
+	</select>
+
+    <!--新增数据 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into platform_activity_discountCoupon
+        (
+        <trim suffixOverrides=",">
+            <if test="type !=null and type !='' ">`type`,</if>
+            <if test="title !=null and title !='' ">`title`,</if>
+            <if test="threshold !=null and threshold !='' ">`threshold`,</if>
+            <if test="apply !=null and apply !='' ">`apply`,</if>
+            <if test="num !=null and num !='' ">`num`,</if>
+            <if test="icon !=null and icon !='' ">`icon`,</if>
+            <if test="content !=null and content !='' ">`content`,</if>
+            <if test="startDate !=null and startDate !='' ">`start_date`,</if>
+            <if test="endDate !=null and endDate !='' ">`end_date`,</if>
+            <if test="enabled !=null and enabled !='' ">`enabled`,</if>
+            <if test="rule !=null and rule !='' ">`rule`,</if>
+            <if test="user !=null and user !='' ">`user`,</if>
+            <if test="remindday !=null and remindday !='' ">`remindday`,</if>
+            <if test="getnum !=null and getnum !='' ">`getnum`,</if>
+            <if test="ruleReduce !=null and ruleReduce !='' ">`rule_reduce`,</if>
+            <if test="ruleDiscount !=null and ruleDiscount !='' ">`rule_discount`,</if>
+            <if test="ruleRandom !=null and ruleRandom !='' ">`rule_random`,</if>
+            <if test="createTime !=null and createTime !='' ">`create_time`,</if>
+            <if test="merchantId !=null and merchantId !='' ">`merchant_id`,</if>
+
+        </trim>
+        )
+        values
+        (
+        <trim suffixOverrides=",">
+            <if test="type !=null and type !='' ">#{type},</if>
+            <if test="title !=null and title !='' ">#{title},</if>
+            <if test="threshold !=null and threshold !='' ">#{threshold},</if>
+            <if test="apply !=null and apply !='' ">#{apply},</if>
+            <if test="num !=null and num !='' ">#{icnumon},</if>
+            <if test="icon !=null and icon !='' ">#{icon},</if>
+            <if test="content !=null and content !='' ">#{content},</if>
+            <if test="startDate !=null and startDate !='' ">#{startDate},</if>
+            <if test="endDate !=null and endDate !='' ">#{endDate},</if>
+            <if test="enabled !=null and enabled !='' ">#{enabled},</if>
+            <if test="rule !=null and rule !='' ">#{rule},</if>
+            <if test="user !=null and user !='' ">#{user},</if>
+            <if test="remindday !=null and remindday !='' ">#{remindday},</if>
+            <if test="getnum !=null and getnum !='' ">#{getnum},</if>
+            <if test="ruleReduce !=null and ruleReduce !='' ">#{ruleReduce},</if>
+            <if test="ruleDiscount !=null and ruleDiscount !='' ">#{ruleDiscount},</if>
+            <if test="ruleRandom !=null and ruleRandom !='' ">#{ruleRandom},</if>
+            <if test="createTime !=null and createTime !='' ">#{createTime},</if>
+            <if test="merchantId !=null and merchantId !='' ">#{merchantId},</if>
+        </trim>
+        )
+    </insert>
+
+    <!--新增数据 -->
+    <insert id="inserts" useGeneratedKeys="true" keyProperty="id">
+        insert into platform_activity_discountCoupon_merchant
+        (
+        <trim suffixOverrides=",">
+            <if test="id !=null and id !='' ">`discountCoupon_id`,</if>
+            <if test="merchantid !=null and merchantid !='' ">`merchant_id`,</if>
+        </trim>
+        )
+        values
+        (
+        <trim suffixOverrides=",">
+            <if test="id !=null and id !='' ">#{id},</if>
+            <if test="merchantid !=null and merchantid !='' ">#{merchantid},</if>
+        </trim>
+        )
+    </insert>
+
+
+    <!--更新数据 -->
+    <update id="update" parameterType="com.vic.ck.entity.PlatformActivityDiscountcoupon">
+        update platform_activity_discountCoupon
+        <set>
+            <trim suffixOverrides=",">
+                <if test="type !=null ">`type` = #{type},</if>
+                <if test="title !=null  ">`title` = #{title},</if>
+                <if test="threshold !=null">`threshold` = #{threshold},</if>
+                <if test="apply !=null">`apply` = #{apply},</if>
+                <if test="num !=null  ">`icnumon` = #{icnumon},</if>
+                <if test="icon !=null   ">`icon` = #{icon},</if>
+                <if test="content !=null  ">`content` = #{content},</if>
+                <if test="startDate !=null ">`start_date` = #{startDate},</if>
+                <if test="endDate !=null">`end_date` = #{endDate},</if>
+                <if test="enabled !=null  ">`enabled` = #{enabled},</if>
+                <if test="rule !=null ">`rule` = #{rule},</if>
+                <if test="user !=null">`user` = #{user},</if>
+                <if test="remindday !=null  ">`remindday` = #{remindday},</if>
+                <if test="getnum !=null  ">`getnum` = #{getnum},</if>
+                <if test="ruleReduce !=null ">`rule_reduce` = #{ruleReduce},</if>
+                <if test="ruleDiscount !=null ">`rule_discount` = #{ruleDiscount},</if>
+                <if test="ruleRandom !=null ">`rule_random` = #{ruleRandom},</if>
+                <if test="createTime !=null ">`create_Time` = #{createTime},</if>
+                <if test="merchantId !=null ">`merchant_id` = #{merchantId},</if>
+            </trim>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--删除数据 -->
+    <delete id="delete">
+        delete from platform_activity_discountCoupon where id in
+        <foreach item="item" collection="ids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </delete>
+    <!--删除优惠券对应商家 数据 -->
+    <delete id="deletemerchantId">
+        delete from platform_activity_discountCoupon_merchant where discountCoupon_id in
+        <foreach item="item" collection="ids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+</mapper>

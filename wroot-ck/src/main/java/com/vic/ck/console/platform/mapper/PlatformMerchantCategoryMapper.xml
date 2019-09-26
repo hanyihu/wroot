@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.platform.mapper.PlatformMerchantCategoryMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`name` AS name ,
+		a.`icon` AS icon ,
+		a.`type` AS type ,
+		a.`enabled` AS enabled ,
+		a.`sort` AS sort ,
+		a.`service_percent` AS servicePercent
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.PlatformMerchantCategory">
+		SELECT
+        a.`id` AS id ,
+        a.`name` AS name ,
+        a.`icon` AS icon ,
+        a.`type` AS type ,
+        a.`enabled` AS enabled ,
+        a.`sort` AS sort ,
+        a.`service_percent` AS servicePercent
+        FROM business_category a
+        WHERE a.parent_id=0
+		<if test="enabled != null">
+			AND a.enabled = #{enabled}
+		</if>
+		<if test="type != null">
+			AND a.type = #{type}
+		</if>
+		<if test="name != null and name != ''">
+			AND a.name LIKE CONCAT('%',  #{name}, '%')
+		</if>
+        ORDER BY a.sort
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.PlatformMerchantCategory">
+		SELECT
+		<include refid="base_list" />
+        FROM business_category a
+		WHERE a.id = #{id}
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into business_category
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="name !=null and name !='' ">`name`, </if>
+			<if test="icon !=null and icon !='' ">`icon`, </if>
+			<if test="type !=null and type !='' ">`type`, </if>
+			<if test="enabled !=null and enabled !='' ">`enabled`, </if>
+			<if test="sort !=null and sort !='' ">`sort`, </if>
+			<if test="servicePercent !=null and servicePercent !='' ">`service_percent`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="name !=null and name !='' ">#{name}, </if>
+			<if test="icon !=null and icon !='' ">#{icon}, </if>
+			<if test="type !=null and type !='' ">#{type}, </if>
+			<if test="enabled !=null and enabled !='' ">#{enabled}, </if>
+			<if test="sort !=null and sort !='' ">#{sort}, </if>
+			<if test="servicePercent !=null and servicePercent !='' ">#{servicePercent}</if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.PlatformMerchantCategory">
+        update business_category
+		<set>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="icon != null">`icon` = #{icon}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="enabled != null">`enabled` = #{enabled}, </if>
+			<if test="sort != null">`sort` = #{sort}, </if>
+			<if test="servicePercent != null">`service_percent` = #{servicePercent}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+        delete from business_category where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

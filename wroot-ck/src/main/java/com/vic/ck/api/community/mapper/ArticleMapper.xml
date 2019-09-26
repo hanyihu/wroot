@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.api.community.mapper.ArticleMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`title` AS title ,
+		a.`summary` AS summary ,
+		a.`icon` AS icon ,
+		a.`city_id` AS cityId ,
+		a.`category_id` AS categoryId ,
+		a.`create_time` AS createTime ,
+		a.`enabled` AS enabled ,
+		a.`open_comment` AS openComment ,
+		a.`praise_num` AS praiseNum ,
+		a.`comment_num` AS commentNum,
+		a.`view_num` AS viewNum
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.Article">
+		SELECT
+		<include refid="base_list" />
+		,b.`name` AS categoryName
+		,c.`name` AS cityName
+		FROM article a
+		LEFT JOIN  article_category b ON a.`category_id` = b.`id`
+		LEFT JOIN sys_area  c ON a.`city_id` = c.`id`
+		WHERE 1=1 
+		<!-- 管辖城市 -->
+		<if test="managerCityId !=null and managerCityId !=0">
+			AND a.city_id = #{managerCityId}
+		</if>
+		
+		<if test="enabled != null">
+			AND a.`enabled` =  #{enabled}
+		</if>
+		<if test="cityId !=null">
+			AND (a.city_id = #{cityId} OR a.city_id is null or a.city_id=0)
+		</if>
+		<if test="categoryId != null">
+			AND a.`category_id` =#{categoryId} 
+		</if>
+		<if test="name !=null and name !=''">
+			AND a.`title` LIKE CONCAT('%', #{name},'%')
+		</if>  
+		
+		ORDER BY a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.Article">
+		SELECT
+		<include refid="base_list" />
+		,a.`content` AS content
+		,b.`name` AS categoryName
+		FROM article a
+		LEFT JOIN  article_category b ON a.`category_id` = b.`id`
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findByIds" resultType="com.vic.ck.entity.Article">
+		SELECT
+		<include refid="base_list" />
+		,a.`content` AS content
+		,b.`name` AS categoryName
+		FROM article a
+		LEFT JOIN  article_category b ON a.`category_id` = b.`id`
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="findPersonalArticle" resultType="com.vic.ck.entity.Article">
+		SELECT
+		<include refid="base_list" />
+		,a.`content` AS content
+		,b.`name` AS categoryName
+		,c.`id` IS NOT NULL AS isPraised
+		FROM article a
+		LEFT JOIN  article_category b ON a.`category_id` = b.`id`
+		LEFT JOIN article_praise c ON a.`id` = c.`article_id` AND c.`customer_id` = #{customerId}
+		WHERE a.id = #{id}
+	</select>
+	
+	
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into article
+		(
+		<trim suffixOverrides=",">
+			<if test="title !=null and title !='' ">`title`, </if>
+			<if test="summary !=null and summary !='' ">`summary`, </if>
+			<if test="icon !=null and icon !='' ">`icon`, </if>
+			<if test="cityId !=null and cityId !='' ">`city_id`, </if>
+			<if test="categoryId !=null and categoryId !='' ">`category_id`, </if>
+			<if test="content !=null and content !='' ">`content`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`, </if>
+			<if test="enabled !=null and enabled !='' ">`enabled`, </if>
+            <if test="openComment !=null and openComment !='' ">`open_comment`, </if>
+			<if test="praiseNum !=null and praiseNum !='' ">`praise_num`, </if>
+			<if test="commentNum !=null and commentNum !='' ">`comment_num`</if>
+		</trim>
+		)
+		values
+		(
+		<trim suffixOverrides=",">
+			<if test="title !=null and title !='' ">#{title}, </if>
+			<if test="summary !=null and summary !='' ">#{summary}, </if>
+			<if test="icon !=null and icon !='' ">#{icon}, </if>
+			<if test="cityId !=null and cityId !='' ">#{cityId}, </if>
+			<if test="categoryId !=null and categoryId !='' ">#{categoryId}, </if>
+			<if test="content !=null and content !='' ">#{content}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}, </if>
+			<if test="enabled !=null and enabled !='' ">#{enabled}, </if>
+            <if test="openComment !=null and openComment !='' ">#{openComment}, </if>
+			<if test="praiseNum !=null and praiseNum !='' ">#{praiseNum}, </if>
+			<if test="commentNum !=null and commentNum !='' ">#{commentNum}</if>
+		</trim>
+		)
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.Article">
+		update article
+		<set>
+			<if test="title != null">`title` = #{title}, </if>
+			<if test="summary != null">`summary` = #{summary}, </if>
+			<if test="icon != null">`icon` = #{icon}, </if>
+			<if test="cityId != null">`city_id` = #{cityId}, </if>
+			<if test="categoryId != null">`category_id` = #{categoryId}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="enabled != null">`enabled` = #{enabled}, </if>
+            <if test="openComment != null">`open_comment` = #{openComment}, </if>
+			<if test="praiseNum != null">`praise_num` = #{praiseNum}, </if>
+			<if test="commentNum != null">`comment_num` = #{commentNum}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from article where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<update id="addCommentNum">
+		UPDATE article SET  comment_num = comment_num + #{num} WHERE id = #{id}
+	</update>
+	
+	<update id="addPraiseNum">
+		UPDATE article SET  praise_num = praise_num + #{num} WHERE id = #{id}
+	</update>
+	
+
+</mapper>

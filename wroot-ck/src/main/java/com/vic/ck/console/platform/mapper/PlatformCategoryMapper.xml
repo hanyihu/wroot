@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.platform.mapper.PlatformCategoryMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`type` AS type ,
+		a.`name` AS name ,
+		a.`icon` AS icon ,
+		a.`city_id` AS cityId ,
+		a.`sort` AS sort ,
+		a.`enabled` AS enabled ,
+		a.`create_time` AS createTime
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.PlatformCategory">
+		SELECT
+		<include refid="base_list" />
+		,b.`name` AS cityName
+		FROM platform_category a LEFT JOIN sys_area b ON a.`city_id` = b.`id`
+		WHERE 1=1
+		<if test="name !=null and name !=''">
+			AND a.`name` LIKE CONCAT('%', #{name},'%')
+		</if>
+		<if test="enabled != null">
+			AND a.enabled = #{enabled}
+		</if>
+		<if test="type != null">
+			AND a.type = #{type}
+		</if>
+		<if test="cityId != null">
+			AND a.city_id = #{cityId}
+		</if>
+		ORDER BY a.city_id, a.type, a.sort
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.PlatformCategory">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_category a
+		WHERE a.id = #{id}
+	</select>
+
+	<!--批量查询对象 -->
+	<select id="findByIds" resultType="com.vic.ck.entity.PlatformCategory">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_category a
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into platform_category
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="type !=null and type !='' ">`type`, </if>
+			<if test="name !=null and name !='' ">`name`, </if>
+			<if test="icon !=null and icon !='' ">`icon`, </if>
+			<if test="cityId !=null and cityId !='' ">`city_id`, </if>
+			<if test="sort !=null and sort !='' ">`sort`, </if>
+			<if test="enabled !=null and enabled !='' ">`enabled`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="type !=null and type !='' ">#{type}, </if>
+			<if test="name !=null and name !='' ">#{name}, </if>
+			<if test="icon !=null and icon !='' ">#{icon}, </if>
+			<if test="cityId !=null and cityId !='' ">#{cityId}, </if>
+			<if test="sort !=null and sort !='' ">#{sort}, </if>
+			<if test="enabled !=null and enabled !='' ">#{enabled}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}</if>
+		</trim>
+	</insert>
+
+
+	<!-- 更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.PlatformCategory">
+		update platform_category
+		<set>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="icon != null">`icon` = #{icon}, </if>
+			<if test="cityId != null">`city_id` = #{cityId}, </if>
+			<if test="sort != null">`sort` = #{sort}, </if>
+			<if test="enabled != null">`enabled` = #{enabled}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from platform_category where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<!-- 获取当前城市下的特色分类 -->
+	<select id="findCityCategoryList" resultType="com.vic.base.model.BaseModel">
+		SELECT a.`id`, CONCAT(a.`name`,'(', CASE a.`type` WHEN 1 THEN '首页' ELSE '百惠店' END,')') AS `name`
+		FROM platform_category a 
+		WHERE a.`city_id` = #{cityId}	
+	</select>
+	
+	
+	<!-- ****************************维系和商家的关系 ↓↓ ↓********************** -->
+	<!-- 分类下商家列表 -->
+	<select id="relList" resultType="com.vic.ck.entity.PlatformCategoryMerchant">
+		SELECT a.`id`, b.`type`, a.`category_id` AS categoryId, a.`merchant_id` AS merchantId, a.`city_id` AS cityId,
+		b.`name` AS categoryName,c.`name` AS merchantName, d.`name` AS cityName, a.`create_time` AS createTime
+		FROM platform_merchant_category_rel a 
+		LEFT JOIN platform_category b ON a.`category_id` = b.`id`
+		LEFT JOIN merchant c ON a.`merchant_id` = c.`id`
+		LEFT JOIN sys_area d ON a.`city_id` = d.`id`
+		WHERE 1=1	
+		<if test="name !=null and name !=''">
+			AND c.`name` LIKE CONCAT('%', #{name},'%')
+		</if>
+		<if test="categoryId != null">
+			AND a.category_id = #{categoryId}
+		</if>
+		<if test="type != null">
+			AND b.type = #{type}
+		</if>
+		<if test="cityId != null">
+			AND a.city_id = #{cityId}
+		</if>
+		ORDER BY a.city_id, b.type
+	</select>
+	
+	<select id="findByIdRel" resultType="com.vic.ck.entity.PlatformCategoryMerchant">
+		SELECT a.`id`, b.`type`, a.`category_id` AS categoryId, a.`merchant_id` AS merchantId, a.`city_id` AS cityId,
+		b.`name` AS categoryName,c.`name` AS merchantName, d.`name` AS cityName, a.`create_time` AS createTime
+		FROM platform_merchant_category_rel a 
+		LEFT JOIN platform_category b ON a.`category_id` = b.`id`
+		LEFT JOIN merchant c ON a.`merchant_id` = c.`id`
+		LEFT JOIN sys_area d ON a.`city_id` = d.`id`
+		WHERE a.`id` = #{id}
+	
+	</select>
+	
+	<!--新增关系数据 -->
+	<insert id="insertRel" useGeneratedKeys="true" keyProperty="id">
+		insert into platform_merchant_category_rel
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="categoryId !=null and categoryId !='' ">category_id, </if>
+			<if test="merchantId !=null and merchantId !='' ">`merchant_id`, </if>
+			<if test="cityId !=null and cityId !='' ">`city_id` </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="categoryId !=null and categoryId !='' ">#{categoryId}, </if>
+			<if test="merchantId !=null and merchantId !='' ">#{merchantId}, </if>
+			<if test="cityId !=null and cityId !='' ">#{cityId}, </if>
+		</trim>
+	</insert>
+	
+	<!--更新关系数据 -->
+	<update id="updateRel" parameterType="com.vic.ck.entity.PlatformCategoryMerchant">
+		update platform_merchant_category_rel
+		<set>
+			<if test="cityId != null">`city_id` = #{cityId}, </if>
+			<if test="categoryId != null">`category_id` = #{categoryId}, </if>
+			<if test="merchantId != null">`merchant_id` = #{merchantId}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<!-- 删除关系数据 -->
+	<delete id="deleteRel">
+		delete from platform_merchant_category_rel where id in
+		<foreach item="item" collection="ids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	
+
+</mapper>

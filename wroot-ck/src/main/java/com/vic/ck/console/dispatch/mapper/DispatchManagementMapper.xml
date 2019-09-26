@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.dispatch.mapper.DispatchManagementMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`orderno` AS orderno ,
+		a.`service_time` AS serviceTime ,
+		a.`sendaddress` AS sendaddress ,
+		a.`pickaddress` AS pickaddress ,
+		a.`fee` AS fee ,
+		a.`order_status` AS orderStatus ,
+		a.`remarks` AS remarks ,
+		a.`rider_id` AS riderId ,
+		a.`merchant_id` AS merchantId ,
+		a.`in_pic` AS inPic ,
+		a.`creation_time` AS creationTime
+
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.RiderTask">
+		SELECT
+		<include refid="base_list" />
+		,d.`name` AS merchantname
+		,b.`nickname` AS ridername
+		,b.`isfree` AS isfree
+		,b.`list_status` AS listStatus
+		FROM rider_task a
+		LEFT JOIN customer b on a.`rider_id`=b.`id`
+		LEFT JOIN merchant d on a.`merchant_id`=d.`id`
+		WHERE 1=1
+		<if test="name != null and name != ''">
+			AND a.name LIKE CONCAT('%', #{name}, '%')
+		</if>
+		ORDER BY id DESC
+	</select>
+
+	<select id="manageList" resultType="com.vic.ck.entity.RiderTask">
+		select
+		<include refid="base_list" />
+		,d.`name` AS merchantname
+
+		FROM rider_task a
+		LEFT JOIN merchant d on a.`merchant_id`=d.`id`
+		where 1=1
+		and a.`order_status`=4
+
+	</select>
+
+<!--根据订单号查找-->
+	<select id="findByOrderNo" resultType="integer">
+		SELECT
+		a.`merchant_id` As merchantId
+		FROM rider_task a
+		WHERE a.orderno = #{orderno}
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.RiderTask">
+		SELECT
+		<include refid="base_list" />
+		FROM rider_task a
+		WHERE id = #{id}
+	</select>
+	
+
+
+
+</mapper>

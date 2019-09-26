@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.api.community.mapper.ActivitySurveyPhoneMoneyMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`activity_id` AS activityId ,
+		a.`enabled` AS enabled ,
+		a.`level` AS level ,
+		a.`receive_amount` AS receiveAmount ,
+		a.`receive_number` AS receiveNumber ,
+		a.`receive_group` AS receiveGroup ,
+		a.`group_amount` AS groupAmount ,
+		a.`available_amount` AS availableAmount ,
+		a.`current_receive_number` AS currentReceiveNumber ,
+		a.`create_time` AS createTime
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.ActivitySurveyPhoneMoney">
+		SELECT
+		<include refid="base_list" />
+		FROM activity_survey_phone_money a
+		WHERE 1=1
+		ORDER BY id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.ActivitySurveyPhoneMoney">
+		SELECT
+		<include refid="base_list" />
+		FROM activity_survey_phone_money a
+		WHERE id = #{id}
+	</select>
+	
+	<select id="findByActivityIdAndLevel" resultType="com.vic.ck.entity.ActivitySurveyPhoneMoney">
+		SELECT
+		<include refid="base_list" />
+		FROM activity_survey_phone_money a
+		WHERE a.`activity_id` =#{activityId}  AND a.`level` = #{level} 
+		LIMIT 1
+	</select>
+	
+	<insert id="generatorSurveyPhoneMoney" useGeneratedKeys="true" >
+		  insert into activity_survey_phone_money (activity_id, level, group_amount, available_amount) VALUES
+        <foreach collection="phoneChargeLevels" item="item" index="index" separator="," > 
+            (#{id}, #{item.level},#{item.amount}, #{item.amount}) 
+        </foreach>
+		
+	</insert>
+	
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into activity_survey_phone_money
+		(
+		<trim suffixOverrides=",">
+			<if test="activityId !=null and activityId !='' ">`activity_id`, </if>
+			<if test="enabled !=null and enabled !='' ">`enabled`, </if>
+			<if test="level !=null and level !='' ">`level`, </if>
+			<if test="receiveAmount !=null and receiveAmount !='' ">`receive_amount`, </if>
+			<if test="receiveNumber !=null and receiveNumber !='' ">`receive_number`, </if>
+			<if test="receiveGroup !=null and receiveGroup !='' ">`receive_group`, </if>
+			<if test="groupAmount !=null and groupAmount !='' ">`group_amount`, </if>
+			<if test="availableAmount !=null and availableAmount !='' ">`available_amount`, </if>
+			<if test="currentReceiveNumber !=null and currentReceiveNumber !='' ">`current_receive_number`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`</if>
+		</trim>
+		)
+		values
+		(
+		<trim suffixOverrides=",">
+			<if test="activityId !=null and activityId !='' ">#{activityId}, </if>
+			<if test="enabled !=null and enabled !='' ">#{enabled}, </if>
+			<if test="level !=null and level !='' ">#{level}, </if>
+			<if test="receiveAmount !=null and receiveAmount !='' ">#{receiveAmount}, </if>
+			<if test="receiveNumber !=null and receiveNumber !='' ">#{receiveNumber}, </if>
+			<if test="receiveGroup !=null and receiveGroup !='' ">#{receiveGroup}, </if>
+			<if test="groupAmount !=null and groupAmount !='' ">#{groupAmount}, </if>
+			<if test="availableAmount !=null and availableAmount !='' ">#{availableAmount}, </if>
+			<if test="currentReceiveNumber !=null and currentReceiveNumber !='' ">#{currentReceiveNumber}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}</if>
+		</trim>
+		)
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.ActivitySurveyPhoneMoney">
+		update activity_survey_phone_money
+		<set>
+			<if test="activityId != null">`activity_id` = #{activityId}, </if>
+			<if test="enabled != null">`enabled` = #{enabled}, </if>
+			<if test="level != null">`level` = #{level}, </if>
+			<if test="receiveAmount != null">`receive_amount` = #{receiveAmount}, </if>
+			<if test="receiveNumber != null">`receive_number` = #{receiveNumber}, </if>
+			<if test="receiveGroup != null">`receive_group` = #{receiveGroup}, </if>
+			<if test="groupAmount != null">`group_amount` = #{groupAmount}, </if>
+			<if test="availableAmount != null">`available_amount` = #{availableAmount}, </if>
+			<if test="currentReceiveNumber != null">`current_receive_number` = #{currentReceiveNumber}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from activity_survey_phone_money where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

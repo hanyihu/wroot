@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.statistics.mapper.OrderStatisticsMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`orderno` AS orderno ,
+		a.`customer_id` AS customerId ,
+		a.`merchant_id` AS merchantId,
+		a.`commodity_id` AS commodityId ,
+		a.`order_type` AS orderType,
+		a.`total_fee` AS totalFee,
+		a.`amount` AS	amount,
+		a.`ticket_id` AS	ticketId,
+		a.`ticket_discount` AS	ticketDiscount,
+		a.`ticket_discount_money` AS	ticketDiscountMoney,
+		a.`minus_money` AS	minusMoney,
+		a.`reach_money` AS	reachMoney,
+		a.`discounts_desc` AS	discountsDesc,
+		a.`quantity` AS	quantity,
+		a.`status` AS	status,
+		a.`is_comment ` AS	isComment,
+		a.`order_image` AS	orderImage,
+		a.`order_name` AS	orderName,
+		a.`mobile` AS	mobile,
+		a.`pay_type` AS	payType,
+		a.`pay_time` AS	payTime,
+		a.`pay_out_no` AS	payOutNo,
+		a.`create_time` AS	createTime,
+		a.`refund_reason` AS	refundReason,
+		a.`is_delete` AS	isDelete,
+		a.`merchant_type` AS	merchantType,
+		a.`remark` AS	remark,
+		a.`room_number` AS	roomNumber,
+		a.`check_person` AS	checkPerson,
+		a.`check_start_date` AS	checkStartDate,
+		a.`check_end_date` AS	checkEndDate,
+		a.`check_last_time` AS	checkLastTime
+
+	</sql>
+
+	<sql id="condition">
+
+		<if test="startDate !=null">
+			AND a.`create_time` &gt;= #{startDate}
+		</if>
+		<if test="endDate !=null">
+			AND a.`create_time` &lt;= #{endDate}
+		</if>
+
+		<if test="status ==1">
+			AND a.`status` =4
+		</if>
+         <if test="status ==2">
+			AND a.`status` &lt;&gt;4
+		</if>
+
+	</sql>
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.Order">
+		SELECT
+		<include refid="base_list" />
+		FROM  order a
+		WHERE 1=1
+		<include refid="condition"></include>
+		ORDER BY a.id DESC
+	</select>
+
+	<!--商品有效订单统计-->
+	<select id="statistics" resultType="com.vic.ck.entity.OrderStatistics">
+		SELECT
+		 COUNT(DISTINCT(a.`customer_id`)) as orderMember,
+		(SELECT  SUM(a.`amount`) ) as validOrderAmount,
+		(SELECT  COUNT(DISTINCT(a.`orderno`))) as validOrderNum,
+		(SELECT  SUM(b.`amount`) from `order` b) as orderAmount,
+		(SELECT  COUNT(b.`orderno`) from `order` b ) as orderNumber,
+
+        a.`status` as status
+		FROM `order` a
+		WHERE 1=1
+		<include refid="condition" />
+
+	</select>
+
+	<!--商品全部订单统计-->
+	<select id="allStatistics" resultType="com.vic.ck.entity.OrderStatistics">
+		SELECT
+		  COUNT(DISTINCT(a.`customer_id`)) as orderMember,
+		  (SELECT  SUM(a.`amount`)) as orderAmount,
+		  (SELECT  COUNT(a.`orderno`)) as orderNumber
+
+		 from `order` a
+		 where 1=1
+		<if test="startDate !=null">
+			AND a.`create_time` &gt;= #{startDate}
+		</if>
+		<if test="endDate !=null">
+			AND a.`create_time` &lt;= #{endDate}
+		</if>
+	</select>
+	<!--&lt;!&ndash;商品订单统计&ndash;&gt;
+	<select id="statistics" resultType="com.vic.ck.entity.OrderStatistics">
+		SELECT
+        COUNT(DISTINCT(a.`customer_id`)) as orderMember,
+        (SELECT  SUM(a.`amount`)) as validOrderAmount,
+        (SELECT  COUNT(DISTINCT(a.`orderno`))) as validOrderNum,
+        CONVERT(IFNULL(SUM(a.`amount`),0), DECIMAL(10,2)) as orderAmount,
+        COUNT(DISTINCT(a.`orderno`)) as orderNumber,
+        a.`create_time` as createTime
+		FROM `order` a
+		WHERE 1=1
+		<include refid="condition" />
+
+	</select>-->
+
+
+	<!-- 统计 -->
+	<select id="total" resultType="com.vic.ck.entity.Order">
+		SELECT
+		IFNULL(SUM(a.`amount`),0) AS amount ,
+		IFNULL(SUM(a.`commission_amount`),0) AS commissionAmount 
+		FROM order a
+		WHERE 1=1
+		<include refid="condition"></include>
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.Order">
+		SELECT
+		<include refid="base_list" />
+		FROM order a
+		WHERE a.id = #{id}
+	</select>
+
+	<!--批量查询对象 -->
+	<select id="findByIds" resultType="com.vic.ck.entity.Order">
+		SELECT
+		<include refid="base_list" />
+		FROM order a
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+</mapper>

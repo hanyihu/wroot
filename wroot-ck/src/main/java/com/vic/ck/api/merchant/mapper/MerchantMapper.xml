@@ -1,0 +1,881 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vic.ck.api.merchant.mapper.MerchantMapper">
+
+<resultMap id="BaseResultMap" type="com.vic.ck.entity.Merchant"> 
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<id column="qrcode" property="qrcode" jdbcType="INTEGER" />
+		<result column="customer_id" property="customerId" jdbcType="INTEGER" />
+		<result column="recommend_id" property="recommendId" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="province_id" property="provinceId" jdbcType="INTEGER" />
+		<result column="city_id" property="cityId" jdbcType="INTEGER" />
+		<result column="area_id" property="areaId" jdbcType="INTEGER" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="landmarks" property="landmarks" jdbcType="VARCHAR" />
+		<result column="longitude" property="longitude" jdbcType="DECIMAL" />
+		<result column="latitude" property="latitude" jdbcType="DECIMAL" />
+		<result column="type" property="type" jdbcType="TINYINT" />
+		<result column="category_id" property="categoryId" jdbcType="INTEGER" />
+		<result column="mobile" property="mobile" jdbcType="CHAR" />
+		<result column="out_pic" property="outPic" jdbcType="INTEGER" />
+		<result column="in_pic" property="inPic" jdbcType="VARCHAR" />
+		<result column="license_pic" property="licensePic" jdbcType="INTEGER" />
+		<result column="license_persistent" property="licensePersistent" jdbcType="TINYINT" />
+		<result column="license_date" property="licenseDate" jdbcType="VARCHAR" />
+		<result column="license_name" property="licenseName" jdbcType="VARCHAR" />
+		<result column="license_regcode" property="licenseRegcode" jdbcType="VARCHAR" />
+		<result column="permit_pic" property="permitPic" jdbcType="INTEGER" />
+		<result column="permit_persistent" property="permitPersistent"	jdbcType="TINYINT" />
+		<result column="permit_date" property="permitDate" jdbcType="VARCHAR" />
+		<result column="other_prove_pic" property="otherProvePic" jdbcType="VARCHAR" />
+		<result column="account_name" property="accountName" jdbcType="VARCHAR" />
+		<result column="bank_account" property="bankAccount" jdbcType="VARCHAR" />
+		<result column="bank_name" property="bankName" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="TINYINT" />
+		<result column="facility" property="facility" jdbcType="VARCHAR" />
+		<result column="business_day" property="businessDay" jdbcType="VARCHAR" />
+		<result column="business_hours" property="businessHours" jdbcType="VARCHAR" />
+		<result column="price" property="price" jdbcType="DOUBLE" />
+		<result column="service_star" property="serviceStar" jdbcType="DOUBLE" />
+		<result column="environment_star" property="environmentStar"	jdbcType="DOUBLE" />
+		<result column="flavor_star" property="flavorStar" jdbcType="DOUBLE" />
+		<result column="star" property="star" jdbcType="DOUBLE" />
+		<result column="view_num" property="viewNum" jdbcType="INTEGER" />
+		<result column="comment_num" property="commentNum" jdbcType="INTEGER" />
+		<result column="sell_num" property="sellNum" jdbcType="INTEGER" />
+		<result column="current_activity" property="currentActivity"	jdbcType="VARCHAR" />
+		<result column="hotel_in_time" property="hotelInTime" jdbcType="TIME" />
+		<result column="hotel_out_time" property="hotelOutTime" jdbcType="TIME" />
+		<result column="hotel_can_add_bed" property="hotelCanAddBed" jdbcType="TINYINT" />
+		<result column="hotel_add_bed_price" property="hotelAddBedPrice" jdbcType="DECIMAL" />
+		<result column="hotel_foreigned" property="hotelForeigned" jdbcType="TINYINT" />
+		<result column="hotel_peted" property="hotelPeted" jdbcType="TINYINT" />
+		<result column="hotel_pledge" property="hotelPledge" jdbcType="TINYINT" />
+		<result column="hotel_level" property="hotelLevel" jdbcType="TINYINT" />
+		<result column="well_chosened" property="wellChosened" jdbcType="TINYINT" />
+		<result column="well_chosen_sort" property="wellChosenSort" jdbcType="INTEGER" />
+		<result column="describe" property="describe" jdbcType="LONGVARCHAR" />
+
+    <result column="provinceName" property="provinceName" jdbcType="VARCHAR"/>
+		<result column="cityName" property="cityName" jdbcType="VARCHAR" />
+		<result column="areaName" property="areaName" jdbcType="VARCHAR" />
+		<result column="categoryName" property="categoryName" jdbcType="VARCHAR" />
+		
+		<result column="contact_name" property="contactName" jdbcType="VARCHAR" />
+		<result column="first_category_id" property="firstCategoryId" jdbcType="INTEGER" />
+		<result column="two_category_id" property="twoCategoryId" jdbcType="INTEGER" />
+		<result column="three_category_id" property="threeCategoryId" jdbcType="INTEGER" />
+		<result column="shop_trademark" property="shopTrademark" jdbcType="INTEGER" />
+		<result column="shop_address" property="shopAddress" jdbcType="VARCHAR" />
+		<result column="license_representative" property="licenseRepresentative" jdbcType="VARCHAR" />
+		<result column="license_place" property="licensePlace" jdbcType="VARCHAR" />
+		<result column="license_registration_time" property="licenseRegistrationTime" jdbcType="VARCHAR" />
+		<result column="license_registration_authority" property="licenseRegistrationAuthority" jdbcType="VARCHAR" />
+		<result column="license_approval_date" property="licenseApprovalDate" jdbcType="VARCHAR" />
+		<result column="license_scope" property="licenseScope" jdbcType="VARCHAR" />
+		<result column="license_capital" property="licenseCapital" jdbcType="VARCHAR" />
+		<result column="identity_positive" property="identityPositive" jdbcType="INTEGER" />
+		<result column="identity_back" property="identityBack" jdbcType="INTEGER" />
+		<result column="real_name" property="realName" jdbcType="VARCHAR" />
+		<result column="id_card" property="idCard" jdbcType="VARCHAR" />
+		<result column="nation" property="nation" jdbcType="VARCHAR" />
+		<result column="date_birth" property="dateBirth" jdbcType="VARCHAR" />
+		<result column="identity_address" property="identityAddress" jdbcType="VARCHAR" />
+		<result column="identity_authority" property="identityAuthority" jdbcType="VARCHAR" />
+		<result column="identity_validity" property="identityValidity" jdbcType="VARCHAR" />
+		<result column="permit_name" property="permitName" jdbcType="VARCHAR" />
+		<result column="permit_representative" property="permitRepresentative" jdbcType="VARCHAR" />
+		<result column="permit_number" property="permitNumber" jdbcType="VARCHAR" />
+		<result column="permit_address" property="permitAddress" jdbcType="VARCHAR" />
+		<result column="permit_validity_period" property="permitValidityPeriod" jdbcType="VARCHAR" />
+		
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		a.id, a.customer_id, a.recommend_id, a.`name`, a.province_id,
+		a.city_id, a.area_id, a.address, a.landmarks,
+		a.longitude, a.latitude, a.`type`,
+		a.category_id, a.mobile, a.out_pic, a.in_pic, a.license_pic,
+		a.license_persistent,
+		a.license_date, a.license_name, a.license_regcode, a.permit_pic,
+		a.permit_persistent, a.permit_date,
+		a.other_prove_pic, a.account_name,
+		a.bank_account, a.bank_name, a.`status`, a.facility, a.business_hours,a.business_day, a.price,
+		a.service_star, a.environment_star, a.flavor_star, a.star, a.view_num, a.comment_num,
+		a.sell_num, a.current_activity, a.hotel_in_time, a.hotel_out_time,
+		a.hotel_can_add_bed,	a.hotel_add_bed_price,
+		a.hotel_foreigned, a.hotel_peted,
+		a.hotel_pledge, a.hotel_level, a.well_chosened,
+		a.well_chosen_sort,a.`describe`
+	</sql> 
+
+
+	<!-- 相册列表 -->
+	<select id="merchantPhotos" resultType="com.vic.ck.entity.MerchantPhoto">
+		SELECT a.id, a.`merchant_id` AS merchantId, a.`image`, a.`type`  FROM merchant_photo a 
+		WHERE a.`merchant_id` = #{merchantId} 
+		<if test="type !=null and type !=0">
+			AND a.`type` = #{type}
+		</if>
+		ORDER BY a.`create_time` DESC 	
+	</select>
+
+    <!-- 新增商家相册  -->
+    <insert id="insertPhoto" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO merchant_photo(merchant_id, image, `type`, create_time) VALUES(
+			#{merchantId}, #{image}, #{type}, NOW()
+		)
+	</insert>
+
+    <!-- 删除商家相册 -->
+    <delete id="deletePhoto">
+		DELETE FROM merchant_photo WHERE id = #{id}
+	</delete>
+
+    <update id="updateQrcode">
+		update merchant set qrcode = #{qrcode} where id = #{id}	
+	</update>
+
+
+    <select id="findMerchantByCustomerId" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List"></include>
+		,b.name AS provinceName
+		,c.name AS cityName
+		,d.name as areaName
+		,e.name AS categoryName
+		FROM merchant a
+		LEFT JOIN sys_area b ON a.`province_id` = b.`id`
+		LEFT JOIN sys_area c ON a.`city_id` = c.`id`
+		LEFT JOIN sys_area d ON a.`area_id` = d.`id`
+		LEFT JOIN platform_merchant_category e ON e.`id` = a.`category_id`
+		WHERE a.`customer_id` = #{customerId}
+		LIMIT 1
+	</select>
+	
+	<select id="findMerchantById" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List"></include>
+		,b.name AS provinceName
+		,c.name AS cityName
+		,d.name as areaName
+		,e.name AS categoryName
+		FROM merchant a
+		LEFT JOIN sys_area b ON a.`province_id` = b.`id`
+		LEFT JOIN sys_area c ON a.`city_id` = c.`id`
+		LEFT JOIN sys_area d ON a.`area_id` = d.`id`
+		LEFT JOIN platform_merchant_category e ON e.`id` = a.`category_id`
+		WHERE a.`id` = #{id}
+	</select>
+	
+	<select id="findMerchantByName" resultType="boolean">
+		SELECT COUNT(1) > 0
+		FROM merchant a
+		WHERE a.`name` = #{name}
+	</select>
+
+	<select id="findMerchantByMobile" resultType="boolean">
+		SELECT COUNT(1) > 0
+		FROM merchant a
+		WHERE a.`mobile` = #{mobile}
+	</select>
+
+	<!-- 插入merchant 空的字段也不插入 方便多处调用 -->
+	<insert id="insertMerchant" parameterType="com.vic.ck.entity.Merchant" useGeneratedKeys="true" keyProperty="id">
+		insert into merchant
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="customerId != null">
+				customer_id,
+			</if>
+			<if test="qrcode != null">
+				qrcode,
+			</if>
+			<if test="recommendId != null">
+				recommend_id,
+			</if>
+			<if test="name != null">
+				name,
+			</if>
+			<if test="provinceId != null">
+				province_id,
+			</if>
+			<if test="cityId != null">
+				city_id,
+			</if>
+			<if test="areaId != null">
+				area_id,
+			</if>
+			<if test="address != null">
+				address,
+			</if>
+			<if test="landmarks != null">
+				landmarks,
+			</if>
+			<if test="longitude != null">
+				longitude,
+			</if>
+			<if test="latitude != null">
+				latitude,
+			</if>
+			<if test="type != null">
+				type,
+			</if>
+			<if test="categoryId != null">
+				category_id,
+			</if>
+			<if test="mobile != null">
+				mobile,
+			</if>
+			<if test="outPic != null">
+				out_pic,
+			</if>
+			<if test="inPic != null">
+				in_pic,
+			</if>
+			<if test="licensePic != null">
+				license_pic,
+			</if>
+			<if test="licensePersistent != null">
+				license_persistent,
+			</if>
+			<if test="licenseDate != null">
+				license_date,
+			</if>
+			<if test="licenseName != null">
+				license_name,
+			</if>
+			<if test="licenseRegcode != null">
+				license_regcode,
+			</if>
+			<if test="permitPic != null">
+				permit_pic,
+			</if>
+			<if test="permitPersistent != null">
+				permit_persistent,
+			</if>
+			<if test="permitDate != null">
+				permit_date,
+			</if>
+			<if test="otherProvePic != null">
+				other_prove_pic,
+			</if>
+			<if test="accountName != null">
+				account_name,
+			</if>
+			<if test="bankAccount != null">
+				bank_account,
+			</if>
+			<if test="bankName != null">
+				bank_name,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="facility != null">
+				facility,
+			</if>
+			<if test="businessHours != null">
+				`business_hours`,
+			</if>
+			<if test="businessDay != null">
+				`business_day`,
+			</if>
+			<if test="price != null">
+				price,
+			</if>
+			<if test="serviceStar != null">
+				service_star,
+			</if>
+			<if test="environmentStar != null">
+				environment_star,
+			</if>
+			<if test="flavorStar != null">
+				flavor_star,
+			</if>
+			<if test="star != null">
+				star,
+			</if>
+			<if test="viewNum != null">
+				view_num,
+			</if>
+			<if test="commentNum != null">
+				comment_num,
+			</if>
+			<if test="sellNum != null">
+				sell_num,
+			</if>
+			<if test="currentActivity != null">
+				current_activity,
+			</if>
+			<if test="hotelInTime != null">
+				hotel_in_time,
+			</if>
+			<if test="hotelOutTime != null">
+				hotel_out_time,
+			</if>
+			<if test="hotelCanAddBed != null">
+				hotel_can_add_bed,
+			</if>
+			<if test="hotelAddBedPrice != null">
+				hotel_add_bed_price,
+			</if>
+			<if test="hotelForeigned != null">
+				hotel_foreigned,
+			</if>
+			<if test="hotelPeted != null">
+				hotel_peted,
+			</if>
+			<if test="hotelPledge != null">
+				hotel_pledge,
+			</if>
+			<if test="hotelLevel != null">
+				hotel_level,
+			</if>
+			<if test="wellChosened != null">
+				well_chosened,
+			</if>
+			<if test="wellChosenSort != null">
+				well_chosen_sort,
+			</if>
+			<if test="describe != null">
+				`describe`,
+			</if>
+			<if test="contactName != null">
+				contact_name,
+			</if>
+			<if test="firstCategoryId != null">
+				first_category_id,
+			</if>
+			<if test="twoCategoryId != null">
+				two_category_id,
+			</if>
+			<if test="threeCategoryId != null">
+				three_category_id,
+			</if>
+			<if test="shopTrademark != null">
+				shop_trademark,
+			</if>
+			<if test="shopAddress != null">
+				shop_address,
+			</if>
+			<if test="licenseRepresentative != null">
+				license_representative,
+			</if>
+			<if test="licensePlace != null">
+				license_place,
+			</if>
+			<if test="licenseRegistrationTime != null">
+				license_registration_time,
+			</if>
+			<if test="licenseRegistrationAuthority != null">
+				license_registration_authority,
+			</if>
+			<if test="licenseApprovalDate != null">
+				license_approval_date,
+			</if>
+			<if test="licenseScope != null">
+				license_scope,
+			</if>
+			<if test="licenseCapital != null">
+				license_capital,
+			</if>
+			<if test="identityPositive != null">
+				identity_positive,
+			</if>
+			<if test="identityBack != null">
+				identity_back,
+			</if>
+			<if test="realName != null">
+				real_name,
+			</if>
+			<if test="idCard != null">
+				id_card,
+			</if>
+			<if test="nation != null">
+				nation,
+			</if>
+			<if test="dateBirth != null">
+				date_birth,
+			</if>
+			<if test="identityAddress != null">
+				identity_address,
+			</if>
+			<if test="identityAuthority != null">
+				identity_authority,
+			</if>
+			<if test="identityValidity != null">
+				identity_validity,
+			</if>
+			<if test="permitName != null">
+				permit_name,
+			</if>
+			<if test="permitRepresentative != null">
+				permit_representative,
+			</if>
+			<if test="permitNumber != null">
+				permit_number,
+			</if>
+			<if test="permitAddress != null">
+				permit_address,
+			</if>
+			<if test="permitValidityPeriod != null">
+				permit_validity_period,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="customerId != null">
+				#{customerId,jdbcType=INTEGER},
+			</if>
+			<if test="qrcode != null">
+				#{qrcode,jdbcType=INTEGER},
+			</if>
+			<if test="recommendId != null">
+				#{recommendId,jdbcType=INTEGER},
+			</if>
+			<if test="name != null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="provinceId != null">
+				#{provinceId,jdbcType=INTEGER},
+			</if>
+			<if test="cityId != null">
+				#{cityId,jdbcType=INTEGER},
+			</if>
+			<if test="areaId != null">
+				#{areaId,jdbcType=INTEGER},
+			</if>
+			<if test="address != null">
+				#{address,jdbcType=VARCHAR},
+			</if>
+			<if test="landmarks != null">
+				#{landmarks,jdbcType=VARCHAR},
+			</if>
+			<if test="longitude != null">
+				#{longitude,jdbcType=DECIMAL},
+			</if>
+			<if test="latitude != null">
+				#{latitude,jdbcType=DECIMAL},
+			</if>
+			<if test="type != null">
+				#{type,jdbcType=TINYINT},
+			</if>
+			<if test="categoryId != null">
+				#{categoryId,jdbcType=INTEGER},
+			</if>
+			<if test="mobile != null">
+				#{mobile,jdbcType=CHAR},
+			</if>
+			<if test="outPic != null">
+				#{outPic,jdbcType=INTEGER},
+			</if>
+			<if test="inPic != null">
+				#{inPic,jdbcType=VARCHAR},
+			</if>
+			<if test="licensePic != null">
+				#{licensePic,jdbcType=INTEGER},
+			</if>
+			<if test="licensePersistent != null">
+				#{licensePersistent,jdbcType=TINYINT},
+			</if>
+			<if test="licenseDate != null">
+				#{licenseDate,jdbcType=VARCHAR},
+			</if>
+			<if test="licenseName != null">
+				#{licenseName,jdbcType=VARCHAR},
+			</if>
+			<if test="licenseRegcode != null">
+				#{licenseRegcode,jdbcType=VARCHAR},
+			</if>
+			<if test="permitPic != null">
+				#{permitPic,jdbcType=INTEGER},
+			</if>
+			<if test="permitPersistent != null">
+				#{permitPersistent,jdbcType=TINYINT},
+			</if>
+			<if test="permitDate != null">
+				#{permitDate,jdbcType=VARCHAR},
+			</if>
+			<if test="otherProvePic != null">
+				#{otherProvePic,jdbcType=VARCHAR},
+			</if>
+			<if test="accountName != null">
+				#{accountName,jdbcType=VARCHAR},
+			</if>
+			<if test="bankAccount != null">
+				#{bankAccount,jdbcType=VARCHAR},
+			</if>
+			<if test="bankName != null">
+				#{bankName,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=TINYINT},
+			</if>
+			<if test="facility != null">
+				#{facility,jdbcType=VARCHAR},
+			</if>
+			<if test="businessHours != null">
+				#{businessHours,jdbcType=VARCHAR},
+			</if>
+			<if test="businessDay != null">
+				#{businessDay,jdbcType=VARCHAR},
+			</if>
+			<if test="price != null">
+				#{price,jdbcType=DOUBLE},
+			</if>
+			<if test="serviceStar != null">
+				#{serviceStar,jdbcType=DOUBLE},
+			</if>
+			<if test="environmentStar != null">
+				#{environmentStar,jdbcType=DOUBLE},
+			</if>
+			<if test="flavorStar != null">
+				#{flavorStar,jdbcType=DOUBLE},
+			</if>
+			<if test="star != null">
+				#{star,jdbcType=DOUBLE},
+			</if>
+			<if test="viewNum != null">
+				#{viewNum,jdbcType=INTEGER},
+			</if>
+			<if test="commentNum != null">
+				#{commentNum,jdbcType=INTEGER},
+			</if>
+			<if test="sellNum != null">
+				#{sellNum,jdbcType=INTEGER},
+			</if>
+			<if test="currentActivity != null">
+				#{currentActivity,jdbcType=VARCHAR},
+			</if>
+			<if test="hotelInTime != null">
+				#{hotelInTime,jdbcType=TIME},
+			</if>
+			<if test="hotelOutTime != null">
+				#{hotelOutTime,jdbcType=TIME},
+			</if>
+			<if test="hotelCanAddBed != null">
+				#{hotelCanAddBed,jdbcType=TINYINT},
+			</if>
+			<if test="hotelAddBedPrice != null">
+				#{hotelAddBedPrice,jdbcType=DECIMAL},
+			</if>
+			<if test="hotelForeigned != null">
+				#{hotelForeigned,jdbcType=TINYINT},
+			</if>
+			<if test="hotelPeted != null">
+				#{hotelPeted,jdbcType=TINYINT},
+			</if>
+			<if test="hotelPledge != null">
+				#{hotelPledge,jdbcType=TINYINT},
+			</if>
+			<if test="hotelLevel != null">
+				#{hotelLevel,jdbcType=TINYINT},
+			</if>
+			<if test="wellChosened != null">
+				#{wellChosened,jdbcType=TINYINT},
+			</if>
+			<if test="wellChosenSort != null">
+				#{wellChosenSort,jdbcType=INTEGER},
+			</if>
+			<if test="describe != null">
+				#{describe,jdbcType=LONGVARCHAR},
+			</if>
+			<if test="contactName != null">
+				#{contactName,jdbcType=VARCHAR},
+			</if>
+			<if test="firstCategoryId != null">
+				#{firstCategoryId,jdbcType=INTEGER},
+			</if>
+			<if test="twoCategoryId != null">
+				#{twoCategoryId,jdbcType=INTEGER},
+			</if>
+			<if test="threeCategoryId != null">
+				#{threeCategoryId,jdbcType=INTEGER},
+			</if>
+			<if test="shopTrademark != null">
+				#{shopTrademark,jdbcType=VARCHAR},
+			</if>
+			<if test="shopAddress != null">
+				#{shopAddress,jdbcType=VARCHAR},
+			</if>
+			<if test="licenseRepresentative != null">
+				#{licenseRepresentative,jdbcType=VARCHAR},
+			</if>
+			<if test="licensePlace != null">
+				#{licensePlace,jdbcType=VARCHAR},
+			</if>
+			<if test="licenseRegistrationTime != null">
+				#{licenseRegistrationTime,jdbcType=VARCHAR},
+			</if>
+			<if test="licenseRegistrationAuthority != null">
+				#{licenseRegistrationAuthority,jdbcType=VARCHAR},
+			</if>
+			<if test="licenseApprovalDate != null">
+				#{licenseApprovalDate,jdbcType=VARCHAR},
+			</if>
+			<if test="licenseScope != null">
+				#{licenseScope,jdbcType=VARCHAR},
+			</if>
+			<if test="licenseCapital != null">
+				#{licenseCapital,jdbcType=VARCHAR},
+			</if>
+			<if test="identityPositive != null">
+				#{identityPositive,jdbcType=VARCHAR},
+			</if>
+			<if test="identityBack != null">
+				#{identityBack,jdbcType=VARCHAR},
+			</if>
+			<if test="realName != null">
+				#{realName,jdbcType=VARCHAR},
+			</if>
+			<if test="idCard != null">
+				#{idCard,jdbcType=VARCHAR},
+			</if>
+			<if test="nation != null">
+				#{nation,jdbcType=VARCHAR},
+			</if>
+			<if test="dateBirth != null">
+				#{dateBirth,jdbcType=VARCHAR},
+			</if>
+			<if test="identityAddress != null">
+				#{identityAddress,jdbcType=VARCHAR},
+			</if>
+			<if test="identityAuthority != null">
+				#{identityAuthority,jdbcType=VARCHAR},
+			</if>
+			<if test="identityValidity != null">
+				#{identityValidity,jdbcType=VARCHAR},
+			</if>
+			<if test="permitName != null">
+				#{permitName,jdbcType=VARCHAR},
+			</if>
+			<if test="permitRepresentative != null">
+				#{permitRepresentative,jdbcType=VARCHAR},
+			</if>
+			<if test="permitNumber != null">
+				#{permitNumber,jdbcType=VARCHAR},
+			</if>
+			<if test="permitAddress != null">
+				#{permitAddress,jdbcType=VARCHAR},
+			</if>
+			<if test="permitValidityPeriod != null">
+				#{permitValidityPeriod,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<!-- 修改merchant 空字段不修改 因为前段会不传一些数据来 -->
+	<update id="updateMerchant" parameterType="com.vic.ck.entity.Merchant">
+		update merchant
+		<set>
+			<if test="customerId != null" >
+				customer_id = #{customerId,jdbcType=INTEGER},
+			</if>
+			<if test="qrcode != null">
+				qrcode = #{qrcode,jdbcType=INTEGER},
+			</if>
+			<if test="recommendId != null">
+				recommend_id = #{recommendId,jdbcType=INTEGER},
+			</if>
+			<if test="name != null">
+				name = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="provinceId != null">
+				province_id = #{provinceId,jdbcType=INTEGER},
+			</if>
+			<if test="cityId != null">
+				city_id = #{cityId,jdbcType=INTEGER},
+			</if>
+			<if test="areaId != null">
+				area_id = #{areaId,jdbcType=INTEGER},
+			</if>
+			<if test="address != null">
+				address = #{address,jdbcType=VARCHAR},
+			</if>
+			<if test="landmarks != null">
+				landmarks = #{landmarks,jdbcType=VARCHAR},
+			</if>
+			<if test="longitude != null">
+				longitude = #{longitude,jdbcType=DECIMAL},
+			</if>
+			<if test="latitude != null">
+				latitude = #{latitude,jdbcType=DECIMAL},
+			</if>
+			<if test="type != null">
+				type = #{type,jdbcType=TINYINT},
+			</if>
+			<if test="categoryId != null">
+				category_id = #{categoryId,jdbcType=INTEGER},
+			</if>
+			<if test="mobile != null">
+				mobile = #{mobile,jdbcType=CHAR},
+			</if>
+			<if test="outPic != null">
+				out_pic = #{outPic,jdbcType=INTEGER},
+			</if>
+			<if test="inPic != null">
+				in_pic = #{inPic,jdbcType=VARCHAR},
+			</if>
+			<if test="licensePic != null">
+				license_pic = #{licensePic,jdbcType=INTEGER},
+			</if>
+			<if test="licensePersistent != null">
+				license_persistent =#{licensePersistent,jdbcType=TINYINT},
+			</if>
+			<if test="licenseDate != null">
+				license_date = #{licenseDate,jdbcType=VARCHAR},
+			</if>
+			<if test="licenseName != null">
+				license_name = #{licenseName,jdbcType=VARCHAR},
+			</if>
+			<if test="licenseRegcode != null">
+				license_regcode = #{licenseRegcode,jdbcType=VARCHAR},
+			</if>
+			<if test="permitPic != null">
+				permit_pic = #{permitPic,jdbcType=INTEGER},
+			</if>
+			<if test="permitPersistent != null">
+				permit_persistent = #{permitPersistent,jdbcType=TINYINT},
+			</if>
+			<if test="permitDate != null">
+				permit_date = #{permitDate,jdbcType=VARCHAR},
+			</if>
+			<if test="otherProvePic != null">
+				other_prove_pic = #{otherProvePic,jdbcType=VARCHAR},
+			</if>
+			<if test="accountName != null">
+				account_name = #{accountName,jdbcType=VARCHAR},
+			</if>
+			<if test="bankAccount != null">
+				bank_account = #{bankAccount,jdbcType=VARCHAR},
+			</if>
+			<if test="bankName != null">
+				bank_name = #{bankName,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=TINYINT},
+			</if>
+			<if test="facility != null">
+				facility = #{facility,jdbcType=VARCHAR},
+			</if>
+			<if test="businessHours != null">
+				business_hours = #{businessHours,jdbcType=VARCHAR},
+			</if>
+			<if test="businessDay != null">
+				business_day = #{businessDay,jdbcType=VARCHAR},
+			</if>
+			<if test="price != null">
+				price = #{price,jdbcType=DOUBLE},
+			</if>
+			<if test="serviceStar != null">
+				service_star = #{serviceStar,jdbcType=DOUBLE},
+			</if>
+			<if test="environmentStar != null">
+				environment_star = #{environmentStar,jdbcType=DOUBLE},
+			</if>
+			<if test="flavorStar != null">
+				flavor_star = #{flavorStar,jdbcType=DOUBLE},
+			</if>
+			<if test="star != null">
+				star = #{star,jdbcType=DOUBLE},
+			</if>
+			<if test="viewNum != null">
+				view_num = #{viewNum,jdbcType=INTEGER},
+			</if>
+			<if test="commentNum != null">
+				comment_num = #{commentNum,jdbcType=INTEGER},
+			</if>
+			<if test="sellNum != null">
+				sell_num = #{sellNum,jdbcType=INTEGER},
+			</if>
+			<if test="currentActivity != null">
+				current_activity = #{currentActivity,jdbcType=VARCHAR},
+			</if>
+			<if test="hotelInTime != null">
+				hotel_in_time = #{hotelInTime,jdbcType=TIME},
+			</if>
+			<if test="hotelOutTime != null">
+				hotel_out_time = #{hotelOutTime,jdbcType=TIME},
+			</if>
+			<if test="hotelCanAddBed != null">
+				hotel_can_add_bed = #{hotelCanAddBed,jdbcType=TINYINT},
+			</if>
+			<if test="hotelAddBedPrice != null">
+				hotel_add_bed_price =
+				#{hotelAddBedPrice,jdbcType=DECIMAL},
+			</if>
+			<if test="hotelForeigned != null">
+				hotel_foreigned = #{hotelForeigned,jdbcType=TINYINT},
+			</if>
+			<if test="hotelPeted != null">
+				hotel_peted = #{hotelPeted,jdbcType=TINYINT},
+			</if>
+			<if test="hotelPledge != null">
+				hotel_pledge = #{hotelPledge,jdbcType=TINYINT},
+			</if>
+			<if test="hotelLevel != null">
+				hotel_level = #{hotelLevel,jdbcType=TINYINT},
+			</if>
+			<if test="wellChosened != null">
+				well_chosened = #{wellChosened,jdbcType=TINYINT},
+			</if>
+			<if test="wellChosenSort != null">
+				well_chosen_sort = #{wellChosenSort,jdbcType=INTEGER},
+			</if>
+			<if test="describe != null">
+				`describe` = #{describe,jdbcType=LONGVARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 新增用戶实名认证 -->
+	<insert id="insertMerchantAuthentication" parameterType="com.vic.ck.entity.MerchantAuthentication" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO  merchant_authentication(merchant_id, id_number, read_name, gender, nation,birthday, house_address, expiry_date)
+		VALUES(#{merchantId}, #{idNumber},#{readName},#{gender},#{birthday},#{nation},#{houseAddress},#{expiryDate})  ON DUPLICATE KEY UPDATE 
+		id_number = VALUES(id_number), read_name=VALUES(read_name), gender=VALUES(gender), birthday=VALUES(birthday), house_address=VALUES(house_address), expiry_date=VALUES(expiry_date)
+	</insert>
+	
+	<!-- 商家交通信息列表 -->
+	<select id="traffics" resultType="com.vic.ck.entity.MerchantTraffic">
+		SELECT a.`id`, a.`merchant_id` AS merchantId, a.`start_point` AS `startPoint`, a.`tool`, a.`distance`, a.`times`
+		FROM merchant_traffic a
+		WHERE a.`merchant_id` = #{merchantId}
+		ORDER BY a.`create_time` DESC
+	</select>
+	
+	<!-- 新增商家交通 -->
+	<insert id="insertTraffic" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO merchant_traffic(merchant_id, start_point, tool, times, distance) VALUES(
+			#{merchantId}, #{startPoint}, #{tool}, #{times}, #{distance}
+		)
+	</insert>
+	
+	<!-- 删除商家交通 -->
+	<delete id="deleteTraffic">
+		DELETE FROM merchant_traffic WHERE id = #{id}
+	</delete>
+
+	<!--热门商家查询（精选）  -->
+	<select id="rmssList" resultType="com.vic.ck.entity.Merchant">
+		 SELECT 
+		<include refid="Base_Column_List"></include>
+		 FROM merchant a  
+		 WHERE a.well_chosened = "1"
+		 
+	</select>
+
+    <!--附近商家  （全部商家查询）
+    时间：2019-4-10 17:12:57
+    修改：返回改为 resultMap
+    -->
+    <select id="fjsjList" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List"></include>
+        FROM merchant a
+		WHERE longitude BETWEEN #{minjd} AND #{maxjd} 
+		and  latitude BETWEEN #{minwd} AND #{maxwd} 
+		  
+	</select>
+
+</mapper>

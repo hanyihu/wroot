@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.console.system.role.mapper.RoleMapper">
+
+	<select id="listRole" resultType="com.vic.ck.console.entity.Role">
+	    select *  from sys_role 
+	    WHERE 1=1 
+	    <if test="name !=null and name !=''">
+	       AND name like concat('%', #{name} ,'%')
+	        
+	    </if>
+	</select>
+	
+	<select id="checkName" resultType="boolean">
+		SELECT COUNT(1)=0 FROM sys_role WHERE name = #{name}
+		<if test="id !=null">
+			AND id != #{id}
+		</if>
+	</select>
+	
+	<select id="checkRole" resultType="int">
+		SELECT COUNT(*) FROM sys_user_role_rel WHERE role_id in 
+	     <foreach collection="ids" item="item" open="(" close=")" separator=",">
+	        #{item}
+	    </foreach>
+	</select>
+	
+	<select id="getRole" resultType="com.vic.ck.console.entity.Role">
+	    select *  from sys_role where id = #{id}
+	</select>
+	
+	<update id="update">
+	    update sys_role set name=#{name} where id = #{id}
+	</update>
+	
+	<insert id="add" useGeneratedKeys="true"  keyProperty="id">
+	 	insert into sys_role (name) values(#{name})  
+	</insert>
+	
+	<!-- 删除角色 -->
+	<delete id="delete">
+	    delete from sys_role where id in
+	    <foreach collection="ids" item="item" open="(" close=")" separator=",">
+	        #{item}
+	    </foreach>
+	</delete>
+	
+	<!-- 新增角色和菜单关系 -->
+	<insert id="addRoleMenu" useGeneratedKeys="true"  >
+	    INSERT INTO sys_role_menu (role_id, menu_id) VALUES
+		<foreach collection="ids" item="item" index="index"
+			separator=",">
+			(#{roleId}, #{item})
+		</foreach>
+	</insert>
+	
+	<!-- 删除角色和菜单关系 -->
+	<delete id="deleteRoleMenu">
+	     DELETE FROM sys_role_menu WHERE role_id = #{roleId} AND menu_id in
+	    <foreach collection="ids" item="item" open="(" close=")" separator=",">
+	        #{item}
+	    </foreach>
+	</delete>
+	
+	<delete id="deleteRoleMenuByRoleId">
+	     DELETE FROM sys_role_menu WHERE role_id = #{roleId}
+	</delete>
+	
+	<!-- 新增角色和菜单按钮关系 -->
+	<insert id="addRoleMenuBtn" useGeneratedKeys="true" >
+	    INSERT INTO sys_role_menu_btn_rel (role_id, menu_btn_id) VALUES
+		<foreach collection="ids" item="item" index="index"
+			separator=",">
+			(#{roleId}, #{item})
+		</foreach>
+	</insert>
+	
+	<!-- 删除角色和菜单按钮关系 -->
+	<delete id="deleteRoleMenuBtn">
+	     DELETE FROM sys_role_menu_btn_rel WHERE role_id = #{roleId} AND menu_btn_id in
+	    <foreach collection="ids" item="item" open="(" close=")" separator=",">
+	        #{item}
+	    </foreach>
+	</delete>
+	
+	<delete id="deleteRoleMenuBtnByRoleId">
+		DELETE FROM sys_role_menu_btn_rel WHERE role_id = #{roleId}
+	</delete>
+	
+	<insert id="addUserRole" useGeneratedKeys="true" >
+	    INSERT INTO sys_user_role_rel (user_id, role_id) VALUES
+		<foreach collection="ids" item="item" index="index"
+			separator=",">
+			(#{userId}, #{item})
+		</foreach>
+	</insert>
+	
+	<delete id="deleteUserRole">
+	     DELETE FROM sys_user_role_rel WHERE user_id = #{userId} AND role_id in
+	    <foreach collection="ids" item="item" open="(" close=")" separator=",">
+	        #{item}
+	    </foreach>	
+	</delete>
+	
+	<select id="getUserRoles" resultType="integer">
+	    SELECT a.`role_id`  FROM sys_user_role_rel a WHERE  a.`user_id` = #{userId}
+	</select>
+	
+	<select id="findUserRole" resultType="com.vic.ck.console.entity.Role">
+	    SELECT DISTINCT a.`id`, a.`name`, b.`id` IS NOT NULL AS checked 
+		FROM sys_role a LEFT JOIN sys_user_role_rel b ON a.`id` = b.`role_id` AND b.`user_id` = #{userId}
+		WHERE 1=1 
+	</select>
+	
+</mapper>

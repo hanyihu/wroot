@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.platform.mapper.PlatformBannerMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`image` AS image ,
+		a.`type` AS TYPE ,
+		a.`url_type` AS urlType ,
+		a.`target` AS target ,
+		a.`city_id` AS cityId ,
+		a.`enabled` AS enabled ,
+		a.`sort` AS sort ,
+		a.`title` AS title,
+		IFNULL(b.`name`,'全国') AS cityName,
+		CASE a.`url_type` WHEN 1 THEN a.target WHEN 2 THEN c.name END AS targetDesc
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.PlatformBanner">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_banner a
+		LEFT JOIN  sys_area b ON a.`city_id` = b.`id`
+		LEFT JOIN merchant c ON a.`url_type` = 2 AND a.`target` = c.`id`
+		WHERE 1=1
+		<if test="enabled != null">
+			AND a.enabled = #{enabled}
+		</if>
+		<if test="type != null">
+			AND a.type = #{type}
+		</if>
+		<if test="urlType != null">
+			AND a.url_type = #{urlType}
+		</if>
+		<if test="cityId != null">
+			AND a.city_id = #{cityId}
+		</if>
+		ORDER BY a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.PlatformBanner">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_banner a
+		LEFT JOIN  sys_area b ON a.`city_id` = b.`id`
+		LEFT JOIN merchant c ON a.`type` = 2 AND a.`target` = b.`id`
+		WHERE a.id = #{id}
+	</select>
+	
+	<!--批量查询对象 -->
+	<select id="findByIds" resultType="com.vic.ck.entity.PlatformBanner">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_banner a
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into platform_banner
+		
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="image !=null and image !='' ">`image`, </if>
+			<if test="type !=null and type !='' ">`type`, </if>
+			<if test="urlType !=null and urlType !='' ">`url_type`, </if>
+			<if test="target !=null and target !='' ">`target`, </if>
+			<if test="cityId !=null and cityId !='' ">`city_id`, </if>
+			<if test="enabled !=null and enabled !='' ">`enabled`, </if>
+			<if test="sort !=null and sort !='' ">`sort`, </if>
+			<if test="title !=null and title !='' ">`title`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="image !=null and image !='' ">#{image}, </if>
+			<if test="type !=null and type !='' ">#{type}, </if>
+			<if test="urlType !=null and urlType !='' ">#{urlType}, </if>
+			<if test="target !=null and target !='' ">#{target}, </if>
+			<if test="cityId !=null and cityId !='' ">#{cityId}, </if>
+			<if test="enabled !=null and enabled !='' ">#{enabled}, </if>
+			<if test="sort !=null and sort !='' ">#{sort}, </if>
+			<if test="title !=null and title !='' ">#{title}</if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.PlatformBanner">
+		update platform_banner
+		<set>
+			<if test="image != null">`image` = #{image}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="urlType != null">`url_type` = #{urlType}, </if>
+			<if test="target != null">`target` = #{target}, </if>
+			<if test="cityId != null">`city_id` = #{cityId}, </if>
+			<if test="enabled != null">`enabled` = #{enabled}, </if>
+			<if test="sort != null">`sort` = #{sort}, </if>
+			<if test="title != null">`title` = #{title}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from platform_banner where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

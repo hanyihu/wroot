@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.console.config.mapper.AppConfigMapper">
+    <!-- 查询所有基础配置的数据 -->
+    <select id="list" resultType="com.vic.ck.entity.BasicConfig">
+        SELECT
+          a.id as id,
+          a.app_name as app_name,
+          a.app_appid as app_appid,
+          a.app_appsecret as app_appsecret
+        FROM
+          basic_config a
+        where
+          type = 'app'
+        <if test="app_name != null and app_name != ''">
+            and a.app_name like CONCAT(CONCAT('%',#{app_name}),'%')
+        </if>
+        ORDER BY a.id DESC
+    </select>
+
+    <!-- 根据id获取基础配置的详细信息 -->
+    <select id="findById" resultType="com.vic.ck.entity.BasicConfig">
+        SELECT
+          a.id as id,
+          a.app_name as app_name,
+          a.app_appid as app_appid,
+          a.app_appsecret as app_appsecret
+        FROM
+          basic_config a
+        WHERE
+          a.id=#{id}
+    </select>
+
+    <!-- 新增小程序管理 -->
+    <insert id="insert">
+        insert into basic_config(
+          type,app_name,app_appid,app_appsecret
+        ) values (
+          'app',#{app_name},#{app_appid},#{app_appsecret}
+        );
+    </insert>
+
+    <!-- 修改小程序管理 -->
+    <update id="update" parameterType="com.vic.ck.entity.BasicConfig">
+        update basic_config set
+        app_name=#{app_name},
+        app_appid=#{app_appid},
+        app_appsecret=#{app_appsecret}
+        where id=#{id};
+    </update>
+
+    <!--删除公告数据 -->
+    <delete id="delete">
+        delete from basic_config where id in
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,10 @@
+/target/
+/bin/  
+.classpath
+.project
+.settings
+/.settings/ 
+*.class      
+
+/ckapp-log/
+/payback.log

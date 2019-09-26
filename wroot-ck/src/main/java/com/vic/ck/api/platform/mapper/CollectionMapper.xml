@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.api.platform.mapper.CollectionMapper">
+
+	<!-- 我收藏的商家和团购 -->
+	<select id="collections" resultType="com.vic.ck.entity.CustomerCollection">
+		SELECT a.`id`, a.`customer_id` AS customerId, a.`type`, a.`target_id` AS targetId,
+		CASE a.`type` WHEN 1 THEN b.`out_pic`  WHEN 2 THEN c.`icon` ELSE 0 END AS image,
+		CASE a.`type` WHEN 1 THEN b.`name`  WHEN 2 THEN c.`name` ELSE '' END AS NAME,
+		CASE a.`type` WHEN 1 THEN b.`price`  WHEN 2 THEN c.`price` ELSE 0 END AS price,
+		CASE a.`type` WHEN 1 THEN b.`sell_num`  WHEN 2 THEN c.`sell_num` ELSE 0 END AS sellNum,
+		d.`name` AS categoryName,  e.`name` AS areaName, z.distance, b.`current_activity` AS activity, 
+		
+		b.`star`,  b.`hotel_level` AS hotelLevel, c.`merchant_id` AS merchantId,	
+		b.nice_comment_num AS niceCommentNum,  b.type AS merchantType
+		FROM customer_collection a
+		LEFT JOIN merchant b ON a.`target_id` = b.`id` AND a.`type`=1
+		LEFT JOIN merchant_groupbuy c ON a.`target_id` = c.`id` AND a.`type`= 2
+		
+		LEFT JOIN platform_merchant_category d ON b.`category_id` = d.`id`
+		LEFT JOIN sys_area e ON b.`area_id` = e.`id` 
+		LEFT JOIN (SELECT z.id,  ROUND(6378.138*2*ASIN(SQRT(POW(SIN((#{latitude}*PI()/180-z.`latitude`*PI()/180)/2),2)+COS(#{latitude}*PI()/180)*COS(z.`latitude`*PI()/180)*POW(SIN((#{longitude}*PI()/180-z.`longitude`*PI()/180)/2),2)))*1000) AS distance 
+		FROM merchant z ) z ON b.`id` = z.id
+		
+		WHERE a.`customer_id` = #{userId} AND a.`type`= #{type}
+		ORDER BY a.`create_time` DESC 
+	</select>
+	
+	
+	<!-- 删除我的收藏 -->
+	<delete id="deleteCollection">
+		DELETE FROM customer_collection WHERE id = #{id}
+	</delete>
+	
+	<!-- 根据条件删除收藏 -->
+	<delete id="deleteCollectionByCondition">
+		DELETE FROM customer_collection WHERE customer_id = #{customerId} AND target_id = #{targetId} AND type = #{type}
+	</delete>
+	
+	<!-- 新增我的收藏 -->
+	<insert id="addCollection" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO customer_collection(customer_id, `type`,target_id, create_time) VALUES( #{customerId}, #{type}, #{targetId}, NOW())
+	</insert>
+	
+	<!-- 是否已经收藏 -->
+	<select id="isCollected" resultType="boolean">
+		SELECT COUNT(1)>0
+		FROM  customer_collection a 
+		WHERE  a.`customer_id` = #{customerId} 
+		AND a.`target_id` = #{targetId} AND a.`type` = #{type}
+	</select>
+	
+</mapper>

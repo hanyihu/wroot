@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SERVLET 3.0 -->
+<!-- 加载顺序ServletContext——》listener——》filter——SERVLET -->
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+	<!--激活TOMCAT的defaultServlet来拦截静态资源的请求 -->
+	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>/html/*</url-pattern>
+		<url-pattern>/static/*</url-pattern>
+		<url-pattern>/files/*</url-pattern>
+		<url-pattern>*.js</url-pattern>
+		<url-pattern>*.css</url-pattern>
+	</servlet-mapping>
+	
+	
+	 <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:spring-*.xml</param-value>
+    </context-param>
+	
+	<listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    
+     <listener>
+    	<listener-class>com.vic.wroot.common.handler.listener.DriverListener</listener-class>
+    </listener>
+    
+	
+	<!-- SpringMVC核心分发器 start-->
+    <servlet>
+        <servlet-name>dispatcherServlet</servlet-name>
+        <servlet-class>
+            org.springframework.web.servlet.DispatcherServlet
+        </servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:spring-*.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dispatcherServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+    <!-- SpringMVC核心分发器 end-->
+    
+    <!-- encoding start-->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!-- encoding end-->
+    
+    <!-- session -->
+    <session-config>
+        <session-timeout>20</session-timeout>
+    </session-config>
+    
+    
+    <welcome-file-list>
+    	<welcome-file>index.jsp</welcome-file>
+  	</welcome-file-list>
+    
+    <error-page>
+       <error-code>404</error-code>
+       <location>/page/jsp/404.jsp</location>
+   </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/page/jsp/500.jsp</location>
+    </error-page>
+   <!--  <error-page>
+        <error-code>401</error-code>
+        <location>/page/jsp/login.jsp</location>
+    </error-page> -->
+    
+</web-app>

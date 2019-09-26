@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.platform.mapper.BackstageCommodityManageMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.module AS module,
+		a.`name` AS name ,
+		a.`type` AS type ,
+		a.`icon` AS icon ,
+		a.`price` AS price ,
+		a.`sell_num` AS sell_num ,
+		a.`category_id` AS category_id ,
+		a.`coupon_start_date` AS coupon_start_date ,
+		a.`coupon_end_date` AS coupon_end_date ,
+		a.`coupon_amount` AS coupon_amount ,
+		a.`create_time` AS create_time ,
+		a.`today_recommended` AS today_recommended ,
+		a.`module` AS module ,
+		a.`enabled` AS enabled,
+		a.`item_id` AS item_id,
+		a.`commision` AS commision,
+		a.`need_buyed` AS need_buyed,
+		a.`free_ship` AS free_ship,
+		a.`tao_token` AS tao_token,
+		a.`out_icon` AS out_icon,
+		a.`outer_images` AS outer_images,
+		a.`detail_url` AS detail_url,
+		a.`flag` AS flag,
+		a.`handle_status` AS handle_status,
+
+		a.`sub_category_id` AS sub_category_id,
+		a.`module_category_id` AS module_category_id,
+		a.`special_category_id` AS special_category_id,
+		a.examine AS examine,
+		a.spec AS spec,
+		a.company AS company,
+		a.stock AS stock,
+		a.`examineRemarks` AS examineRemarks
+
+	</sql>
+	
+	<sql id="base_detail">
+		a.`id` AS id ,
+		a.module AS module,
+		a.`name` AS name ,
+		a.`type` AS type ,
+		a.`icon` AS icon ,
+		a.`images` AS images ,
+		a.`price` AS price ,
+		a.`discount_price` AS discount_price ,
+		a.`sell_num` AS sell_num ,
+		a.`category_id` AS category_id ,
+		a.`coupon_start_date` AS coupon_start_date ,
+		a.`coupon_end_date` AS coupon_end_date ,
+		a.`coupon_amount` AS coupon_amount ,
+		a.`coupon_url` AS coupon_url ,
+		a.`summary` AS summary ,
+		a.`content` AS content ,
+		a.`create_time` AS create_time ,
+		a.`today_recommended` AS today_recommended ,
+		a.`module` AS module ,
+		a.`brand_seller_id` AS brand_seller_id ,
+		a.`enabled` AS enabled,
+		a.`item_id` AS item_id,
+		a.`commision` AS commision,
+		a.`need_buyed` AS need_buyed,
+		a.`free_ship` AS free_ship,
+		a.`tao_token` AS tao_token,
+		a.`out_icon` AS out_icon,
+		a.`outer_images` AS outer_images,
+		a.`detail_url` AS detail_url,
+		a.`flag` AS flag,
+		a.`handle_status` AS handle_status,
+		a.sub_category_id AS sub_category_id,
+		a.module_category_id AS module_category_id,
+		a.special_category_id AS special_category_id,
+		a.`examine` AS examine,
+		a.`examineRemarks` AS examineRemarks
+
+
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.Commodity">
+		SELECT
+		<include refid="base_list" />
+		, b.`name` AS categoryName
+
+		FROM commodity a
+		LEFT JOIN commodity_category b ON a.`category_id` = b.`id`
+
+
+		WHERE 1=1
+
+		<if test="name != null and name !=''">
+			AND a.name LIKE CONCAT('%', #{name}, '%')	
+		</if>
+		<if test="enabled !=null">
+			AND a.enabled = #{enabled}
+		</if>
+		<if test="categoryId !=null">
+			AND a.category_id = #{categoryId}
+		</if>
+		<if test="examine !=null">
+			AND a.examine = #{examine}
+		</if>
+
+
+		ORDER BY a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.Commodity">
+		SELECT
+		<include refid="base_detail" />
+		FROM commodity a
+		WHERE a.id = #{id}
+	</select>
+
+	<!--批量查询对象 -->
+	<select id="findByIds" resultType="com.vic.ck.entity.Commodity">
+		SELECT
+		<include refid="base_list" />
+		FROM commodity a
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into commodity
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="name !=null and name !='' ">`name`, </if>
+			<if test="type !=null and type !='' ">`type`, </if>
+			<if test="icon !=null and icon !='' ">`icon`, </if>
+			<if test="enabled !=null ">`enabled`, </if>
+			<if test="images !=null and images !='' ">`images`, </if>
+			<if test="price !=null and price !='' ">`price`, </if>
+			<if test="discount_price !=null and discount_price !='' ">`discount_price`, </if>
+			<if test="sell_num!=null and sell_num !='' ">`sell_num`, </if>
+			<if test="virtualSales !=null and virtualSales !='' ">`virtual_sales`, </if>
+			<if test="category_id !=null and category_id !='' ">`category_id`, </if>
+			<if test="sub_category_id !=null and sub_category_id !='' ">`sub_category_id`, </if>
+			<if test="special_category_id !=null and special_category_id !='' ">`special_category_id`, </if>
+			<if test="module_category_id !=null and module_category_id !='' ">`module_category_id`, </if>
+			<if test="coupon_start_date !=null and coupon_start_date !='' ">`coupon_start_date`, </if>
+			<if test="coupon_end_date !=null and coupon_end_date !='' ">`coupon_end_date`, </if>
+			<if test="coupon_amount !=null and coupon_amount !='' ">`coupon_amount`, </if>
+			<if test="coupon_url !=null and coupon_url !='' ">`coupon_url`, </if>
+			<if test="summary !=null and summary !='' ">`summary`, </if>
+			<if test="content !=null and content !='' ">`content`, </if>
+			<if test="create_time !=null and create_time !='' ">`create_time`, </if>
+			<if test="today_recommended !=null and today_recommended !='' ">`today_recommended`, </if>
+			<if test="module !=null and module !='' ">`module`, </if>
+			<if test="brand_seller_id !=null and brand_seller_id !='' ">`brand_seller_id`, </if>
+			<if test="item_id !=null and item_id !='' ">`item_id`, </if>
+			<if test="commision !=null and commision !='' ">`commision`, </if>
+			<if test="free_ship !=null and free_ship !='' ">`free_ship`, </if>
+			<if test="tao_token !=null and tao_token !='' ">`tao_token`, </if>
+			<if test="out_icon !=null and out_icon !='' ">`out_icon`, </if>
+			<if test="outer_images !=null and outer_images !='' ">`outer_images`, </if>
+			<if test="detail_url !=null and detail_url !='' ">`detail_url`, </if>
+			<if test="flag !=null and flag !='' ">`flag`, </if>
+			<if test="handle_status !=null and handle_status !='' ">`handle_status`, </if>
+			<if test="need_buyed !=null and need_buyed !='' ">`need_buyed`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="name !=null and name !='' ">#{name}, </if>
+			<if test="type !=null and type !='' ">#{type}, </if>
+			<if test="icon !=null and icon !='' ">#{icon}, </if>
+			<if test="enabled !=null "> #{enabled}, </if>
+			<if test="images !=null and images !='' ">#{images}, </if>
+			<if test="price !=null and price !='' ">#{price}, </if>
+			<if test="discount_price !=null and discount_price !='' ">#{discount_price}, </if>
+			<if test="sellNum !=null and sellNum !='' ">#{sellNum}, </if>
+			<if test="virtualSales !=null and virtualSales !='' ">#{virtualSales}, </if>
+			<if test="category_id !=null and category_id !='' ">#{category_id}, </if>
+			<if test="sub_category_id !=null and sub_category_id !='' ">#{sub_category_id}, </if>
+			<if test="special_category_id !=null and special_category_id !='' ">#{special_category_id}, </if>
+			<if test="timeId !=null and timeId !='' ">#{timeId}, </if>
+			<if test="module_category_id !=null and module_category_id !='' ">#{module_category_id}, </if>
+			<if test="coupon_start_date !=null and coupon_start_date !='' ">#{coupon_start_date}, </if>
+			<if test="coupon_end_date !=null and coupon_end_date !='' ">#{coupon_end_date}, </if>
+			<if test="coupon_amount !=null and coupon_amount !='' ">#{coupon_amount}, </if>
+			<if test="coupon_url !=null and coupon_url !='' ">#{coupon_url}, </if>
+			<if test="summary !=null and summary !='' ">#{summary}, </if>
+			<if test="content !=null and content !='' ">#{content}, </if>
+			<if test="create_time !=null and create_time !='' ">#{create_time}, </if>
+			<if test="today_recommended !=null and today_recommended !='' ">#{today_recommended}, </if>
+			<if test="module !=null and module !='' ">#{module}, </if>
+			<if test="brand_seller_id !=null and brand_seller_id !='' ">#{brand_seller_id}, </if>
+			<if test="item_id !=null and item_id !='' ">#{item_id}, </if>
+			<if test="commision !=null and commision !='' ">#{commision}, </if>
+			<if test="free_ship !=null and free_ship !='' ">#{free_ship}, </if>
+			<if test="tao_token !=null and tao_token !='' ">#{tao_token},</if>
+			<if test="out_icon !=null and out_icon !='' ">#{out_icon},</if>
+			<if test="outer_images !=null and outer_images !='' ">#{outer_images},</if>
+			<if test="detail_url !=null and detail_url !='' ">#{detail_url},</if>
+			<if test="flag !=null and flag !='' ">#{flag},</if>
+			<if test="handle_status !=null and handle_status !='' ">#{handle_status},</if>
+			<if test="need_buyed !=null and need_buyed !='' ">#{need_buyed}</if>
+		</trim>
+		ON DUPLICATE KEY UPDATE tao_token =VALUES(tao_token),
+		out_icon=VALUES(out_icon),
+		outer_images=VALUES(outer_images),
+		tao_token=VALUES(tao_token),
+		coupon_start_date=VALUES(coupon_start_date),
+		coupon_end_date=VALUES(coupon_end_date),
+		<if test="flag !=null and flag !='' ">content=VALUES(content),</if>
+		<if test="flag !=null and flag !='' ">flag=VALUES(flag),</if>
+		detail_url=VALUES(detail_url)
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.Commodity">
+		update commodity
+		<set>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="icon != null">`icon` = #{icon}, </if>
+			<if test="enabled != null">`enabled` = #{enabled}, </if>
+			<if test="images != null">`images` = #{images}, </if>
+			<if test="price != null">`price` = #{price}, </if>
+			<if test="discount_price != null">`discount_price` = #{discount_price}, </if>
+			<if test="sell_num != null">`sell_num` = #{sell_num}, </if>
+
+			<if test="category_id != null">`category_id` = #{category_id}, </if>
+			<if test="sub_category_id != null">`sub_category_id` = #{sub_category_id}, </if>
+			<if test="special_category_id != null">`special_category_id` = #{special_category_id}, </if>
+
+			<if test="module_category_id != null">`module_category_id` = #{module_category_id}, </if>
+			<if test="coupon_start_date != null">`coupon_start_date` = #{coupon_start_date}, </if>
+			<if test="coupon_end_date != null">`coupon_end_date` = #{coupon_end_date}, </if>
+			<if test="coupon_amount != null">`coupon_amount` = #{coupon_amount}, </if>
+			<if test="coupon_url != null">`coupon_url` = #{coupon_url}, </if>
+			<if test="summary != null">`summary` = #{summary}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="create_time != null">`create_time` = #{create_time}, </if>
+			<if test="today_recommended != null">`today_recommended` = #{today_recommended}, </if>
+			<if test="module != null">`module` = #{module}, </if>
+			<if test="brand_seller_id != null">`brand_seller_id` = #{brand_seller_id}, </if>
+			<if test="item_id != null">`item_id` = #{item_id}, </if>
+			<if test="commision != null">`commision` = #{commision}, </if>
+			<if test="free_ship != null">`free_ship` = #{free_ship}, </if>
+			<if test="tao_token != null">`tao_token` = #{tao_token}, </if>
+			<if test="out_icon !=null and out_icon !='' ">`out_icon` = #{out_icon}, </if>
+			<if test="outer_images !=null and outer_images !='' ">`outer_images`= #{outer_images}, </if>
+			<if test="detail_url !=null and detail_url !='' ">`detail_url`= #{detail_url}, </if>
+			<if test="flag !=null and flag !='' ">`flag`= #{flag}, </if>
+			<if test="handle_status !=null and handle_status !='' ">`handle_status`= #{handle_status}, </if>
+			<if test="need_buyed != null">`need_buyed` = #{need_buyed}, </if>
+			<if test="examine != null">`examine` = #{examine}, </if>
+			<if test="examineRemarks != null">`examineRemarks` = #{examineRemarks} </if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from commodity where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+
+
+</mapper>

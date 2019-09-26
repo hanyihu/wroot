@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.platform.mapper.PlatformCommodityCategoryMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`name` AS name ,
+		a.`icon` AS icon ,
+		a.`sort` AS sort ,
+		a.`enabled` AS enabled ,
+		a.`create_time` AS createTime ,
+		a.`pid` AS pid ,
+		a.`click_num` AS click_num
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.PlatformCommodityCategory">
+
+		select
+		e.`id` AS id ,
+		e.`name` AS name ,
+		e.`icon` AS icon ,
+		e.`sort` AS sort ,
+		e.`enabled` AS enabled ,
+		e.`create_time` AS createTime ,
+		e.`pid` AS pid ,
+		e.`click_num` AS click_num,
+		g.`name` as  categoryName,
+		f.businessName
+		from commodity_category e,
+		(select
+		<include refid="base_list"/>
+		,b.`name` as categoryName
+		,d.`name` as businessName
+		FROM commodity_category a
+		left join commodity_category b on a.pid = b.id
+		left join business_category d on a.business_category_id = d.id
+		WHERE 1=1
+		and a.pid=0) f ,commodity_category g
+		where e.pid=f.id
+		and e.pid=g.id
+		<if test="enabled != null">
+			AND e.enabled = #{enabled}
+		</if>
+		<if test="pid != null">
+			AND e.pid = #{pid}
+		</if>
+
+		<if test="name != null and name != ''">
+			AND e.name LIKE CONCAT('%',  #{name}, '%')
+		</if>
+		ORDER BY e.id DESC
+
+		<!--SELECT
+		<include refid="base_list" />
+		,b.name as categoryName
+
+		FROM commodity_category a
+		left join commodity_category b on a.pid = b.id
+
+		WHERE 1=1
+		and a.pid!=0
+		<if test="enabled != null">
+			AND a.enabled = #{enabled}
+		</if>
+		<if test="pid != null">
+			AND a.pid = #{pid}
+		</if>
+
+		<if test="name != null and name != ''">
+			AND a.name LIKE CONCAT('%',  #{name}, '%')
+		</if>
+		ORDER BY a.id DESC-->
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.PlatformCommodityCategory">
+		SELECT
+		<include refid="base_list" />
+
+		FROM commodity_category a
+
+		WHERE a.id = #{id}
+	</select>
+
+	<!--批量查询对象 -->
+	<select id="findByIds" resultType="com.vic.ck.entity.PlatformCommodityCategory">
+		SELECT
+		<include refid="base_list" />
+		FROM commodity_category a
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+	<!--新增数据 -->
+	<insert id="insert">
+		insert into commodity_category
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+
+			<if test="pid !=null and pid !='' ">`pid`, </if>
+			<if test="name !=null and name !='' ">`name`, </if>
+			<if test="icon !=null and icon !='' ">`icon`, </if>
+			<if test="sort !=null and sort !='' ">`sort`,</if>
+
+			<if test="enabled !=null and enabled !='' ">`enabled`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time` </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+
+
+			<if test="pid !=null and pid !='' ">#{pid}, </if>
+			<if test="name !=null and name !='' ">#{name}, </if>
+			<if test="icon !=null and icon !='' ">#{icon}, </if>
+			<if test="sort !=null and sort !='' ">#{sort},</if>
+
+			<if test="enabled !=null and enabled !='' ">#{enabled}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime} </if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.PlatformCommodityCategory">
+		update commodity_category
+		<set>
+			<if test="pid != null">`pid` = #{pid}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="icon != null">`icon` = #{icon}, </if>
+			<if test="sort != null">`sort` = #{sort},</if>
+
+			<if test="enabled != null">`enabled` = #{enabled}, </if>
+			<if test="createTime != null">`create_time` = #{createTime} </if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from commodity_category where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+
+	<!--查询上级分类 -->
+	<select id="categoryList" resultType="com.vic.base.model.BaseModel">
+		SELECT	a.`id` AS id ,	a.`name` AS name
+		FROM commodity_category a
+		WHERE a.`enabled` = 1
+		<if test="pid == null">
+			AND (a.pid is NULL OR a.pid = 0)
+		</if>
+		<if test="pid != null">
+			AND a.pid = #{pid}
+		</if>
+	</select>
+
+
+</mapper>

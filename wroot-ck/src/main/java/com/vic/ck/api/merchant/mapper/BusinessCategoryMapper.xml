@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vic.ck.api.merchant.mapper.BusinessCategoryMapper">
+
+	<select id="queryCategory" resultType="com.vic.ck.entity.BusinessCategory">
+		SELECT
+			a.`id`,
+			a.`parent_id` AS parentId,
+			a.`name`,
+			a.`level`,
+			a.`parent_name` AS parentName,
+			a.`category_code` AS categoryCode,
+			a.`first_char` AS firstChar,
+			a.`opened`,
+        a.`hot`
+		FROM
+        business_category a
+	</select>
+
+</mapper>

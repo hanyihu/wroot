@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.console.system.user.mapper.UserMapper" >
+
+  <select id="getUserByUsername" resultType="com.vic.ck.console.entity.User">
+	SELECT a.`id`, a.`username`, a.`nickname`, a.`password`, a.`status`,
+	a.`portrait`, a.`create_time` AS createTime, a.`is_delete` AS isDelete, a.`city_id` AS cityId, b.`name` AS cityName
+	FROM sys_user a LEFT JOIN sys_area b ON a.`city_id` = b.`id`
+	WHERE a.`username` = #{username}
+  </select>
+  
+  <!-- 列出所有的信息 -->
+	<select id="listUser" resultType="com.vic.ck.console.entity.User">
+		SELECT a.`id`, a.`username`, a.`nickname`, a.`password`, a.`status`,
+		a.`portrait`, a.`create_time` AS createTime, a.`is_delete` AS isDelete, a.`city_id` AS cityId, b.`name` AS cityName
+		FROM sys_user a LEFT JOIN sys_area b ON a.`city_id` = b.`id`
+		WHERE a.`is_delete`=0
+		<if test="username!=null and username!=''">
+			AND a.username LIKE CONCAT('%',#{username},'%')
+		</if>
+		<if test="status != null">
+			AND  a.status = #{status}
+		</if>
+		<if test="mobile != null and mobile !=''">
+			AND  a.mobile  LIKE CONCAT('%',#{mobile},'%')
+		</if>
+		
+		<if test="cityId != null and cityId !=''">
+			AND a.`city_id` = #{cityId}
+		</if>
+		
+	</select>
+
+	<select id="checkName" resultType="boolean">
+		SELECT COUNT(1)=0 FROM sys_user WHERE username = #{username}
+		<if test="id !=null">
+			AND id!= #{id}
+		</if>
+	</select>
+
+	<!-- 当前id下的用户信息 -->
+	<select id="getUserById" resultType="com.vic.ck.console.entity.User">
+		SELECT a.`id`, a.`username`, a.`nickname`, a.`password`, a.`status`,
+		a.`portrait`, a.`create_time` AS createTime, a.`is_delete` AS isDelete, a.`city_id` AS cityId, b.`name` AS cityName
+		FROM sys_user a LEFT JOIN sys_area b ON a.`city_id` = b.`id`
+		WHERE a.id=#{id}		
+	</select>
+
+	<!-- 添加用户信息 -->
+	<insert id="addUser" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO sys_user (username, password, nickname, create_time, mobile, city_id) 
+		VALUES (#{username},#{password},#{nickname},now(), #{mobile}, #{cityId})
+	</insert>
+	
+	<!-- 修改用户信息 -->
+	<update id="updateUser">
+		UPDATE sys_user SET 
+		username=#{username},
+		nickname=#{nickname},
+		city_id=#{cityId},
+		mobile=#{mobile},
+		WHERE id =#{id}
+	</update>
+	
+	<!-- 修改用户状态 -->
+	<update id="updateStatus">
+	    UPDATE sys_user SET 
+	    status = #{status}
+	    WHERE id = #{id}
+	</update>
+	
+	<!-- 修改密码 -->
+	<update id="updatePassword">
+	    UPDATE sys_user SET 
+	    password = #{password}
+	    WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 删除用户信息 -->
+	<update id="deleteUser">
+		update sys_user set is_delete=1 WHERE id in
+		<foreach collection="ids" item="item" open="(" close=")" separator=",">
+			 #{item} 
+		 </foreach>
+	</update>
+
+	<select id="checkID" resultType="int">
+		SELECT COUNT(*) FROM sys_user_role_rel WHERE user_id IN
+		<foreach collection="ids" item="item" open="(" close=")" separator=","> 
+			#{item} 
+		</foreach>
+	</select> 
+	
+	<select id="findTips" resultType="com.vic.ck.vo.ConsoleBellTip">
+		SELECT COUNT(1) AS customerFetch,
+		(SELECT COUNT(1) FROM customer_swap b WHERE b.`status` = 0) AS mallSwap,
+		(SELECT COUNT(1) FROM phone_charge_fetch_money c WHERE c.`status` = 0) AS  phoneFetch
+		FROM customer_fetch_money a 
+		WHERE a.`status` = 0
+	</select>
+	 
+	
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.api.system.mapper.CustomerBalanceMapper">
+
+	<select id="getCustomerBalance" resultType="com.vic.ck.entity.CustomerBalance" >
+		SELECT a.`id`, a.`balance`, a.`customer_id` AS customerId, a.`version`,a.brokerage  
+		FROM customer_balance a 
+		WHERE a.`customer_id`= #{customerId}
+		LIMIT 1
+	</select>
+	
+	 <!-- 修改余额 -->
+	<update id="updateCustomerBalance">
+		UPDATE customer_balance 
+		SET balance = #{balance} , `version` = `version`+1 
+		WHERE customer_id = #{customerId} AND `version` = #{version}
+	</update>
+
+	<!-- 新增余额明细 -->
+	<insert id="insertBalanceRecord" keyProperty="id" useGeneratedKeys="true" >
+		INSERT INTO customer_balance_record(customer_id, money, create_time, `type`, `describe`) 
+		VALUES(
+			#{customerId}, #{money},NOW(),#{type}, #{describe}
+		)
+	
+	</insert> 
+	
+	<!-- 查询余额明细 -->
+	<select id="balanceRecords" resultType="com.vic.ck.entity.CustomerBalanceRecord">
+		SELECT a.`id`, a.`customer_id` AS customerId, a.`money`, a.`create_time`  AS createTime, a.`type`, a.`describe`
+		 FROM customer_balance_record a
+		 WHERE a.`customer_id` = #{userId}
+		 <if test="type != null and type !=0 ">
+			 AND a.`type` = #{type}
+		 </if>
+		 ORDER BY a.`create_time` DESC
+	</select> 
+	
+	<!-- 当前明细是否存在 -->
+	<select id="existBalanceRecord" resultType="boolean">
+		SELECT COUNT(1) >0
+		FROM customer_balance_record a
+		WHERE a.`customer_id` = #{customerId} AND a.`type` = #{type}
+		<if test="date != null">
+			AND DATE(a.`create_time`) = DATE(#{date})
+		
+		</if>
+	</select>
+	
+	
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`balance` AS balance ,
+		a.`customer_id` AS customerId ,
+		a.`version` AS version 	    
+	</sql>
+    
+    <!--查询列表 -->
+    <select id="list" resultType="com.vic.ck.entity.CustomerBalance">
+		SELECT
+        <include refid="base_list"/>
+		, b.`nickname` AS customerName, b.`mobile` AS customerMobile
+ 		FROM customer_balance a
+ 		INNER JOIN customer b ON a.`customer_id` = b.`id`
+		WHERE 1=1
+		<if test="mobile !=null and mobile !=''">
+			AND b.`mobile` LIKE CONCAT('%', #{mobile}, '%')
+		</if>
+		<if test="name !=null and name !=''">
+			AND b.`nickname` LIKE CONCAT('%', #{name}, '%')
+		</if>
+		ORDER BY a.id DESC 
+	</select>
+	
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.CustomerBalance">
+		SELECT
+        <include refid="base_list"/>
+		, b.`nickname` AS customerName, b.`mobile` AS customerMobile
+ 		FROM customer_balance a
+ 		LEFT JOIN customer b ON a.`customer_id` = b.`id`
+		WHERE a.id = #{id}
+	</select>
+	
+	<!--更新数据 --> 
+	<update id="update" parameterType="com.vic.ck.entity.CustomerBalance">
+		update customer_balance 
+		<set>
+			<if test="balance != null">`balance` = #{balance}, </if>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="version != null">`version` = #{version}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	
+	
+	
+</mapper>

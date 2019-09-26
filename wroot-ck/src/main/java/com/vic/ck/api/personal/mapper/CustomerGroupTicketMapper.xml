@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.api.personal.mapper.CustomerGroupTicketMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`money` AS money ,
+		a.`name` AS name ,
+		a.`ticket_no` AS ticketNo ,
+		a.`orderno` AS orderno ,
+		a.`merchant_id` AS merchantId ,
+		a.`create_time` AS createTime ,
+		a.`start_time` AS startTime ,
+		a.`end_time` AS endTime ,
+		a.`used_time` AS usedTime ,
+		a.`status` AS status ,
+		a.`qrcode` AS qrcode,
+		a.`customer_id` AS customerId
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.CustomerGroupTicket">
+		SELECT
+		<include refid="base_list" />
+		FROM customer_group_ticket a
+		WHERE 1=1 
+		<if test="userId !=null and userId !=0">
+			AND a.`customer_id` = #{userId} AND a.status = 0
+		</if>
+		<if test="merchantId !=null and merchantId!=0">
+			AND a.`merchant_id` = #{merchantId}  AND a.merchant_deleted = 0 AND a.used_time is not null 
+		</if>
+		ORDER BY id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.CustomerGroupTicket">
+		SELECT
+		<include refid="base_list" />
+		FROM customer_group_ticket a
+		WHERE id = #{id}
+	</select>
+	
+	<!--根据券码查询对象 -->
+	<select id="findByTicketNo" resultType="com.vic.ck.entity.CustomerGroupTicket">
+		SELECT
+		<include refid="base_list" />
+		FROM customer_group_ticket a
+		WHERE ticket_no = #{ticketNo}
+	</select>
+	
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into customer_group_ticket
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="money !=null and money !='' ">`money`, </if>
+			<if test="name !=null and name !='' ">`name`, </if>
+			<if test="ticketNo !=null and ticketNo !='' ">`ticket_no`, </if>
+			<if test="orderno !=null and orderno !='' ">`orderno`, </if>
+			<if test="merchantId !=null and merchantId !='' ">`merchant_id`, </if>
+			<if test="customerId !=null and customerId !='' ">`customer_id`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`, </if>
+			<if test="startTime !=null and startTime !='' ">`start_time`, </if>
+			<if test="endTime !=null and endTime !='' ">`end_time`, </if>
+			<if test="usedTime !=null and usedTime !='' ">`used_time`, </if>
+			<if test="status !=null and status !='' ">`status`, </if>
+			<if test="qrcode !=null and  qrcode !='' ">`qrcode`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="money !=null and money !='' ">#{money}, </if>
+			<if test="name !=null and name !='' ">#{name}, </if>
+			<if test="ticketNo !=null and ticketNo !='' ">#{ticketNo}, </if>
+			<if test="orderno !=null and orderno !='' ">#{orderno}, </if>
+			<if test="merchantId !=null and merchantId !='' ">#{merchantId}, </if>
+			<if test="customerId !=null and customerId !='' ">#{customerId}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}, </if>
+			<if test="startTime !=null and startTime !='' ">#{startTime}, </if>
+			<if test="endTime !=null and endTime !='' ">#{endTime}, </if>
+			<if test="usedTime !=null and usedTime !='' ">#{usedTime}, </if>
+			<if test="status !=null and status !='' ">#{status}, </if>
+			<if test="qrcode !=null and qrcode !='' ">#{qrcode}</if>
+		</trim>
+	</insert>
+
+	<!-- 修改用户的二维码code -->
+	<update id="updateQrcode">
+		UPDATE customer_group_ticket SET qrcode = #{qrcode} WHERE id = #{id}
+	</update>
+	
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.CustomerGroupTicket">
+		update customer_group_ticket
+		<set>
+			<if test="money != null">`money` = #{money}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="ticketNo != null">`ticket_no` = #{ticketNo}, </if>
+			<if test="orderno != null">`orderno` = #{orderno}, </if>
+			<if test="merchantId != null">`merchant_id` = #{merchantId}, </if>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="startTime != null">`start_time` = #{startTime}, </if>
+			<if test="endTime != null">`end_time` = #{endTime}, </if>
+			<if test="usedTime != null">`used_time` = #{usedTime}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="qrcode != null">`qrcode` = #{qrcode}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from customer_group_ticket where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteByOrdeno">
+		delete from customer_group_ticket where orderno = #{orderno}
+	</delete>
+
+	<!-- 使用团购券 -->
+	<update id="useGroupTicket">
+		UPDATE customer_group_ticket SET `status` = 1, used_time = NOW() WHERE ticket_no = #{ticketNo}
+	</update>
+	
+	<!-- 商家标记删除团购券 -->
+	<update id="merchantDelete">
+		UPDATE customer_group_ticket SET merchant_deleted = 1 WHERE id = #{id}
+	</update>
+	
+	<!-- 过期团购券状态更新 -->
+	<update id="overduedUpdate">
+		UPDATE customer_group_ticket SET STATUS = 2 WHERE end_time &gt;= NOW()	
+	</update>
+	
+	
+</mapper>

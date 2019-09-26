@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.api.rider.mapper.SingleMapper">
+
+
+    <!--要推送给骑手的新订单-->
+    <select id="selectNewOrders" resultType="com.vic.ck.entity.RiderNewOrders">
+        SELECT a.orderno AS orderno,d.address AS consigneeAddress,
+        m.name as merchantName,m.address AS merchantAddress,m.longitude AS mlongitude,m.latitude AS mlatitude,d.longitude AS dlongitude,
+				d.latitude AS dlatitude
+        FROM
+        `order`  a LEFT JOIN customer  b on a.customer_id =b.id
+        LEFT JOIN  customer_delivery_address d on b.id=d.customer_id and d.id=a.addressId
+        LEFT JOIN merchant m on a.merchant_id=m.id WHERE a.`status` =1
+    </select>
+    <!--根据订单号查询-->
+    <select id="selectByOrder" resultType="com.vic.ck.entity.RiderNewOrders">
+        SELECT a.orderno AS orderno,d.delivery_name AS consigneeName,d.address AS consigneeAddress,
+        m.name as merchantName,m.address AS merchantAddress,m.longitude AS mlongitude,m.latitude AS mlatitude,d.longitude AS dlongitude,
+        d.latitude AS dlatitude
+        FROM
+        `order`  a LEFT JOIN customer  b on a.customer_id =b.id
+        LEFT JOIN  customer_delivery_address d on b.id=d.customer_id and d.id=a.addressId
+        LEFT JOIN merchant m on a.merchant_id=m.id WHERE a.orderno=#{orderno}
+    </select>
+    <!--查询订单的状态-->
+    <select id="selectOrderStatus" resultType="int">
+        SELECT a.`status`
+        FROM
+        `order`  a LEFT JOIN customer  b on a.customer_id =b.id
+        LEFT JOIN commodity  c on a.commodity_id=c.id
+        LEFT JOIN  customer_delivery_address d on b.id=d.customer_id
+        LEFT JOIN merchant m on a.merchant_id=m.id WHERE a.orderno =#{orderno}
+    </select>
+
+    <!--查看订单版本号-->
+    <select id="selectVersion" resultType="com.vic.ck.entity.Version">
+	    SELECT a.version as versionNumber
+        FROM
+        `order`  a WHERE a.orderno =#{orderno}
+    </select>
+
+    <!--修改订单状态-->
+    <update id="updateOrder">
+        UPDATE `order` SET `status`= #{status},version=version+1 WHERE version=#{version} AND orderno=#{orderno}
+    </update>
+
+    <!--修改骑手接单状态-->
+    <update id="riderStatus">
+         UPDATE rider_task SET order_status=#{ordernoStatus} WHERE orderno=#{orderno} AND rider_id=#{riderId}
+    </update>
+    <!--骑手新增订单-->
+    <insert id="riderNewOrder">
+        INSERT INTO rider_task (orderno,rider_id,order_status)VALUES(#{orderno},#{riderId},2);
+    </insert>
+    <!--骑手拍照图片-->
+    <update id="insertRiderPic">
+        UPDATE rider_task SET in_pic= #{inPic} WHERE  orderno=#{orderno} and  rider_id=#{riderId}
+    </update>
+    <!--骑手待取货订单-->
+    <select id="pickupOrder" resultType="com.vic.ck.entity.RiderNewOrders">
+         SELECT
+        a.orderno AS orderno,d.delivery_name AS consigneeName,d.address AS consigneeAddress,
+        m.name as merchantName,m.address AS merchantAddress,m.mobile AS merchantTel,m.longitude AS mlongitude,m.latitude AS mlatitude,d.longitude AS dlongitude,
+		d.latitude AS dlatitude,r.service_time as deliveryTime
+        FROM rider_task r LEFT JOIN `order` a on r.orderno=a.orderno  LEFT JOIN merchant m on a.merchant_id=m.id
+        LEFT JOIN customer  b on a.customer_id =b.id
+        LEFT JOIN  customer_delivery_address d on b.id=d.customer_id and d.id=a.addressId
+        WHERE r.rider_id=#{riderId} and  r.order_status=#{orderStatus}
+    </select>
+    <!--骑手中配送的订单-->
+    <select id="shippingOrder" resultType="com.vic.ck.entity.RiderNewOrders">
+          SELECT
+        a.orderno AS orderno,d.delivery_name AS consigneeName,d.address AS consigneeAddress,d.delivery_mobile AS consigneePhone,
+        m.name as merchantName,m.address AS merchantAddress, m.longitude AS mlongitude,m.latitude AS mlatitude,d.longitude AS dlongitude,
+		d.latitude AS dlatitude,a.fee AS income
+        FROM rider_task r LEFT JOIN `order` a on r.orderno=a.orderno  LEFT JOIN merchant m on a.merchant_id=m.id
+        LEFT JOIN commodity  c on a.commodity_id=c.id
+        LEFT JOIN customer  b on a.customer_id =b.id
+        LEFT JOIN  customer_delivery_address d on b.id=d.customer_id and d.id=a.addressId
+        WHERE r.rider_id=2 AND r.order_status=2
+    </select>
+    <!--订单详情-->
+    <select id="selectByOrderNoDetails" resultType="com.vic.ck.entity.OrderDetails">
+        SELECT
+        c.`name`,c.price,b.number,a.amount as singlePrice,a.fee as shippingFee FROM `order` a LEFT JOIN order_commodity b on a.commodity_id=b.orderno_id
+		LEFT JOIN commodity c on b.commodity_id=c.id
+          WHERE a.orderno=#{orderno}
+    </select>
+</mapper>

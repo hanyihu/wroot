@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.api.platform.mapper.PlatformCooperationMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`mobile` AS mobile, 
+		a.`company_name` AS companyName ,
+		a.`company_address` AS companyAddress ,
+		a.`company_person` AS companyPerson ,
+		a.`product` AS product ,
+		a.`type` AS type ,
+		a.`city` AS city ,
+		a.`amount` AS amount ,
+		a.`customer_id` AS customerId ,
+		a.`status` AS status
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.PlatformCooperation">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_cooperation a
+		WHERE 1=1
+		<if test="name !=null and name !=''">
+			AND a.`company_name` LIKE CONCAT('%', #{name }, '%')
+		</if>
+		<if test="status != null">
+			AND a.status = #{status}
+		</if>
+		<if test="type != null">
+			AND a.type = #{type}
+		</if>
+		ORDER BY a.status, a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.PlatformCooperation">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_cooperation a
+		WHERE id = #{id}
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into platform_cooperation
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyName !=null and  companyName !='' ">`company_name`, </if>
+			<if test="mobile !=null and  mobile !='' ">`mobile`, </if>
+			<if test="companyAddress !=null and  companyAddress !='' ">`company_address`, </if>
+			<if test="companyPerson !=null and  companyPerson !='' ">`company_person`, </if>
+			<if test="product !=null and  product !='' ">`product`, </if>
+			<if test="type !=null and  type !='' ">`type`, </if>
+			<if test="city !=null and  city !='' ">`city`, </if>
+			<if test="amount !=null and  amount !='' ">`amount`, </if>
+			<if test="customerId !=null and  customerId !='' ">`customer_id`, </if>
+			<if test="status !=null and  status !='' ">`status`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyName !=null and  companyName !='' ">#{companyName}, </if>
+			<if test="mobile !=null and  mobile !='' ">#{mobile},</if>
+			<if test="companyAddress !=null and  companyAddress !='' ">#{companyAddress}, </if>
+			<if test="companyPerson !=null and  companyPerson !='' ">#{companyPerson}, </if>
+			<if test="product !=null and  product !='' ">#{product}, </if>
+			<if test="type !=null and  type !='' ">#{type}, </if>
+			<if test="city !=null and  city !='' ">#{city}, </if>
+			<if test="amount !=null and  amount !='' ">#{amount}, </if>
+			<if test="customerId !=null and  customerId !='' ">#{customerId}, </if>
+			<if test="status !=null and  status !='' ">#{status}</if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.PlatformCooperation">
+		update platform_cooperation
+		<set>
+			<if test="companyName != null">`company_name` = #{companyName}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="companyAddress != null">`company_address` = #{companyAddress}, </if>
+			<if test="companyPerson != null">`company_person` = #{companyPerson}, </if>
+			<if test="product != null">`product` = #{product}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="city != null">`city` = #{city}, </if>
+			<if test="amount != null">`amount` = #{amount}, </if>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="status != null">`status` = #{status}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from platform_cooperation where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.merchant.mapper.MerchantGroupbuyMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`merchant_id` AS merchantId ,
+		a.`name` AS	name ,
+		a.`price` AS price ,
+		a.`start_time` AS startTime ,
+		a.`end_time` AS	endTime ,
+		a.`consumed_all_hours` AS consumedAllHours ,
+		a.`consume_start_time` AS consumeStartTime ,
+		a.`consume_end_time` AS	consumeEndTime ,
+		a.`labels` AS labels ,
+		a.`tips` AS tips ,
+		a.`describe` AS `describe` ,
+		a.`images` AS images ,
+		a.`status` AS status ,
+		a.`sell_num` AS sellNum ,
+		a.`comment_num` AS commentNum ,
+		a.`icon` AS icon ,
+		a.`is_delete` AS isDelete ,
+		a.`create_time` AS createTime ,
+		a.`star` AS	star
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.MerchantGroupBuy">
+		SELECT
+		<include refid="base_list" />
+		,b.`name` AS merchantName
+		,b.`mobile` AS merchantMobile
+		FROM merchant_groupbuy a
+		LEFT JOIN merchant b ON a.`merchant_id` = b.`id`
+		WHERE 1=1
+		
+		<!-- 管辖城市 -->
+		<if test="managerCityId !=null and managerCityId !=0">
+			AND b.city_id = #{managerCityId}
+		</if>
+		
+		
+		<if test="name !=null and name !=''">
+			AND a.`name` LIKE CONCAT('%', #{name}, '%')
+		</if>
+		<if test="mobile !=null and mobile !=''" >
+			AND b.`mobile` LIKE CONCAT('%', #{mobile}, '%')
+		</if>
+		<if test="merchantName !=null and merchantName !=''">
+			AND b.`name` LIKE CONCAT('%', #{merchantName}, '%')
+		</if>
+		<if test="status !=null">
+			AND a.`status` = #{status}
+		</if>
+		<if test="isDelete !=null">
+			AND a.`is_delete` = #{isDelete}
+		</if>
+		ORDER BY a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.MerchantGroupBuy">
+		SELECT
+		<include refid="base_list" />
+		,b.`name` AS merchantName
+		,b.`mobile` AS merchantMobile
+		FROM merchant_groupbuy a
+		LEFT JOIN merchant b ON a.`merchant_id` = b.`id`
+		WHERE a.id = #{id}
+	</select>
+
+	<!--批量查询对象 -->
+	<select id="findByIds" resultType="com.vic.ck.entity.MerchantGroupBuy">
+		SELECT
+		<include refid="base_list" />
+		FROM merchant_groupbuy a
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into merchant_groupbuy
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="merchantId !=null and merchantId !='' ">`merchant_id`, </if>
+			<if test="name !=null and name !='' ">`name`, </if>
+			<if test="price !=null and price !='' ">`price`, </if>
+			<if test="startTime !=null and startTime !='' ">`start_time`, </if>
+			<if test="endTime !=null and endTime !='' ">`end_time`, </if>
+			<if test="consumedAllHours !=null and consumedAllHours !='' ">`consumed_all_hours`, </if>
+			<if test="consumeStartTime !=null and consumeStartTime !='' ">`consume_start_time`, </if>
+			<if test="consumeEndTime !=null and consumeEndTime !='' ">`consume_end_time`, </if>
+			<if test="labels !=null and labels !='' ">`labels`, </if>
+			<if test="tips !=null and tips !='' ">`tips`, </if>
+			<if test="describe !=null and describe !='' ">`describe`, </if>
+			<if test="images !=null and images !='' ">`images`, </if>
+			<if test="status !=null and status !='' ">`status`, </if>
+			<if test="sellNum !=null and sellNum !='' ">`sell_num`, </if>
+			<if test="commentNum !=null and commentNum !='' ">`comment_num`, </if>
+			<if test="icon !=null and icon !='' ">`icon`, </if>
+			<if test="isDelete !=null and isDelete !='' ">`is_delete`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`, </if>
+			<if test="star !=null and star !='' ">`star`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="merchantId !=null and merchantId !='' ">#{merchantId}, </if>
+			<if test="name !=null and name !='' ">#{name}, </if>
+			<if test="price !=null and price !='' ">#{price}, </if>
+			<if test="startTime !=null and startTime !='' ">#{startTime}, </if>
+			<if test="endTime !=null and endTime !='' ">#{endTime}, </if>
+			<if test="consumedAllHours !=null and consumedAllHours !='' ">#{consumedAllHours}, </if>
+			<if test="consumeStartTime !=null and consumeStartTime !='' ">#{consumeStartTime}, </if>
+			<if test="consumeEndTime !=null and consumeEndTime !='' ">#{consumeEndTime}, </if>
+			<if test="labels !=null and labels !='' ">#{labels}, </if>
+			<if test="tips !=null and tips !='' ">#{tips}, </if>
+			<if test="describe !=null and describe !='' ">#{describe}, </if>
+			<if test="images !=null and images !='' ">#{images}, </if>
+			<if test="status !=null and status !='' ">#{status}, </if>
+			<if test="sellNum !=null and sellNum !='' ">#{sellNum}, </if>
+			<if test="commentNum !=null and commentNum !='' ">#{commentNum}, </if>
+			<if test="icon !=null and icon !='' ">#{icon}, </if>
+			<if test="isDelete !=null and isDelete !='' ">#{isDelete}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}, </if>
+			<if test="star !=null and star !='' ">#{star}</if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.MerchantGroupBuy">
+		update merchant_groupbuy
+		<set>
+			<if test="merchantId != null">`merchant_id` = #{merchantId}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="price != null">`price` = #{price}, </if>
+			<if test="startTime != null">`start_time` = #{startTime}, </if>
+			<if test="endTime != null">`end_time` = #{endTime}, </if>
+			<if test="consumedAllHours != null">`consumed_all_hours` = #{consumedAllHours}, </if>
+			<if test="consumeStartTime != null">`consume_start_time` = #{consumeStartTime}, </if>
+			<if test="consumeEndTime != null">`consume_end_time` = #{consumeEndTime}, </if>
+			<if test="labels != null">`labels` = #{labels}, </if>
+			<if test="tips != null">`tips` = #{tips}, </if>
+			<if test="describe != null">`describe` = #{describe}, </if>
+			<if test="images != null">`images` = #{images}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="sellNum != null">`sell_num` = #{sellNum}, </if>
+			<if test="commentNum != null">`comment_num` = #{commentNum}, </if>
+			<if test="icon != null">`icon` = #{icon}, </if>
+			<if test="isDelete != null">`is_delete` = #{isDelete}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="star != null">`star` = #{star}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from merchant_groupbuy where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

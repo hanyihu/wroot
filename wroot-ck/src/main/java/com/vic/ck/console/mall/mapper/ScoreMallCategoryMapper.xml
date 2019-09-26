@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.mall.mapper.ScoreMallCategoryMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`icon` AS icon ,
+		a.`name` AS name
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.ScoreMallCategory">
+		SELECT
+		<include refid="base_list" />
+		FROM score_mall_category a
+		WHERE 1=1
+		<if test="name !=null and name !=''">
+			AND a.`name` LIKE concat('%', #{name}, '%')
+		</if>
+		ORDER BY id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.ScoreMallCategory">
+		SELECT
+		<include refid="base_list" />
+		FROM score_mall_category a
+		WHERE id = #{id}
+	</select>
+	
+	<!--批量查询对象 -->
+	<select id="findByIds" resultType="com.vic.ck.entity.ScoreMallCategory">
+		SELECT
+		<include refid="base_list" />
+		FROM score_mall_category a
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into score_mall_category
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="name !=null and name !='' ">`name`,</if>
+			<if test="icon !=null and icon !='' ">`icon`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="name !=null and name !='' ">#{name},</if>
+			<if test="icon !=null and icon !='' ">#{icon}</if>
+		</trim>	
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.ScoreMallCategory">
+		update score_mall_category
+		<set>
+			<if test="name != null">`name` = #{name},</if>
+			<if test="icon != null">`icon` = #{icon}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from score_mall_category where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

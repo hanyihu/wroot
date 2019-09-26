@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.statistics.mapper.ReportCityOrderMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`at_date` AS atDate ,
+		a.`city_id` AS cityId ,
+		a.`city_name` AS cityName ,
+		a.`total_amount` AS totalAmount ,
+		a.`buy_amount` AS buyAmount ,
+		a.`groupbuy_amount` AS groupbuyAmount ,
+		a.`hotel_amount` AS hotelAmount ,
+		a.`total_number` AS totalNumber ,
+		a.`buy_number` AS buyNumber ,
+		a.`groupbuy_number` AS groupbuyNumber ,
+		a.`hotel_number` AS hotelNumber ,
+		a.`type` AS type
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.ReportCityOrder">
+		SELECT
+		<include refid="base_list" />
+		FROM report_city_order a
+		WHERE 1=1
+		<if test="cityId != null">
+			AND a.`city_id` = #{cityId}
+		</if>
+		<if test="type != null">
+			AND a.`type` = #{type}
+		</if>
+		<if test="startDate !=null">
+			AND a.at_date &gt;= #{startDate}
+		</if>
+		<if test="endDate !=null">
+			AND a.at_date &lt;= #{endDate}
+		</if>
+		ORDER BY a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.ReportCityOrder">
+		SELECT
+		<include refid="base_list" />
+		FROM report_city_order a
+		WHERE a.id = #{id}
+	</select>
+
+	<!--批量查询对象 -->
+	<select id="findByIds" resultType="com.vic.ck.entity.ReportCityOrder">
+		SELECT
+		<include refid="base_list" />
+		FROM report_city_order a
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into report_city_order
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="atDate !=null and atDate !='' ">`at_date`, </if>
+			<if test="cityId !=null and cityId !='' ">`city_id`, </if>
+			<if test="cityName !=null and cityName !='' ">`city_name`, </if>
+			<if test="totalAmount !=null and totalAmount !='' ">`total_amount`, </if>
+			<if test="buyAmount !=null and buyAmount !='' ">`buy_amount`, </if>
+			<if test="groupbuyAmount !=null and groupbuyAmount !='' ">`groupbuy_amount`, </if>
+			<if test="hotelAmount !=null and hotelAmount !='' ">`hotel_amount`, </if>
+			<if test="totalNumber !=null and totalNumber !='' ">`total_number`, </if>
+			<if test="buyNumber !=null and buyNumber !='' ">`buy_number`, </if>
+			<if test="groupbuyNumber !=null and groupbuyNumber !='' ">`groupbuy_number`, </if>
+			<if test="hotelNumber !=null and hotelNumber !='' ">`hotel_number`, </if>
+			<if test="type !=null and type !='' ">`type`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="atDate !=null and atDate !='' ">#{atDate}, </if>
+			<if test="cityId !=null and cityId !='' ">#{cityId}, </if>
+			<if test="cityName !=null and cityName !='' ">#{cityName}, </if>
+			<if test="totalAmount !=null and totalAmount !='' ">#{totalAmount}, </if>
+			<if test="buyAmount !=null and buyAmount !='' ">#{buyAmount}, </if>
+			<if test="groupbuyAmount !=null and groupbuyAmount !='' ">#{groupbuyAmount}, </if>
+			<if test="hotelAmount !=null and hotelAmount !='' ">#{hotelAmount}, </if>
+			<if test="totalNumber !=null and totalNumber !='' ">#{totalNumber}, </if>
+			<if test="buyNumber !=null and buyNumber !='' ">#{buyNumber}, </if>
+			<if test="groupbuyNumber !=null and groupbuyNumber !='' ">#{groupbuyNumber}, </if>
+			<if test="hotelNumber !=null and hotelNumber !='' ">#{hotelNumber}, </if>
+			<if test="type !=null and type !='' ">#{type}</if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.ReportCityOrder">
+		update report_city_order
+		<set>
+			<if test="atDate != null">`at_date` = #{atDate}, </if>
+			<if test="cityId != null">`city_id` = #{cityId}, </if>
+			<if test="cityName != null">`city_name` = #{cityName}, </if>
+			<if test="totalAmount != null">`total_amount` = #{totalAmount}, </if>
+			<if test="buyAmount != null">`buy_amount` = #{buyAmount}, </if>
+			<if test="groupbuyAmount != null">`groupbuy_amount` = #{groupbuyAmount}, </if>
+			<if test="hotelAmount != null">`hotel_amount` = #{hotelAmount}, </if>
+			<if test="totalNumber != null">`total_number` = #{totalNumber}, </if>
+			<if test="buyNumber != null">`buy_number` = #{buyNumber}, </if>
+			<if test="groupbuyNumber != null">`groupbuy_number` = #{groupbuyNumber}, </if>
+			<if test="hotelNumber != null">`hotel_number` = #{hotelNumber}, </if>
+			<if test="type != null">`type` = #{type}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from report_city_order where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<!-- 状态图统计数据 -->
+	<select id="barData" resultType="com.vic.ck.entity.ReportCityOrder">
+		SELECT a.`city_name` AS cityName, SUM(a.`total_amount`) AS totalAmount, SUM(a.`buy_amount`) AS buyAmount, SUM(a.`groupbuy_amount`) AS groupbuyAmount,
+		SUM(a.`hotel_amount`) AS hotelAmount  
+		FROM report_city_order a 
+		WHERE a.`type` = 1
+		<!-- 管辖城市 -->
+		<if test="managerCityId !=null and managerCityId !=0">
+			AND a.city_id = #{managerCityId}
+		</if>
+		
+		<if test="type != null">
+			AND a.`type` = #{type}
+		</if>
+		<if test="startDate !=null">
+			AND a.at_date &gt;= #{startDate}
+		</if>
+		<if test="endDate !=null">
+			AND a.at_date &lt;= #{endDate}
+		</if>
+		GROUP BY a.`city_name`
+		UNION ALL
+		SELECT  '平台' AS cityName, SUM(a.`total_amount`) AS totalAmount, SUM(a.`buy_amount`) AS buyAmount, SUM(a.`groupbuy_amount`) AS groupbuyAmount,
+		SUM(a.`hotel_amount`) AS hotelAmount  
+		FROM report_city_order a 
+		WHERE a.`type` = 2
+		<if test="type != null">
+			AND a.`type` = #{type}
+		</if>
+		<if test="startDate !=null">
+			AND a.at_date &gt;= #{startDate}
+		</if>
+		<if test="endDate !=null">
+			AND a.at_date &lt;= #{endDate}
+		</if>
+		GROUP BY a.`city_id`
+	</select>
+	
+	
+	<!-- 当天城市流水 -->
+	<insert id="staticticsCityOrder">
+		INSERT INTO report_city_order(at_date,city_id,total_amount,buy_amount,groupbuy_amount,hotel_amount,total_number,buy_number,groupbuy_number,hotel_number	) 
+		SELECT '${day}',b.`city_id`, SUM(a.`amount`) AS total_amount, 
+		SUM(CASE a.`order_type` WHEN 1 THEN a.`amount` ELSE 0 END) AS buy_amount,
+		SUM(CASE a.`order_type` WHEN 2 THEN a.`amount` ELSE 0 END) AS groupbuy_amount,
+		SUM(CASE a.`order_type` WHEN 3 THEN a.`amount` ELSE 0 END) AS hotel_amount,
+		COUNT(1) AS total_number,
+		SUM(CASE a.`order_type` WHEN 1 THEN 1 ELSE 0 END) AS buy_number,
+		SUM(CASE a.`order_type` WHEN 2 THEN 1 ELSE 0 END) AS groupbuy_number,
+		SUM(CASE a.`order_type` WHEN 3 THEN 1 ELSE 0 END) AS hotel_number
+		FROM `order` a LEFT JOIN merchant b ON a.`merchant_id` = b.`id`
+		WHERE a.`status` IN (1,4,5) AND DATE(a.`pay_time`) = #{day}
+		GROUP BY b.`city_id` 
+	</insert>
+
+	<!-- 更新冗余字段 -->
+	<update id="updateRedundant">
+		UPDATE report_city_order a LEFT	JOIN sys_area b ON a.city_id = b.id
+		SET a.city_name = b.name 
+		WHERE a.at_date = #{day}
+	</update>
+	
+	<!-- 当天平台总流水 -->
+	<insert id="staticticsPlatformOrder">
+		INSERT INTO report_city_order(at_date,city_name,`type`,total_amount,buy_amount,groupbuy_amount,hotel_amount,total_number,buy_number,groupbuy_number,hotel_number) 
+		SELECT '2018-04-07','平台', 2, SUM(total_amount),SUM(buy_amount), SUM(groupbuy_amount), SUM(hotel_amount), SUM(total_number), SUM(buy_number), SUM(groupbuy_number), SUM(hotel_number)
+		FROM report_city_order a WHERE a.type =1 AND a.at_date = #{day}
+	</insert>
+
+	
+	
+	
+
+</mapper>

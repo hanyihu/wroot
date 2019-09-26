@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.msg.mapper.PlatformMsgMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`role` AS role ,
+		a.`title` AS title ,
+		a.`content` AS content ,
+		a.`create_time` AS createTime ,
+		a.`push_time` AS pushTime ,
+		a.`status` AS status ,
+		a.`targt_type` AS targtType ,
+		a.`city_id` AS cityId ,
+		a.`mobile` AS mobile
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.PlatformMsg">
+		SELECT
+		<include refid="base_list" />
+		,b.`name` AS cityName
+		FROM platform_msg a LEFT JOIN sys_area b ON a.`city_id` = b.`id`
+		WHERE 1=1
+		<if test="type != null">
+			AND a.`role` = #{type}
+		</if>
+		<if test="status != null">
+			AND a.`status` = #{status}
+		</if>
+		ORDER BY a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.PlatformMsg">
+		SELECT
+		<include refid="base_list" />
+		,b.`name` AS cityName
+		FROM platform_msg a LEFT JOIN sys_area b ON a.`city_id` = b.`id`
+		WHERE a.id = #{id}
+	</select>
+
+	<!--批量查询对象 -->
+	<select id="findByIds" resultType="com.vic.ck.entity.PlatformMsg">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_msg a
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into platform_msg
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="role !=null and role !='' ">`role`, </if>
+			<if test="title !=null and title !='' ">`title`, </if>
+			<if test="content !=null and content !='' ">`content`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`, </if>
+			<if test="status !=null and status !='' ">`status`, </if>
+			<if test="targtType !=null and targtType !='' ">`targt_type`, </if>
+			<if test="cityId !=null and cityId !='' ">`city_id`, </if>
+			<if test="mobile !=null and mobile !='' ">`mobile`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="role !=null and role !='' ">#{role}, </if>
+			<if test="title !=null and title !='' ">#{title}, </if>
+			<if test="content !=null and content !='' ">#{content}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}, </if>
+			<if test="status !=null and status !='' ">#{status}, </if>
+			<if test="targtType !=null and targtType !='' ">#{targtType}, </if>
+			<if test="cityId !=null and cityId !='' ">#{cityId}, </if>
+			<if test="mobile !=null and mobile !='' ">#{mobile}</if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.PlatformMsg">
+		update platform_msg
+		<set>
+			<if test="role != null">`role` = #{role}, </if>
+			<if test="title != null">`title` = #{title}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="targtType != null">`targt_type` = #{targtType}, </if>
+			<if test="cityId != null">`city_id` = #{cityId}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<!-- 修改推送状态 -->
+	<update id="pushMsg">
+		UPDATE platform_msg SET status = 1, push_time = now() WHERE id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from platform_msg where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

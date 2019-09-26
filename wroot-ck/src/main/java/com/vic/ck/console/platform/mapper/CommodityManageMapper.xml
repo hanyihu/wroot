@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.platform.mapper.CommodityManageMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`name` AS name ,
+        a.`spec` AS spec ,
+		a.`price` AS price ,
+        a.`images` AS images,
+        a.`company` AS company,
+        a.`stock` AS stock,
+        a.`attribute` AS attribute,
+        a.`content` AS content,
+        a.`isgroupbuy` AS isgroupbuy,
+		a.`enabled` AS enabled,
+        a.`create_time` AS create_time,
+        a.`brand_seller_id` AS brand_seller_id,
+        a.`category_id` AS category_id
+
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.Commodity">
+		SELECT
+		<include refid="base_list" />
+		, b.`name` AS categoryName
+        , c.`name` AS merchantName
+		FROM commodity a
+		LEFT JOIN commodity_category b ON a.`category_id` = b.`id`
+        LEFT JOIN merchant c ON a.`brand_seller_id` = c.`id`
+		WHERE 1=1
+
+		<if test="name != null and name !=''">
+			AND a.name LIKE CONCAT('%', #{name}, '%')	
+		</if>
+		<if test="categoryId !=null">
+			AND a.category_id = #{categoryId}
+		</if>
+		ORDER BY a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.Commodity">
+		SELECT
+        <include refid="base_list"/>
+		FROM commodity a
+		WHERE a.id = #{id}
+	</select>
+
+	<!--批量查询对象 -->
+	<select id="findByIds" resultType="com.vic.ck.entity.Commodity">
+		SELECT
+		<include refid="base_list" />
+		FROM commodity a
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into commodity
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="name !=null and name !='' ">`name`, </if>
+            <if test="category_id !=null and category_id !='' ">`category_id`,</if>
+			<if test="images !=null and images !='' ">`images`, </if>
+            <if test="spec !=null and spec !='' ">`spec`,</if>
+			<if test="price !=null and price !='' ">`price`, </if>
+            <if test="company !=null and company !='' ">`company`,</if>
+            <if test="stock !=null and stock !='' ">`stock`,</if>
+            <if test="attribute !=null and attribute !='' ">`attribute`,</if>
+			<if test="content !=null and content !='' ">`content`, </if>
+            <if test="isgroupbuy !=null and isgroupbuy !='' ">`isgroupbuy`,</if>
+            <if test="enabled !=null and enabled !='' ">`enabled`,</if>
+            <if test="create_time !=null and create_time !='' ">`create_time`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="name !=null and name !='' ">#{name}, </if>
+            <if test="category_id !=null and category_id !='' ">#{category_id},</if>
+			<if test="images !=null and images !='' ">#{images}, </if>
+            <if test="spec !=null and spec !='' ">#{spec},</if>
+			<if test="price !=null and price !='' ">#{price}, </if>
+            <if test="company !=null and company !='' ">#{company},</if>
+            <if test="stock !=null and stock !='' ">#{stock},</if>
+            <if test="attribute !=null and attribute !='' ">#{attribute},</if>
+			<if test="content !=null and content !='' ">#{content}, </if>
+            <if test="isgroupbuy !=null and isgroupbuy !='' ">#{isgroupbuy},</if>
+            <if test="enabled !=null and enabled !='' ">#{enabled},</if>
+            <if test="create_time !=null and create_time !='' ">#{create_time}</if>
+		</trim>
+	</insert>
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.Commodity">
+		update commodity
+		<set>
+			<if test="name != null">`name` = #{name}, </if>
+            <if test="category_id != null">`category_id` = #{category_id},</if>
+			<if test="images != null">`images` = #{images}, </if>
+            <if test="spec != null">`spec` = #{spec},</if>
+			<if test="price != null">`price` = #{price}, </if>
+            <if test="company != null">`company` = #{company},</if>
+            <if test="stock != null">`stock` = #{stock},</if>
+            <if test="attribute != null">`attribute` = #{attribute},</if>
+			<if test="content != null">`content` = #{content}, </if>
+            <if test="isgroupbuy != null">`isgroupbuy` = #{isgroupbuy},</if>
+            <if test="enabled != null">`enabled` = #{enabled},</if>
+            <if test="create_time != null">`create_time` = #{create_time}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from commodity where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+
+
+</mapper>

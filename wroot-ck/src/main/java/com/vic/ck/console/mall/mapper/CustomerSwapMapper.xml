@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.mall.mapper.CustomerSwapMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`swapno` AS swapno ,
+		a.`customer_id` AS customerId ,
+		a.`customer_Name` AS customerName ,
+		a.`mobile` AS mobile ,
+		a.`swap_mall_id` AS swapMallId ,
+		a.`swap_mall_name` AS swapMallName ,
+		a.`merchant_name` AS merchantName,
+		a.`quantity` AS quantity ,
+		a.`unit_score` AS unitScore ,
+		a.`score` AS score ,
+		a.`icon` AS icon ,
+		a.`address_id` AS addressId ,
+		a.`status` AS status ,
+		a.`remark` AS remark ,
+		a.`create_time` AS createTime
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.CustomerSwap">
+		SELECT
+		<include refid="base_list" />
+		FROM customer_swap a
+		WHERE 1=1 
+		<if test="swapno !=null and swapno !=''">
+			AND a.`swapno` LIKE CONCAT('%', #{swapno}, '%')
+		</if>
+		<if test="name !=null and name !=''">
+			AND a.`customer_Name` LIKE CONCAT('%', #{name}, '%')
+		</if>
+		<if test="mobile !=null and mobile !=''">
+			AND a.`mobile` LIKE CONCAT('%', #{mobile}, '%')
+		</if>
+		<if test="swapMallName !=null and swapMallName !=''">
+			AND a.`swap_mall_name` LIKE CONCAT('%', #{swapMallName}, '%')
+		</if>
+		<if test="status != null">
+			AND a.`status`  = #{status}
+		</if>
+		ORDER BY status, id desc
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.CustomerSwap">
+		SELECT
+		<include refid="base_list" />
+		FROM customer_swap a
+		
+		WHERE id = #{id}
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into customer_swap
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="swapno !=null and swapno !='' ">`swapno`, </if>
+			<if test="remark !=null and remark !='' ">`remark`, </if>
+			<if test="customerId !=null and customerId !='' ">`customer_id`, </if>
+			<if test="customerName !=null and customerName !='' ">`customer_name`, </if>
+			<if test="mobile !=null and mobile !='' ">`mobile`, </if>
+			<if test="swapMallId !=null and swapMallId !='' ">`swap_mall_id`, </if>
+			<if test="swapMallName !=null and swapMallName !='' ">`swap_mall_name`, </if>
+			<if test="merchantName !=null and merchantName !='' ">`merchant_name`, </if>
+			<if test="quantity !=null and quantity !='' ">`quantity`, </if>
+			<if test="unitScore !=null and unitScore !='' ">`unit_score`, </if>
+			<if test="score !=null and score !='' ">`score`, </if>
+			<if test="icon !=null and icon !='' ">`icon`, </if>
+			<if test="addressId !=null and addressId !='' ">`address_id`, </if>
+			<if test="status !=null and status !='' ">`status`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="swapno !=null and swapno !='' ">#{swapno}, </if>
+			<if test="remark !=null and remark !='' ">#{remark}, </if>
+			<if test="customerId !=null and customerId !='' ">#{customerId}, </if>
+			<if test="customerName !=null and customerName !='' ">#{customerName}, </if>
+			<if test="mobile !=null and mobile !='' ">#{mobile}, </if>
+			<if test="swapMallId !=null and swapMallId !='' ">#{swapMallId}, </if>
+			<if test="swapMallName !=null and swapMallName !='' ">#{swapMallName}, </if>
+			<if test="merchantName !=null and merchantName !='' ">#{merchantName}, </if>
+			<if test="quantity !=null and quantity !='' ">#{quantity}, </if>
+			<if test="unitScore !=null and unitScore !='' ">#{unitScore}, </if>
+			<if test="score !=null and score !='' ">#{score}, </if>
+			<if test="icon !=null and icon !='' ">#{icon}, </if>
+			<if test="addressId !=null and addressId !='' ">#{addressId}, </if>
+			<if test="status !=null and status !='' ">#{status}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}</if>
+		</trim>	
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.CustomerSwap">
+		update customer_swap
+		<set>
+			<if test="customerName != null">`customer_name` = #{customerName}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="swapMallName != null">`swap_mall_name` = #{swapMallName}, </if>
+			<if test="swapno != null">`swapno` = #{swapno}, </if>
+			<if test="remark != null">`remark` = #{remark}, </if>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="swapMallId != null">`swap_mall_id` = #{swapMallId}, </if>
+			<if test="quantity != null">`quantity` = #{quantity}, </if>
+			<if test="unitScore != null">`unit_score` = #{unitScore}, </if>
+			<if test="score != null">`score` = #{score}, </if>
+			<if test="addressId != null">`address_id` = #{addressId}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from customer_swap where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

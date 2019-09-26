@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.api.personal.mapper.LookNoterMapper">
+ 
+	
+	<!-- 我的浏览记录+商品列表 -->
+    <select id="lljlList" resultType="com.vic.ck.entity.UserBrowsingHistory">
+        SELECT
+        a.id,
+        a.commodity_id as commodityId,
+        a.customer_id as customerId,
+        a.visit_time as visitTime,
+        b.name as commodityName,
+        b.out_icon as outIcon
+		 FROM commodity_visit_record a 
+		 LEFT JOIN commodity b ON a.commodity_id = b.id
+        WHERE
+        a.customer_id = #{userId}
+        ORDER BY
+        a.visit_time DESC
+	</select>
+	 
+	
+</mapper>

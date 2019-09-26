@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.merchant.mapper.MerchantHotelMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`merchant_id` AS merchantId ,
+		a.`icon` AS icon ,
+		a.`images` AS images ,
+		a.`name` AS name ,
+		a.`price` AS price ,
+		a.`stock` AS stock ,
+		a.`unsubscribe_way` AS unsubscribeWay ,
+		a.`verify_way` AS verifyWay ,
+		a.`room_bed` AS roomBed ,
+		a.`room_person_num` AS roomPersonNum ,
+		a.`room_network` AS roomNetwork ,
+		a.`room_window` AS roomWindow ,
+		a.`room_area` AS roomArea ,
+		a.`room_floor` AS roomFloor ,
+		a.`room_tel` AS roomTel ,
+		a.`room_windowm_view` AS roomWindowmView ,
+		a.`room_breakfast` AS roomBreakfast ,
+		a.`room_add_beded` AS roomAddBeded ,
+		a.`room_smoke` AS roomSmoke ,
+		a.`room_bed_wide` AS roomBedWide ,
+		a.`is_delete` AS isDelete ,
+		a.`create_time` AS createTime ,
+		a.`status` AS status
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.MerchantHotel">
+		SELECT
+		<include refid="base_list" />
+		,b.`name` AS merchantName
+		,b.`mobile` AS merchantMobile
+		FROM merchant_hotel a
+		LEFT JOIN merchant b ON a.`merchant_id` = b.`id`
+		WHERE 1=1
+		
+		<!-- 管辖城市 -->
+		<if test="managerCityId !=null and managerCityId !=0">
+			AND b.city_id = #{managerCityId}
+		</if>
+		
+		<if test="name !=null and name !=''">
+			AND a.`name` LIKE CONCAT('%', #{name}, '%')
+		</if>
+		<if test="mobile !=null and mobile !=''" >
+			AND b.`mobile` LIKE CONCAT('%', #{mobile}, '%')
+		</if>
+		<if test="merchantName !=null and merchantName !=''">
+			AND b.`name` LIKE CONCAT('%', #{merchantName}, '%')
+		</if>
+		<if test="status !=null">
+			AND a.`status` = #{status}
+		</if>
+		<if test="isDelete !=null">
+			AND a.`is_delete` = #{isDelete}
+		</if>
+		ORDER BY a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.MerchantHotel">
+		SELECT
+		<include refid="base_list" />
+		,b.`name` AS merchantName
+		,b.`mobile` AS merchantMobile
+		FROM merchant_hotel a
+		LEFT JOIN merchant b ON a.`merchant_id` = b.`id`
+		WHERE a.id = #{id}
+	</select>
+
+	<!--批量查询对象 -->
+	<select id="findByIds" resultType="com.vic.ck.entity.MerchantHotel">
+		SELECT
+		<include refid="base_list" />
+		FROM merchant_hotel a
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into merchant_hotel
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="merchantId !=null and merchantId !='' ">`merchant_id`, </if>
+			<if test="icon !=null and icon !='' ">`icon`, </if>
+			<if test="images !=null and images !='' ">`images`, </if>
+			<if test="name !=null and name !='' ">`name`, </if>
+			<if test="price !=null and price !='' ">`price`, </if>
+			<if test="stock !=null and stock !='' ">`stock`, </if>
+			<if test="unsubscribeWay !=null and unsubscribeWay !='' ">`unsubscribe_way`, </if>
+			<if test="verifyWay !=null and verifyWay !='' ">`verify_way`, </if>
+			<if test="roomBed !=null and roomBed !='' ">`room_bed`, </if>
+			<if test="roomPersonNum !=null and roomPersonNum !='' ">`room_person_num`, </if>
+			<if test="roomNetwork !=null and roomNetwork !='' ">`room_network`, </if>
+			<if test="roomWindow !=null and roomWindow !='' ">`room_window`, </if>
+			<if test="roomArea !=null and roomArea !='' ">`room_area`, </if>
+			<if test="roomFloor !=null and roomFloor !='' ">`room_floor`, </if>
+			<if test="roomTel !=null and roomTel !='' ">`room_tel`, </if>
+			<if test="roomWindowmView !=null and roomWindowmView !='' ">`room_windowm_view`, </if>
+			<if test="roomBreakfast !=null and roomBreakfast !='' ">`room_breakfast`, </if>
+			<if test="roomAddBeded !=null and roomAddBeded !='' ">`room_add_beded`, </if>
+			<if test="roomSmoke !=null and roomSmoke !='' ">`room_smoke`, </if>
+			<if test="roomBedWide !=null and roomBedWide !='' ">`room_bed_wide`, </if>
+			<if test="isDelete !=null and isDelete !='' ">`is_delete`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`, </if>
+			<if test="status !=null and status !='' ">`status`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="merchantId !=null and merchantId !='' ">#{merchantId}, </if>
+			<if test="icon !=null and icon !='' ">#{icon}, </if>
+			<if test="images !=null and images !='' ">#{images}, </if>
+			<if test="name !=null and name !='' ">#{name}, </if>
+			<if test="price !=null and price !='' ">#{price}, </if>
+			<if test="stock !=null and stock !='' ">#{stock}, </if>
+			<if test="unsubscribeWay !=null and unsubscribeWay !='' ">#{unsubscribeWay}, </if>
+			<if test="verifyWay !=null and verifyWay !='' ">#{verifyWay}, </if>
+			<if test="roomBed !=null and roomBed !='' ">#{roomBed}, </if>
+			<if test="roomPersonNum !=null and roomPersonNum !='' ">#{roomPersonNum}, </if>
+			<if test="roomNetwork !=null and roomNetwork !='' ">#{roomNetwork}, </if>
+			<if test="roomWindow !=null and roomWindow !='' ">#{roomWindow}, </if>
+			<if test="roomArea !=null and roomArea !='' ">#{roomArea}, </if>
+			<if test="roomFloor !=null and roomFloor !='' ">#{roomFloor}, </if>
+			<if test="roomTel !=null and roomTel !='' ">#{roomTel}, </if>
+			<if test="roomWindowmView !=null and roomWindowmView !='' ">#{roomWindowmView}, </if>
+			<if test="roomBreakfast !=null and roomBreakfast !='' ">#{roomBreakfast}, </if>
+			<if test="roomAddBeded !=null and roomAddBeded !='' ">#{roomAddBeded}, </if>
+			<if test="roomSmoke !=null and roomSmoke !='' ">#{roomSmoke}, </if>
+			<if test="roomBedWide !=null and roomBedWide !='' ">#{roomBedWide}, </if>
+			<if test="isDelete !=null and isDelete !='' ">#{isDelete}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}, </if>
+			<if test="status !=null and status !='' ">#{status}</if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.MerchantHotel">
+		update merchant_hotel
+		<set>
+			<if test="merchantId != null">`merchant_id` = #{merchantId}, </if>
+			<if test="icon != null">`icon` = #{icon}, </if>
+			<if test="images != null">`images` = #{images}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="price != null">`price` = #{price}, </if>
+			<if test="stock != null">`stock` = #{stock}, </if>
+			<if test="unsubscribeWay != null">`unsubscribe_way` = #{unsubscribeWay}, </if>
+			<if test="verifyWay != null">`verify_way` = #{verifyWay}, </if>
+			<if test="roomBed != null">`room_bed` = #{roomBed}, </if>
+			<if test="roomPersonNum != null">`room_person_num` = #{roomPersonNum}, </if>
+			<if test="roomNetwork != null">`room_network` = #{roomNetwork}, </if>
+			<if test="roomWindow != null">`room_window` = #{roomWindow}, </if>
+			<if test="roomArea != null">`room_area` = #{roomArea}, </if>
+			<if test="roomFloor != null">`room_floor` = #{roomFloor}, </if>
+			<if test="roomTel != null">`room_tel` = #{roomTel}, </if>
+			<if test="roomWindowmView != null">`room_windowm_view` = #{roomWindowmView}, </if>
+			<if test="roomBreakfast != null">`room_breakfast` = #{roomBreakfast}, </if>
+			<if test="roomAddBeded != null">`room_add_beded` = #{roomAddBeded}, </if>
+			<if test="roomSmoke != null">`room_smoke` = #{roomSmoke}, </if>
+			<if test="roomBedWide != null">`room_bed_wide` = #{roomBedWide}, </if>
+			<if test="isDelete != null">`is_delete` = #{isDelete}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="status != null">`status` = #{status}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from merchant_hotel where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

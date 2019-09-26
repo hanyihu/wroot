@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.console.config.mapper.PromptMapper">
+    <sql id="base_list">
+		a.`id` AS id ,
+		a.`prompt_name` AS prompt_name ,
+		a.`prompt_type` AS prompt_type ,
+		a.`prompt_attachId` AS prompt_attachId
+	</sql>
+
+    <!-- 查询所有提示音数据 -->
+    <select id="list" resultType="com.vic.ck.entity.BasicConfig">
+        select
+        <include refid="base_list"></include>
+        from
+        basic_config a
+        where 1=1
+        and a.type='prompt'
+        <if test="prompt_type != null and prompt_type != 0">
+            and a.prompt_type = #{prompt_type}
+        </if>
+        ORDER BY a.id DESC
+    </select>
+
+    <!-- 根据主键查询提示音对象 -->
+    <select id="findById" resultType="com.vic.ck.entity.BasicConfig">
+        select
+        <include refid="base_list"></include>
+        from
+        basic_config a
+        where 1=1
+        and a.id = #{id}
+    </select>
+
+    <!-- 新增一条公告信息 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into basic_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="prompt_type != null and prompt_type != ''">prompt_type,</if>
+            <if test="prompt_name != null and prompt_name != ''">prompt_name,</if>
+            <if test="prompt_attachId != null and prompt_attachId != ''">prompt_attachId,</if>
+            type
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="prompt_type != null and prompt_type != ''">#{prompt_type},</if>
+            <if test="prompt_name != null and prompt_name != ''">#{prompt_name},</if>
+            <if test="prompt_attachId != null and prompt_attachId != ''">#{prompt_attachId},</if>
+            'prompt'
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.vic.ck.entity.BasicConfig">
+        update basic_config
+        <set>
+            prompt_type=#{prompt_type},
+            prompt_name=#{prompt_name},
+            prompt_attachId=#{prompt_attachId}
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <!--删除公告数据 -->
+    <delete id="delete">
+        delete from basic_config where id in
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+</mapper>

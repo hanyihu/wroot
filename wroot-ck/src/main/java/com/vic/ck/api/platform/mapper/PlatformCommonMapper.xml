@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.api.platform.mapper.PlatformCommonMapper">
+
+	<!-- 意见反馈列表 -->
+	<select id="feedbacks" resultType="com.vic.ck.entity.PlatformFeedback">
+		SELECT a.`id`, a.`customer_id` AS customerId, a.`customer_name` AS customerName, a.`content`, a.`type`, a.`images`, a.`create_time` AS createTime, a.`status` , a.`reply`
+		FROM  platform_feedback a
+		WHERE 1=1
+		ORDER BY a.`create_time` DESC
+	</select>
+	
+	<!-- 新增意见反馈 -->
+	<insert id="insertFeedback" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO platform_feedback(customer_id, customer_name, content,type, images,create_time,mobile) VALUES (
+		#{customerId}, #{customerName}, #{content}, #{type}, #{images},sysdate(),#{mobile}
+		)
+	</insert>
+	
+	<!-- 商家分类 -->
+	<select id="merchantCategories" resultType="com.vic.ck.entity.PlatformMerchantCategory">
+		SELECT a.`id`, a.`name`,a.`type`, a.`icon`, a.`service_percent` AS servicePercent, a.`enabled`, a.`sort`
+		FROM platform_merchant_category a
+		WHERE a.`enabled` = 1
+		ORDER BY  a.`sort`
+	</select>
+	
+	<!-- 判断用户当日是否已经签到 -->
+	<select id="isSign" resultType="boolean">
+		SELECT COUNT(1)>0 FROM merchant_sign a 
+		WHERE a.`customer_id` = #{customerId} AND a.`merchant_id` = #{merchantId} 
+		AND DATE(NOW()) = DATE(a.`create_time`)
+	</select>
+	
+	<!-- 用户评论列表 2条 并判断是否已经点赞 -->
+	<select id="merchantComments" resultType="com.vic.ck.vo.CommentVo">
+		SELECT a.`id`, a.`orderno`, a.`customer_id` AS customerId, b.`headpic` AS customerHeadpic,
+		b.`nickname` AS customerName, a.`images`, a.`content`, a.`reply`, a.`star`, a.`praise_num` AS praiseNum, 
+		a.`create_time` AS createTime, c.id IS NOT NULL AS praised
+		FROM order_comment a 
+		LEFT JOIN customer b ON a.`customer_id` = b.`id`
+		LEFT JOIN comment_praise c ON a.`id` = c.`target_id` AND c.`type` =1 AND c.`customer_id` = #{customerId}
+		WHERE a.`is_delete` = 0 AND a.`merchant_id` = #{merchantId}
+		ORDER BY a.`star` DESC, a.`create_time` DESC
+		LIMIT 3
+	</select>
+	
+	<!-- 商家/团购评论列表 -->
+	<select id="comments" resultType="com.vic.ck.vo.CommentVo">
+		SELECT a.`id`, a.`orderno`, a.`customer_id` AS customerId, b.`headpic` AS customerHeadpic,
+		b.`nickname` AS customerName, a.`images`, a.`content`, a.`reply`, a.`star`, a.`praise_num` AS praiseNum, 
+		a.`create_time` AS createTime, c.id IS NOT NULL AS praised
+		FROM order_comment a 
+		LEFT JOIN customer b ON a.`customer_id` = b.`id`
+		LEFT JOIN comment_praise c ON a.`id` = c.`target_id` AND c.`type` =1 AND c.`customer_id` = #{userId}
+		WHERE a.`is_delete` = 0
+		
+		<!-- 商家的只查询商家 -->
+		<if test="merchantId != null">
+			AND a.`merchant_id` = #{merchantId}
+		</if>
+		<!-- 团购的话 只查询团购 -->
+		<if test="groupbuyId !=null">
+			AND a.`commodity_id` = #{groupbuyId}
+		</if>
+		ORDER BY a.`create_time` DESC
+	</select>
+	
+	<!-- 标记删除 -->
+	<update id="removeComment">
+		UPDATE order_comment set is_delete = 1 where id = #{id}
+	</update>
+	
+	<!-- 回复评论 -->
+	<update id="replyComment">
+		UPDATE order_comment set reply = #{reply} where id = #{id}	
+	</update>
+	
+	
+	<!-- 商家的签到列表 -->
+	<select id="signs" resultType="com.vic.ck.vo.SignVo">
+		SELECT a.`id`, a.`customer_id` AS customerId, b.`nickname` AS customerName, b.`headpic` AS customerHeadpic,
+		a.`create_time` AS createTime
+		FROM merchant_sign a 
+		LEFT JOIN customer b ON a.`customer_id` = b.`id`
+		WHERE a.`merchant_id` = #{merchantId}
+		ORDER BY a.`create_time` DESC
+	</select>
+	
+	<!-- 商家签到 -->
+	<insert id="sign" useGeneratedKeys="true">
+		INSERT INTO merchant_sign(customer_id, merchant_id) VALUES( #{customerId}, #{merchantId})
+	</insert>
+	
+	<!-- 计算此商家的签到数量 -->
+	<update id="calcViewNum">
+		UPDATE merchant a
+		SET a.`view_num` = (SELECT COUNT(1) FROM merchant_sign b WHERE b.`merchant_id` = a.`id`)
+		WHERE a.`id` = #{id}
+	</update>
+	
+	<!--  对评论是否已经点赞 -->
+	<select id="isPraise" resultType="boolean">
+		SELECT COUNT(1)>0
+		FROM comment_praise a 
+		WHERE a.`target_id` = #{targetId} AND a.`customer_id` = #{customerId} AND a.`type` = #{type}
+	</select>
+	
+	<select id="findPraiseId" resultType="integer">
+		SELECT a.`id`
+		FROM comment_praise a 
+		WHERE a.`target_id` = #{targetId} AND a.`customer_id` = #{customerId} AND a.`type` = #{type}
+		LIMIT 1
+	</select>
+	
+
+	<!-- 对评论点赞 -->
+	<insert id="insertPraise" >
+		INSERT INTO comment_praise(customer_id, target_id, `type`) VALUES(#{customerId}, #{targetId}, #{type})
+	</insert>
+	
+	<!-- 删除点赞 -->
+	<delete id="deletePraise">
+		DELETE FROM comment_praise WHERE id = #{id}
+	</delete>
+	
+	<!-- 今日已分享次数 -->
+	<select id="findSharedNum" resultType="int">
+		SELECT COUNT(1)  FROM customer_score_record a 
+		WHERE a.`customer_id` = #{customerId} AND DATE(a.`create_time`) = CURDATE()
+	</select>
+	
+	<!-- 新增分享 -->
+	<insert id="insertShare" useGeneratedKeys="true" keyProperty="id">
+		insert into customer_share_record
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="customerId !=null and customerId !='' ">`customer_id`, </if>
+			<if test="type !=null and type !='' ">`type`, </if>
+			<if test="target !=null and target !='' ">`target`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`</if>
+		
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="customerId !=null and customerId !='' ">#{customerId}, </if>
+			<if test="type !=null and type !='' ">#{type}, </if>
+			<if test="target !=null and target !='' ">#{target}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}</if>
+		</trim>	
+	</insert>
+	
+</mapper>

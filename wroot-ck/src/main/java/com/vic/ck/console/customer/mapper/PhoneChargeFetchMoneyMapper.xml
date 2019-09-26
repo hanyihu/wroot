@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.customer.mapper.PhoneChargeFetchMoneyMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`customer_id` AS customerId ,
+		a.`money` AS money ,
+		a.`mobile` AS mobile ,
+		a.`create_time` AS createTime ,
+		a.`status` AS status ,
+		a.`fetch_time` AS fetchTime ,
+		a.`deny_reason` AS denyReason
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.PhoneChargeFetchMoney">
+		SELECT
+		<include refid="base_list" />
+		,b.`nickname` AS customerName, b.`mobile` AS customerMobile
+		FROM phone_charge_fetch_money a
+		LEFT JOIN customer b ON a.`customer_id` = b.`id`
+		WHERE 1=1
+		<if test="userId != null and userId !=0">
+			AND a.`customer_id` = #{userId}
+		</if>
+		<if test="name !=null and name !=''">
+			AND b.`nickname` LIKE CONCAT('%', #{name}, '%')
+		</if>
+		<if test="mobile !=null and mobile !=''">
+			AND b.`mobile` LIKE CONCAT('%', #{mobile}, '%')
+		</if>
+		<if test="status != null">
+			AND a.`status` = #{status}
+		</if>
+		
+		ORDER BY a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.PhoneChargeFetchMoney">
+		SELECT
+		<include refid="base_list" />
+		,b.`nickname` AS customerName, b.`mobile` AS customerMobile
+		FROM phone_charge_fetch_money a
+		LEFT JOIN customer b ON a.`customer_id` = b.`id`
+		WHERE a.id = #{id}
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into phone_charge_fetch_money
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="customerId !=null and customerId !='' ">`customer_id`, </if>
+			<if test="money !=null and money !='' ">`money`, </if>
+			<if test="mobile !=null and mobile !='' ">`mobile`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`, </if>
+			<if test="status !=null and status !='' ">`status`, </if>
+			<if test="fetchTime !=null and fetchTime !='' ">`fetch_time`, </if>
+			<if test="denyReason !=null and denyReason !='' ">`deny_reason`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="customerId !=null and customerId !='' ">#{customerId}, </if>
+			<if test="money !=null and money !='' ">#{money}, </if>
+			<if test="mobile !=null and mobile !='' ">>#{mobile}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}, </if>
+			<if test="status !=null and status !='' ">#{status}, </if>
+			<if test="fetchTime !=null and fetchTime !='' ">#{fetchTime}, </if>
+			<if test="denyReason !=null and denyReason !='' ">#{denyReason}</if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.PhoneChargeFetchMoney">
+		update phone_charge_fetch_money
+		<set>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="money != null">`money` = #{money}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="fetchTime != null">`fetch_time` = #{fetchTime}, </if>
+			<if test="denyReason != null">`deny_reason` = #{denyReason}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from phone_charge_fetch_money where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.api.merchant.mapper.MerchantBalanceMapper">
+
+	<select id="getMerchantBalance" resultType="com.vic.ck.entity.MerchantBalance" >
+		SELECT a.`id`, a.`balance`, a.`merchant_id` AS merchantId, a.`version`  
+		FROM merchant_balance a 
+		WHERE a.`merchant_id`= #{merchantId}
+		LIMIT 1
+	</select>
+	
+	<!-- 新建余额记录 -->
+	<insert id="insertMerchantBalance" >
+		INSERT INTO merchant_balance(balance, merchant_id) VALUES(0,#{id})
+	</insert>
+	
+	 <!-- 修改余额 -->
+	<update id="updateMerchantBalance">
+		UPDATE merchant_balance 
+		SET balance = #{balance} , `version` = `version`+1 
+		WHERE merchant_id = #{merchantId} AND `version` = #{version}
+	</update>
+
+	<!-- 新增余额明细 -->
+	<insert id="insertBalanceRecord" keyProperty="id" useGeneratedKeys="true" >
+		INSERT INTO merchant_balance_record(merchant_id, money, create_time, `type`, `describe`) 
+		VALUES(
+			#{merchantId}, #{money},NOW(),#{type}, #{describe}
+		)
+	
+	</insert> 
+	
+	<!-- 查询余额明细 -->
+	<select id="balanceRecords" resultType="com.vic.ck.entity.CustomerBalanceRecord">
+		SELECT a.`id`, a.`merchant_id` AS merchantId, a.`money`, a.`create_time`  AS createTime, a.`type`, a.`describe`
+		 FROM merchant_balance_record a
+		 WHERE a.`merchant_id` = #{merchantId}
+		 <if test="type != null and type !=0">
+		 	AND a.`type` = #{type}
+		 </if>
+		 ORDER BY a.`create_time` DESC
+	</select> 
+	
+	<!-- 获得用户的对账信息 -->
+	<select id="findMerchantBill" resultType="com.vic.ck.vo.CompareBillVo">
+		SELECT IFNULL(SUM(a.`money`),0) AS amount, COUNT(1) AS nums
+		FROM merchant_balance_record a
+		WHERE a.`merchant_id` = #{merchantId}
+		AND DATE(a.`create_time`) &gt;=  DATE(#{startDate})
+		AND DATE(a.`create_time`)  &lt;=  DATE(#{endDate})
+	</select>
+	
+	<!-- ********************** 后台管理 ↓↓↓*************************************** -->
+	
+    <sql id="base_list">
+		a.`id` AS id ,
+		a.`balance` AS balance ,
+		a.`merchant_id` AS merchantId ,
+		a.`version` AS version 	    
+	</sql>
+    
+    <!--查询列表 -->
+    <select id="list" resultType="com.vic.ck.entity.MerchantBalance">
+		SELECT
+        <include refid="base_list"/>
+		,b.`name` AS merchantName, b.`mobile` AS merchantMobile
+		FROM merchant_balance a
+		LEFT JOIN merchant b ON a.`merchant_id` = b.`id`
+		WHERE 1=1
+		<if test="name !=null and name !=''">
+			AND b.`name` LIKE CONCAT('%', #{name}, '%')
+		</if>
+		<if test="mobile !=null and mobile !=''">
+			AND b.`mobile` LIKE CONCAT('%', #{mobile}, '%')
+		</if>
+		ORDER BY a.id DESC 
+	</select>
+	
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.MerchantBalance">
+		SELECT
+        <include refid="base_list"/>
+		,b.`name` AS merchantName, b.`mobile` AS merchantMobile, 
+		b.`account_name` AS accountName, b.`bank_account` AS bankAccount, b.`bank_name` AS bankName  
+		FROM merchant_balance a
+		LEFT JOIN merchant b ON a.`merchant_id` = b.`id`
+		WHERE a.id = #{id}
+	</select>
+	
+	<!--更新数据 --> 
+	<update id="update" parameterType="com.vic.ck.entity.MerchantBalance">
+		update merchant_balance 
+		<set>
+			<if test="balance != null">`balance` = #{balance}, </if>
+			<if test="merchantId != null">`merchant_id` = #{merchantId}, </if>
+			<if test="version != null">`version` = #{version}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.platform.mapper.PlatformBootPageMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`image` AS image ,
+		a.`title` AS title ,
+		a.`status` AS status ,
+		a.`create_time` AS createTime ,
+		a.`sort` AS sort
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.PlatformBootPage">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_boot_page a
+		WHERE 1=1
+		<if test="status != null">
+			AND a.`status` = #{status}
+		</if>
+		<if test="name != null and name !=''">
+			AND a.`title` LIKE CONCAT('%', #{name}, '%')
+		</if>
+		ORDER BY a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.PlatformBootPage">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_boot_page a
+		WHERE a.id = #{id}
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into platform_boot_page
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="image !=null and image !='' ">`image`, </if>
+			<if test="title !=null and title !='' ">`title`, </if>
+			<if test="status !=null and status !='' ">`status`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`, </if>
+			<if test="sort !=null and sort !='' ">`sort`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="image !=null and image !='' ">#{image}, </if>
+			<if test="title !=null and title !='' ">#{title}, </if>
+			<if test="status !=null and status !='' ">#{status}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}, </if>
+			<if test="sort !=null and sort !='' ">#{sort}</if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.PlatformBootPage">
+		update platform_boot_page
+		<set>
+			<if test="image != null">`image` = #{image}, </if>
+			<if test="title != null">`title` = #{title}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="sort != null">`sort` = #{sort}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from platform_boot_page where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

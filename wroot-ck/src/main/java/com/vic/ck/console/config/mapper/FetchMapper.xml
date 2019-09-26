@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.console.config.mapper.FetchMapper">
+    <!-- 查询所有基础配置的数据 -->
+    <select id="list" resultType="com.vic.ck.entity.BasicConfig">
+        SELECT
+          a.id as id,
+          a.fetch_type as fetch_type,
+          a.fetch_open as fetch_open,
+          a.fetch_startTime as fetch_startTime,
+          a.fetch_endTime as fetch_endTime,
+          a.fetch_rule as fetch_rule,
+          a.fetch_way as fetch_way,
+          a.fetch_poundage as fetch_poundage
+        FROM
+          basic_config a
+        where
+          type = 'fetch'
+    </select>
+
+    <!-- 根据id获取基础配置的详细信息 -->
+    <select id="findById" resultType="com.vic.ck.entity.BasicConfig">
+        SELECT
+          a.id as id,
+          a.fetch_type as fetch_type,
+          a.fetch_open as fetch_open,
+          a.fetch_startTime as fetch_startTime,
+          a.fetch_endTime as fetch_endTime,
+          a.fetch_rule as fetch_rule,
+          a.fetch_way as fetch_way,
+          a.fetch_poundage as fetch_poundage
+        FROM
+          basic_config a
+        WHERE
+          a.id=#{id}
+    </select>
+
+    <!-- 修改基础配置 -->
+    <update id="update" parameterType="com.vic.ck.entity.BasicConfig">
+        update basic_config set
+        fetch_open=#{fetch_open},
+        fetch_startTime=#{fetch_startTime},
+        fetch_endTime=#{fetch_endTime},
+        fetch_rule=#{fetch_rule},
+        fetch_way=#{fetch_way},
+        fetch_poundage=#{fetch_poundage}
+        where id=#{id};
+    </update>
+
+</mapper>

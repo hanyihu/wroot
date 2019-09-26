@@ -1,0 +1,35 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<script>
+$(function(){
+	$(".pagination [data-value]").on("change", function(){
+		$("input[name=page]").val(1);
+		$(this).closest("form").submit();
+	});
+	
+});
+</script>
+<!--页码相关-->
+<form class="row pager-form" role="form"  method="post">
+	<div class="row">
+		<div class="col-md-5">
+			<div class="pagination input-group-bsx">
+				<span>共<span class="total">100</span>条记录，每页显示
+				<select class=" input-xs" name="size" data-value="${pager.size }">
+					<option value="10">10</option>
+					<option value="12">12</option>
+					<option value="20">20</option>
+					<option value="30">30</option>
+					<option value="40">40</option>
+					<option value="50">50</option>
+					<option value="60">60</option>
+					<option value="70">70</option>
+				</select>条，</span>
+				<span><button type="submit" class="btn btn-xs">跳转到</button>第<input class="input-xs" type="text" style="width: 35px;" name="page"  value="${pager.page }"/>页</span>
+			</div>
+		</div>
+		<div class="col-md-7">
+			<ul class="pagination pagination-sm pager-list" data-size="${pager.size }" data-page="${pager.page }"  data-total="${pager.total }"  >
+			</ul>
+		</div>
+	</div>
+</form>

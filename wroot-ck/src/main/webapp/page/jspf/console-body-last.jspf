@@ -1,0 +1,21 @@
+<%@ page pageEncoding="UTF-8" %>
+<!-- 后台一般页面的body的结束部分-->
+
+				</div>
+			</div><!-- 页面的主要内容end -->
+		</div><!-- 右部end -->
+	</div><!--主体结束-->
+	
+	<!--页脚-->
+	<div id="footer" class="container">
+		<nav class="navbar navbar-default navbar-fixed-bottom">
+			<div class="navbar-inner navbar-content-center">
+				<div align="center" style="padding-top: 15px;">
+					<!--<span style="float: left;padding-left: 20px;">整理自 <a  href="http://www.baidu.com" target="_blank">网络</a> V1.0</span>-->
+					Copyright © 镗镗锣
+				</div>
+			</div>
+		</nav>
+	</div>
+</div><!-- container end -->
+

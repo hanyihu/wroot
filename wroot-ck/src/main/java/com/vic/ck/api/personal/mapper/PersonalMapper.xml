@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.api.personal.mapper.PersonalMapper">
+
+	<!-- 收货地址列表 -->
+	<select id="deliveries" resultType="com.vic.ck.entity.CustomerDeliveryAddress">
+		SELECT a.`id`, a.`customer_id` AS customerId, a.`delivery_name` AS   deliveryName, a.`delivery_mobile` AS deliveryMobile, a.`province_id` AS provinceId, b.`name` AS provinceName,
+		a.`city_id` AS cityId, c.`name` AS cityName, a.`area_id` AS areaId, d.`name` AS areaName, a.`address`
+		FROM customer_delivery_address a LEFT JOIN sys_area b ON a.`province_id` = b.`id`
+		LEFT JOIN sys_area c ON a.`city_id` = c.`id`
+		LEFT JOIN sys_area d ON a.`area_id` = d.`id`
+		WHERE 1=1  AND a.`customer_id` = #{userId} 
+		ORDER BY a.`create_time` DESC
+	</select>
+	
+	<select id="deliverieDetail" resultType="com.vic.ck.entity.CustomerDeliveryAddress">
+		SELECT a.`id`, a.`customer_id` AS customerId, a.`delivery_name` AS   deliveryName, a.`delivery_mobile` AS deliveryMobile, a.`province_id` AS provinceId, b.`name` AS provinceName,
+		a.`city_id` AS cityId, c.`name` AS cityName, a.`area_id` AS areaId, d.`name` AS areaName, a.`address`
+		FROM customer_delivery_address a LEFT JOIN sys_area b ON a.`province_id` = b.`id`
+		LEFT JOIN sys_area c ON a.`city_id` = c.`id`
+		LEFT JOIN sys_area d ON a.`area_id` = d.`id`
+		WHERE a.id = #{id}
+	</select>
+	
+	<!--新增收货地址 -->
+	<insert id="addDelivery" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO customer_delivery_address(customer_id, delivery_mobile, delivery_name, province_id, city_id,
+        area_id, address,create_time,longitude,latitude)
+		 VALUES(
+        #{customerId}, #{deliveryMobile}, #{deliveryName}, #{provinceId}, #{cityId}, #{areaId},
+        #{address},NOW(),#{longitude},#{latitude}
+		)
+	</insert>
+	
+	<update id="updateDelivery">
+		UPDATE customer_delivery_address 
+		<set>
+			<if test="deliveryMobile != null">`delivery_mobile` = #{deliveryMobile}, </if>
+			<if test="deliveryName != null">`delivery_name` = #{deliveryName}, </if>
+			<if test="provinceId != null">`province_id` = #{provinceId}, </if>
+			<if test="cityId != null">`city_id` = #{cityId}, </if>
+			<if test="areaId != null">`area_id` = #{areaId}, </if>
+			<if test="address != null">`address` = #{address}, </if>
+            <if test="longitude != null">`longitude` = #{longitude},</if>
+            <if test="latitude != null">`latitude` = #{latitude}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<!-- 删除我的收货地址 -->
+	<delete id="deleteDelivery">
+		DELETE FROM customer_delivery_address WHERE id= #{id}
+	</delete>
+	
+	<!-- 我的银行卡列表 -->
+	<select id="bankCards" resultType="com.vic.ck.entity.CustomerBankCard">
+		 SELECT a.`id`, a.`customer_id` AS customerId, a.`bank_id` AS bankId, a.`bank_name` AS bankName, a.`account_name` AS accountName, a.`bank_cardno` AS bankCardno, a.`id_number` AS idNumber, a.`mobile`,b.`icon` as bankIcon
+		 FROM customer_bank_card a LEFT JOIN platform_bank b ON a.`bank_id` = b.`id`
+		 WHERE a.`customer_id` = #{userId}
+		 ORDER BY a.`create_time` DESC 
+	</select>
+	
+	<!--  新增 -->
+	<insert id="addBankCards" useGeneratedKeys="true" keyProperty="id">
+		 INSERT INTO customer_bank_card(customer_id, bank_id, bank_name, bank_cardno, id_number, mobile, create_time, account_name) 
+		 VALUES(#{customerId}, #{bankId}, #{bankName}, #{bankCardno}, #{idNumber}, #{mobile}, NOW(), #{accountName} )
+	</insert>
+	
+	<!-- 删除  -->
+	<delete id="deleteBankCards">
+		DELETE FROM customer_bank_card WHERE id= #{id}
+	</delete>
+	
+	<insert id="fetch" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO customer_fetch_money(customer_id, money,card_id, fetch_time) VALUES(#{customerId}, #{money}, #{cardId}, NOW())
+	</insert>
+	
+	<!-- 获得银行卡 -->
+	<select id="getBankCard" resultType="com.vic.ck.entity.CustomerBankCard">
+		 SELECT a.`id`, a.`customer_id` AS customerId, a.`bank_id` AS bankId, a.`bank_name` AS bankName, a.`bank_cardno` AS bankCardno, a.`id_number` AS idNumber, a.`mobile`
+		 FROM customer_bank_card a
+		 WHERE a.`id` = #{cardId}
+	</select>
+	
+	<select id="scores" resultType="com.vic.ck.entity.CustomerScoreRecord">
+		SELECT a.`id`, a.`customer_id` AS customerId, a.`score`,  a.`create_time`  AS createTime ,a.`type`, a.`describe` 
+		FROM customer_score_record a
+		WHERE a.`customer_id` = #{userId}
+		ORDER BY a.`create_time` DESC	
+	</select>
+	
+	<insert id="addCustomerScoreRecord" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO customer_score_record(customer_id, score, `type`, `describe`, create_time) 
+		VALUES(#{customerId}, #{score}, #{type}, #{describe}, NOW() )
+	</insert>
+	
+	<!-- 我的推荐概况 -->
+	<select id="recommentSurvey" resultType="com.vic.ck.vo.RecommentSurveyVo">
+		SELECT 
+			MAX(CASE a.type WHEN 1 THEN num ELSE 0 END) AS customerNum,
+			MAX(CASE a.type WHEN 2 THEN num ELSE 0 END) AS merchantNum,
+			MAX(CASE a.type WHEN 3 THEN num ELSE 0 END) AS amount
+		 FROM
+		( 
+			SELECT 1 AS TYPE, COUNT(1) AS num  FROM customer a  WHERE a.`recommend_id` = #{userId}
+			UNION ALL 
+			SELECT 2 AS TYPE, COUNT(1) AS num  FROM merchant b WHERE b.`recommend_id` = #{userId}
+			UNION ALL
+			SELECT 3 AS TYPE, IFNULL(SUM(c.`money`),0) AS num FROM customer_balance_record c WHERE c.`customer_id` = #{userId} AND c.`type` IN (1,4)
+		) a
+	</select>
+	
+	<select id="merchantRecomments"  resultType="com.vic.ck.vo.RecommentVo">
+		SELECT a.`id`, a.`name`, a.`mobile`, a.`out_pic` AS icon, a.`create_time` AS createTime
+		FROM merchant a
+		WHERE a.`recommend_id` = #{userId}
+		ORDER BY a.`id` DESC
+	</select>
+	
+	<select id="customerRecomments"  resultType="com.vic.ck.vo.RecommentVo">
+		SELECT a.`id`, a.`mobile`, a.`nickname` AS `name`, a.`headpic` AS icon, a.`create_time` AS createTime
+		FROM customer a
+		WHERE a.`recommend_id` = #{userId}
+		ORDER BY a.`id` DESC
+	</select>
+	
+	<!-- 当天当前type的获得积分的次数 -->
+	<select id="findSignNum" resultType="int">
+		SELECT COUNT(1)  FROM customer_score_record a WHERE a.`customer_id` = #{customerId} AND DATE(a.`create_time`) = CURDATE() AND a.`type` = #{type}
+	</select>	
+	
+		<!--  积分兑换商品查 -->
+	<select id="integralCommodity" resultType="com.vic.ck.entity.SwapGoods">
+		SELECT *  FROM swap_goods  
+	</select>	
+	
+			<!-- 个人消息查询  用户推送消息表 -->
+	<select id="xxtx" resultType="com.vic.ck.entity.CustomerMsg">
+		SELECT  *  FROM customer_msg  
+		WHERE a.`userId` = #{userId}
+		ORDER BY a.`create_time` DESC 
+	</select>	
+	
+	
+	
+	
+</mapper>

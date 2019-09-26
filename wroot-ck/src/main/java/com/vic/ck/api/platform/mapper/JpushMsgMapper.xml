@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.api.platform.mapper.JpushMsgMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`customer_id` AS customerId ,
+		a.`role` AS role ,
+		a.`content` AS content ,
+		a.`create_time` AS createTime ,
+		a.`readed` AS readed ,
+		a.`type` AS type ,
+		a.`is_delete` AS isDelete ,
+		a.`msg_id` AS msgId
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.JpushMsg">
+		SELECT
+		<include refid="base_list" />
+		FROM jpush_msg a
+		WHERE 1=1 AND a.customer_id = #{userId}
+		AND a.is_delete = 0
+		<if test="type !=null and type != 0">
+			AND a.type = #{type}
+		</if>
+		<if test="status !=null and status != 0">
+			AND a.role = #{status}
+		</if>
+		ORDER BY a.readed, a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.JpushMsg">
+		SELECT
+		<include refid="base_list" />
+		FROM jpush_msg a
+		WHERE id = #{id}
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into jpush_msg
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="customerId !=null and customerId !='' ">`customer_id`, </if>
+			<if test="role !=null and role !='' ">`role`, </if>
+			<if test="content !=null and content !='' ">`content`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`, </if>
+			<if test="readed !=null and readed !='' ">`readed`, </if>
+			<if test="type !=null and type !='' ">`type`, </if>
+			<if test="isDelete !=null and isDelete !='' ">`is_delete`, </if>
+			<if test="msgId !=null and msgId !='' ">`msg_id`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="customerId !=null and customerId !='' ">#{customerId}, </if>
+			<if test="role !=null and role !='' ">#{role}, </if>
+			<if test="content !=null and content !='' ">#{content}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}, </if>
+			<if test="readed !=null and readed !='' ">#{readed}, </if>
+			<if test="type !=null and type !='' ">#{type}, </if>
+			<if test="isDelete !=null and isDelete !='' ">#{isDelete}, </if>
+			<if test="msgId !=null and msgId !='' ">#{msgId}</if>
+		</trim>
+	</insert>
+	
+	<!-- 新增一个城市的 -->
+	<insert id="insertCity">
+		INSERT INTO jpush_msg(customer_id, role, content, TYPE	,msg_id) 
+		SELECT  a.`id`, ${role}, '${content}', ${type}, ${msgId}
+		FROM customer a LEFT JOIN merchant b ON a.`id`= b.`customer_id` AND ${role}=2
+		WHERE a.`live_city` = #{cityId}
+		<if test="role==2">
+			AND b.`id` IS NOT NULL
+		</if>
+	
+	</insert>
+	
+	<!-- 新增全平台的 -->
+	<insert id="insertAll">
+		INSERT INTO jpush_msg(customer_id, role, content, TYPE	,msg_id) 
+		SELECT  a.`id`, ${role}, '${content}', ${type}, ${msgId}
+		FROM customer a LEFT JOIN merchant b ON a.`id`= b.`customer_id` AND ${role}=2
+		WHERE 1=1
+		<if test="role==2">
+			AND b.`id` IS NOT NULL
+		</if>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.JpushMsg">
+		update jpush_msg
+		<set>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="role != null">`role` = #{role}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="readed != null">`readed` = #{readed}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="isDelete != null">`is_delete` = #{isDelete}, </if>
+			<if test="msgId != null">`msg_id` = #{msgId}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from jpush_msg where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

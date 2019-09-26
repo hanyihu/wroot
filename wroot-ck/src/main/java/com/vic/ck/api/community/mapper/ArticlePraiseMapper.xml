@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.api.community.mapper.ArticlePraiseMapper">
+
+    <sql id="base_list">
+		a.`id` AS id ,
+		a.`article_id` AS articleId ,
+		a.`customer_id` AS customerId ,
+		a.`create_time` AS createTime
+	</sql>
+
+    <!--根据文章id和用户id查询对象 -->
+    <select id="findPraiseById" resultType="com.vic.ck.entity.ArticlePraise">
+        SELECT
+        <include refid="base_list"/>
+        FROM article_praise a
+        WHERE a.customer_id = #{customerId} and a.article_id = #{articleId}
+    </select>
+
+    <!--新增数据 -->
+    <insert id="insertPraise" useGeneratedKeys="true" keyProperty="id">
+        insert into article_praise
+        (
+        <trim suffixOverrides=",">
+            <if test="articleId !=null and articleId !='' ">`article_id`,</if>
+            <if test="customerId !=null and customerId !='' ">`customer_id`,</if>
+            create_time
+        </trim>
+        )
+        values
+        (
+        <trim suffixOverrides=",">
+            <if test="articleId !=null and articleId !='' ">#{article_Id},</if>
+            <if test="customerId !=null and customerId !='' ">#{customerId},</if>
+            sysdate()
+        </trim>
+        )
+    </insert>
+
+    <!--删除数据 -->
+    <delete id="deletePraiseById">
+		delete from article_praise where id = #{id}
+	</delete>
+
+</mapper>

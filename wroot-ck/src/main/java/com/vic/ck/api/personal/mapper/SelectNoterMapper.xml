@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.api.personal.mapper.SelectNoterMapper">
+ 
+	
+	<!-- 我的搜索记录  -->
+	<select id="ssjlList" resultType="com.vic.ck.entity.SelectNoter">
+		 SELECT  a.id,a.commodity,a.customer_id, a.select_time,a.note
+		 FROM commodity_select_record a 
+		 WHERE a.customer_id = #{userId}
+		 ORDER BY a.select_time DESC
+	</select>
+	 
+	
+</mapper>

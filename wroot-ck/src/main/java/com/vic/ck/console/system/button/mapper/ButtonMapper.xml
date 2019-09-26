@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.console.system.button.mapper.ButtonMapper">
+
+	<select id="ListButton" resultType="com.vic.ck.console.entity.Button">
+		SELECT a.id,a.name,a.code from sys_btn a WHERE 1=1
+		<if test="name!=null and name!=''">
+			and name like concat('%',#{name},'%')
+		</if>
+		<if test="code!=null and code!=''">
+			and code like concat('%',#{code},'%')
+		</if>
+	</select>
+	<select id="checkName" resultType="boolean">
+		SELECT COUNT(1)=0 FROM sys_btn WHERE name = #{name}
+		<if test="id !=null">
+			AND id!= #{id}
+		</if>
+	</select>
+	<select id="getButtonid" resultType="com.vic.ck.console.entity.Button">
+		select a.id,a.name,a.code
+		from sys_btn a where a.id=#{id}
+	</select>
+
+	<insert id="addButton" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO sys_btn(name,code) VALUES
+		(#{name}, #{code})
+	</insert>
+
+	<update id="updateButton">
+		UPDATE sys_btn SET name = #{name}, code = #{code}
+		WHERE id =#{id}
+	</update>
+
+	<delete id="deleteButton">
+		DELETE FROM sys_btn WHERE id in
+		<foreach collection="ids" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
+		and (select count(*) from sys_menu_btn_rel where btn_id in
+		<foreach collection="ids" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+			</foreach>)=0
+	</delete>
+	<select id="checkID" resultType="int">
+		select count(*) from sys_menu_btn_rel where btn_id in
+		<foreach collection="ids" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+			</foreach>
+	</select>
+
+
+</mapper>

@@ -1,0 +1,123 @@
+body { 
+ padding-bottom: 45px;/*使固定在底部的不会遮住其他内容*/
+}
+
+.clear{
+	clear: both;
+}
+.post_list{/*文章列表*/
+	margin-top: 0;
+	padding-left: 5px;
+	padding-right: 0;
+	padding-top: 10px;
+	min-height: 300px;
+	margin-top: 0;
+	padding-left: 5px;
+	padding-right: 0;
+	padding-top: 10px;
+	min-height: 300px;
+}
+.post_item{/*列表文章数据*/
+	border-bottom: 1px dotted #ccc;
+	border-width: 1px;
+	margin-bottom: 15px;
+	padding-bottom: 15px;
+}
+
+.digg{/*推荐*/
+	float: left;
+	width: 60px;
+}
+.diggit{/*推荐背景*/
+	float: left;
+	width: 46px;
+	height: 52px;
+	background: url(../img/sys/upup.gif) no-repeat;
+	text-align: center;
+	cursor: pointer;
+	margin-top: 2px;
+	text-indent: 0;
+}
+.diggnum{/*推荐数*/
+	line-height: 2.2em;
+	font-size: 14px;
+	color: #075db3;
+	font-family: Verdana;
+}
+.digg_tip{/*点击推荐时候的提示*/
+	margin-top: 5px;
+	font-size: 12px;
+}
+.post_item_body{
+	margin-left: 50px;
+	padding-top: 1px;
+	line-height: 150%;
+}
+.post_list h3 {
+	font-size: 14px;
+	margin: 0 0 5px 0;
+}
+.titlelnk{/*标题*/
+	margin-top: 5px;
+	color: #105cb6;
+	font-size: 14px;
+	font-weight: bold;
+	text-decoration: underline;
+}
+.post_item_summary{/*简介*/
+	line-height: 1.8em;
+	margin-bottom: 5px;
+	color: #333;
+	overflow: hidden;
+	padding-right: 5px;
+	font-size: 12px;
+	padding-top: 5px;
+}
+
+.post_item_foot{/*列表下部的一些信息*/
+	color: #555;
+	padding-top: 5px;
+	margin-left: 10px;
+}
+
+.lightblue{/*亮蓝色*/
+	color: #005a94;
+	text-decoration: none;
+}
+.article_comment{/*评论数*/
+	background: transparent url(../img/sys/icon_comment.gif) no-repeat scroll 0 0;
+	padding-left: 18px;
+	padding-right: 5px;
+	margin-left: 1px;
+}
+.gay{/*灰色*/
+	color: #555;
+	text-decoration: none;
+}
+.article_view{/*阅读数*/
+	background: transparent url(../img/sys/icon_arrow.gif) no-repeat scroll 0 0;
+	padding-left: 18px;
+	padding-right: 5px;
+	margin-left: 1px;
+}
+
+.list-label{/*文章列表的label*/
+	margin: 10px 10px 10px 10px;
+}
+hr.hr{
+	margin: 0px auto;
+	margin-bottom: 10px;;
+}
+/**************************/
+
+.login-layout{
+	width: 400px;
+	height: 240px;;
+	border: 10px solid gray;
+	margin: 0 auto;
+	margin-top: 50px;
+	padding-bottom: 50px;
+	background: white;
+	
+	
+}

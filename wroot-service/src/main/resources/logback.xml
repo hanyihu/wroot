@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	 <property name="logDir" value="/www/wwwroot/ttl/logs/attach-log" />
+
+	<appender name="rollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logDir}/service-log-%d{yyyy-MM-dd}.log</fileNamePattern>
+			<!-- the day that is kept-->
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"><!-- 必须指定，否则不会往文件输出内容 -->
+			<!-- %d:date; %thread:thread name; %-5level:level appear from left with 5 char width; %msg:message; %n:\n-->
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
+		</encoder>
+		<append>false</append>
+		<prudent>false</prudent>
+	</appender>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>console-%d{MMdd HH:mm:ss.SSS} [%thread] %-5level%logger{36}- %msg%n</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+
+	<logger name="com.vic" level="DEBUG" />
+	<logger name="org.springframework.web.servlet.DispatcherServlet"
+		level="DEBUG" />
+	<logger name="druid.sql" level="INFO" />
+
+	<logger name="org.springframework.jdbc.core.StatementCreatorUtils"
+		additivity="false" level="TRACE">
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="org.springframework.jdbc.core" additivity="true">
+		<level value="DEBUG" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+	<logger name="java.sql.Connection" additivity="true">
+		<level value="DEBUG" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="java.sql.Statement" additivity="true">
+		<level value="DEBUG" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="java.sql.PreparedStatement" additivity="true">
+		<level value="DEBUG" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="java.sql.ResultSet" additivity="true">
+		<level value="DEBUG" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<root level="INFO">
+		<!-- <appender-ref ref="STDOUT" /> -->
+		 <appender-ref ref="rollingFile" />
+	</root>
+</configuration>

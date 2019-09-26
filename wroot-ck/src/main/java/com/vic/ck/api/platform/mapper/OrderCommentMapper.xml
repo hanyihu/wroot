@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.api.platform.mapper.OrderCommentMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`orderno` AS orderno ,
+		a.`type` AS type ,
+		a.`customer_id` AS customerId ,
+		a.`merchant_id` AS merchantId ,
+		a.`commodity_id` AS commodityId ,
+		a.`images` AS images ,
+		a.`content` AS content ,
+		a.`star` AS star ,
+		a.`environment_star` AS environmentStar ,
+		a.`flavor_star` AS flavorStar ,
+		a.`service_star` AS serviceStar ,
+		a.`reply` AS reply ,
+		a.`praise_num` AS praiseNum ,
+		a.`create_time` AS createTime ,
+		a.`is_delete` AS isDelete
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.OrderComment">
+		SELECT
+		<include refid="base_list" />
+		FROM order_comment a
+		WHERE 1=1
+		ORDER BY id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.OrderComment">
+		SELECT
+		<include refid="base_list" />
+		FROM order_comment a
+		WHERE id = #{id}
+	</select>
+	
+	<select id="findByOrderno" resultType="com.vic.ck.entity.OrderComment">
+		SELECT
+		<include refid="base_list" />
+		FROM order_comment a
+		WHERE orderno = #{orderno}
+	</select>
+	
+	
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into order_comment
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="orderno !=null and orderno !='' ">`orderno`, </if>
+			<if test="type !=null and type !='' ">`type`, </if>
+			<if test="customerId !=null and customerId !='' ">`customer_id`, </if>
+			<if test="merchantId !=null and  merchantId !='' ">`merchant_id`, </if>
+			<if test="commodityId !=null and commodityId !='' ">`commodity_id`, </if>
+			<if test="images !=null and images !='' ">`images`, </if>
+			<if test="content !=null and content !='' ">`content`, </if>
+			<if test="star !=null and star !='' ">`star`, </if>
+			<if test="environmentStar !=null and environmentStar !='' ">`environment_star`, </if>
+			<if test="flavorStar !=null and flavorStar !='' ">`flavor_star`, </if>
+			<if test="serviceStar !=null and serviceStar !='' ">`service_star`, </if>
+			<if test="reply !=null and reply !='' ">`reply`, </if>
+			<if test="praiseNum !=null and praiseNum !='' ">`praise_num`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`, </if>
+			<if test="isDelete !=null and isDelete !='' ">`is_delete`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="orderno !=null and orderno !='' ">#{orderno}, </if>
+			<if test="type !=null and type !='' ">#{type}, </if>
+			<if test="customerId !=null and customerId !='' ">#{customerId}, </if>
+			<if test="merchantId !=null and merchantId !='' ">#{merchantId}, </if>
+			<if test="commodityId !=null and commodityId !='' ">#{commodityId}, </if>
+			<if test="images !=null and images !='' ">#{images}, </if>
+			<if test="content !=null and content !='' ">#{content}, </if>
+			<if test="star !=null and star !='' ">#{star}, </if>
+			<if test="environmentStar !=null and environmentStar !='' ">#{environmentStar}, </if>
+			<if test="flavorStar !=null and flavorStar !='' ">#{flavorStar}, </if>
+			<if test="serviceStar !=null and serviceStar !='' ">#{serviceStar}, </if>
+			<if test="reply !=null and reply !='' ">#{reply}, </if>
+			<if test="praiseNum !=null and praiseNum !='' ">#{praiseNum}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}, </if>
+			<if test="isDelete !=null and isDelete !='' ">#{isDelete}</if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.OrderComment">
+		update order_comment
+		<set>
+			<if test="orderno != null">`orderno` = #{orderno}, </if>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="merchantId != null">`merchant_id` = #{merchantId}, </if>
+			<if test="commodityId != null">`commodity_id` = #{commodityId}, </if>
+			<if test="images != null">`images` = #{images}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="star != null">`star` = #{star}, </if>
+			<if test="environmentStar != null">`environment_star` = #{environmentStar}, </if>
+			<if test="flavorStar != null">`flavor_star` = #{flavorStar}, </if>
+			<if test="serviceStar != null">`service_star` = #{serviceStar}, </if>
+			<if test="reply != null">`reply` = #{reply}, </if>
+			<if test="praiseNum != null">`praise_num` = #{praiseNum}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="isDelete != null">`is_delete` = #{isDelete}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from order_comment where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<!-- 计算点赞数 -->
+	<update id="calcPraiseNum">
+		UPDATE order_comment a
+		SET a.`praise_num` = (SELECT COUNT(1) FROM comment_praise b WHERE b.`target_id` = a.`id` AND b.`type` = 1)
+		WHERE a.`id` = #{id}
+	</update>
+	
+	<!-- 评论商家之后的计算评星 -->
+	<update id="afterComment">
+		UPDATE merchant a
+		LEFT JOIN 
+		(
+			SELECT a.`id`, a.`type`, 
+			SUM(CASE WHEN b.`id`IS NOT NULL  THEN 1 ELSE 0 END  ) AS total,
+			SUM(CASE WHEN a.`type` = 1  AND b.`id`IS NOT NULL  THEN 1 ELSE 0 END ) AS foodTotal,
+			SUM(IFNULL(b.`service_star`,0)) AS service_star,
+			SUM(IFNULL(b.`environment_star`,0)) AS environment_star,
+			SUM(IFNULL(b.`flavor_star`,0)) AS flavor_star,
+			SUM(IFNULL(b.`star`,0)) AS star,
+			SUM(CASE WHEN b.`star` &gt;=4 THEN 1 ELSE 0 END) AS nice_comment_num
+			FROM merchant a LEFT JOIN order_comment b ON a.`id` = b.`merchant_id`
+			WHERE 1=1
+			<if test="merchantId != null">
+				AND a.`id` = #{merchantId}
+			</if>
+			GROUP BY a.`id`
+		) t ON a.`id` = t.id
+		SET a.`star` = (t.star/IF(t.total=0, 1, t.total)),
+		a.`environment_star` = (t.environment_star/IF(t.total=0, 1, t.total)),
+		a.`service_star` = (t.service_star/IF(t.total=0, 1, t.total)),
+		a.`comment_num` = t.total,
+		a.`nice_comment_num` = t.nice_comment_num,
+		a.`flavor_star` = (
+		    CASE WHEN a.`type` !=1 THEN 0
+		    ELSE (t.flavor_star/IF(t.foodTotal=0,1, t.foodTotal)) END	
+		)
+		WHERE 1=1 
+		<if test="merchantId != null">
+			AND a.`id` = #{merchantId}
+		</if>
+	</update>
+	
+	<update id="updateGroupBuyComment">
+		UPDATE merchant_groupbuy a
+		LEFT JOIN 
+		(
+			SELECT  a.`id`,
+			SUM(CASE WHEN b.`id`IS NOT NULL  THEN 1 ELSE 0 END  ) AS total,
+			SUM(IFNULL(b.`star`,0)) AS star
+			FROM merchant_groupbuy a LEFT JOIN order_comment b ON a.`id` = b.`commodity_id` AND b.`type` = 2
+			WHERE a.`id` = #{id}
+			GROUP BY a.`id`
+		) t ON a.`id` = t.id
+		SET a.`star` = (t.star/IF(t.total=0, 1, t.total)),
+		a.`comment_num` = t.total
+		WHERE a.`id` = #{id}
+	</update>
+
+</mapper>

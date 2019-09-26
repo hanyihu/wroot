@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.api.rider.personal.mapper.SetupApiMapper">
+
+    <sql id="base_list">
+		a.`id` AS id ,
+		a.`nickname` as nickname,
+		a.`recommend_qcode_path` AS recommendQcodePath ,
+		a.`ttl_account` AS ttlAccounts ,
+		a.`headpic` AS headpic ,
+		a.`create_time` AS createTime ,
+		a.`birthday` AS birthday ,
+		a.`health_card` AS healthCard ,
+		a.`healthCardNo` AS healthCardNo ,
+		a.`health_validity` AS healthValidity,
+		a.`sendcity` AS sendcity,
+		a.`sendarea` AS sendarea,
+		a.`id_card` AS idCard,
+		a.`id_validity` AS idValidity,
+		a.`name` AS name,
+		a.`emergency` AS emergency,
+		a.`emergency_phone` AS emergencyPhone,
+		a.`vehicle` AS vehicle,
+		a.`marriage` AS marriage,
+		a.`education` AS education,
+		a.`birthday` AS age,
+		a.`mobile` AS mobile
+
+	</sql>
+ <sql id="order_list">
+		b.`id` AS id ,
+		b.`orderno` AS orderno ,
+		b.`order_type` AS orderType ,
+		b.`total_fee` AS totalFee ,
+		b.`amount` AS amount ,
+		b.`quantity` AS quantity,
+		b.`status` AS status
+
+	</sql>
+<sql id="task_list">
+		d.`id` AS id ,
+		d.`ridername` AS ridername ,
+		d.`merchantname` AS merchantname ,
+		d.`fee` AS fee ,
+		d.`orderno` AS orderno ,
+		d.`order_status` AS orderStatus,
+		d.`remarks` AS remarks,
+		d.`rider_id` AS riderId,
+		d.`merchant_id` AS merchantId,
+        d.`creation_time` AS creationTime
+	</sql>
+
+
+
+    <!--根据主键查询对象 -->
+    <select id="findById" resultType="com.vic.ck.entity.Customer">
+        SELECT
+        <include refid="base_list" />
+        FROM customer a
+        where 1=1
+        and a.id = #{id}
+    </select>
+
+    <!--修改骑手个人中心设置-->
+    <update id="updateSetup" parameterType="com.vic.ck.entity.Customer">
+        update customer
+        <set>
+            <if test="headpic != null">`headpic` = #{headpic}, </if>
+            <if test="recommendQcodePath != null">`recommend_qcode_path` = #{recommendQcodePath}, </if>
+            <if test="ttlAccounts != null">`ttl_account` = #{ttlAccounts}, </if>
+            <if test="birthday != null">`birthday` = #{birthday}, </if>
+            <if test="healthCard != null">`health_card` = #{healthCard}, </if>
+            <if test="healthCardNo != null">`healthCardNo` = #{healthCardNo}, </if>
+            <if test="healthValidity != null">`health_validity` = #{healthValidity}, </if>
+            <if test="sendcity != null">`sendcity` = #{sendcity}, </if>
+            <if test="sendarea != null">`sendarea` = #{sendarea}, </if>
+            <if test="idCard != null">`id_card` = #{idCard}, </if>
+            <if test="idValidity != null">`id_validity` = #{idValidity}, </if>
+            <if test="name != null">`name` = #{name}, </if>
+            <if test="emergency != null">`emergency` = #{emergency}, </if>
+            <if test="emergencyPhone != null">`emergency_phone` = #{emergencyPhone}, </if>
+            <if test="vehicle != null">`vehicle` = #{vehicle}, </if>
+            <if test="marriage != null">`marriage` = #{marriage}, </if>
+            <if test="education != null">`education` = #{education}, </if>
+            <if test="healthStatus != null">`health_status` = #{healthStatus}, </if>
+            <if test="idCardStatus != null">`id_card_status` = #{idCardStatus}</if>
+
+        </set>
+        where id = #{id}
+
+    </update>
+
+    <!-- 修改余额 -->
+    <update id="updateRiderBalance">
+		UPDATE rider_balance_sheet
+		SET balance = #{balance} , `version` = `version`+1
+		WHERE rider_id = #{riderId}
+		AND `version` = #{version}
+	</update>
+
+    <!--获取骑手余额-->
+    <select id="balance" resultType="com.vic.ck.entity.RiderBalanceSheet">
+        select
+         a.`id` AS id,
+         a.`balance` AS balance,
+         a.`rider_id` AS riderId,
+         a.`version` AS version,
+         a.`creat_time` AS createTime
+        from rider_balance_sheet a
+        where 1=1
+        and a.`rider_id`=#{id}
+    </select>
+
+    <!--工作统计  今日/历史接单数-->
+    <select id="orderNum" resultType="Integer">
+      select
+        COUNT(*) from rider_task a
+        where a.rider_id=#{id}
+        <if test="createTime ==1">
+         and  TO_DAYS(a.creation_time) = TO_DAYS(NOW())
+        </if>
+    </select>
+
+   <!--工作统计  今日/历史完成订单数-->
+   <select id="completeOrder" resultType="integer">
+      select
+        COUNT(*) from rider_task a
+        where a.rider_id=#{id} and a.order_status=3
+       <if test="createTime ==1">
+           and  TO_DAYS(a.creation_time) = TO_DAYS(NOW())
+       </if>
+
+
+   </select>
+
+    <!--工作统计  今日/历史取消订单数-->
+    <select id="cancelOrders" resultType="integer">
+        select
+        COUNT(*) from rider_task a
+        where a.rider_id=#{id} and a.order_status=0
+        <if test="createTime ==1">
+            and  TO_DAYS(a.creation_time) = TO_DAYS(NOW())
+        </if>
+    </select>
+
+    <!--工作统计  今日/历史收益-->
+    <select id="profit" resultType="decimal">
+        select
+        SUM(a.fee) from rider_task a
+        where a.rider_id=#{id} and a.order_status=3
+        <if test="createTime ==1">
+            and  TO_DAYS(a.creation_time) = TO_DAYS(NOW())
+        </if>
+    </select>
+
+    <!--管理细则-->
+    <select id="ruleList" resultType="com.vic.ck.entity.RiderManagement">
+        select
+         a.`id` as id,
+         a.`title` as title,
+         a.`icon` as icon,
+         a.`content` as content,
+         a.`create_time` as createTime,
+         a.`is_show` as isShow
+         from rider_management a
+         where 1=1
+
+    </select>
+
+  <!-- 接单明细-->
+    <select id="listDetail" resultType="com.vic.ck.entity.RiderTask">
+    select
+    <include refid="task_list"/>
+    ,<include refid="order_list"/>
+        from rider_task d , `order` b
+        where 1=1
+        and d.orderno=b.orderno
+        and d.`order_status` in(0,3)
+        and d.`rider_id`=#{id}
+        and  TO_DAYS(d.creation_time) = TO_DAYS(#{createTime})
+    </select>
+
+    <!--获取客服集合-->
+    <select id="customerService" resultType="com.vic.ck.entity.CustomerService">
+        select
+         a.`id` AS id,
+         a.`title` AS title,
+         a.`phone` AS phone,
+         a.`headImage` AS headImage
+
+        from customer_service a
+
+    </select>
+
+    <!--我的客服问题集合-->
+    <select id="findProblemList" resultType="com.vic.ck.entity.CustomerServiceProblem">
+        select
+         a.`id` AS id,
+         a.`problem` AS problem,
+         a.`solution` AS solution
+         from customer_service_problem a
+         where 1=1
+    </select>
+
+    <!--邀请信息集合-->
+    <select id="invitationList" resultType="com.vic.ck.entity.Customer">
+       select
+        a.id,
+        a.nickname,
+        a.mobile,
+        a.recommend_id,
+        a.create_time As createTime
+      from customer a
+      LEFT JOIN customer b on b.id=a.recommend_id
+      where 1=1
+      and a.recommend_id=#{id}
+    </select>
+
+    <!--获取全部的邀请人数-->
+    <select id="getAllInvitation" resultType="integer">
+        select
+         count(*)
+        from customer a
+        where 1=1
+        and a.recommend_id=#{id}
+    </select>
+
+    <!--获取邀请成功的人数-->
+    <select id="getSuccessInvitation" resultType="integer">
+        select
+         count(*)
+        from customer a
+        where 1=1
+        and a.recommend_id=#{id}
+        and a.isRider=1
+    </select>
+
+
+    <!--配送中心-->
+    <select id="distribution" resultType="com.vic.ck.entity.WorkStatistics">
+      select
+       COUNT(*) as completeOrder,
+       SUM(a.fee) as profit,
+       SUM(a.activity_award) as activityAward,
+       SUM(a.other_income) as otherIncome
+      from rider_task a
+      where a.rider_id=#{id}
+        and a.order_status=3
+      <if test="type==1">
+          and  TO_DAYS(a.creation_time) = TO_DAYS(#{createTime})
+      </if>
+      <if test="type==2">
+          and  date_format(a.creation_time,'%Y-%m')=#{createTime}
+      </if>
+
+    </select>
+
+    <!--开通骑手-->
+    <insert id="submitRider" useGeneratedKeys="true" keyProperty="id">
+        insert into rider_examine
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+
+            <if test="riderId !=null and riderId !='' ">`rider_id`,</if>
+            <if test="sendcity !=null and sendcity !='' ">`sendcity`,</if>
+            <if test="address !=null and address !='' ">`address`,</if>
+            <if test="phone !=null and phone !='' ">`phone`</if>
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+
+            <if test="riderId !=null and riderId !='' ">#{riderId},</if>
+            <if test="sendcity !=null and sendcity !='' ">#{sendcity},</if>
+            <if test="address !=null and address !='' ">#{address},</if>
+            <if test="phone !=null and phone !='' ">#{phone}</if>
+
+        </trim>
+    </insert>
+
+
+    <!--上传健康证-->
+    <update id="uploadHealth">
+        update rider_examine a
+        <set>
+            <if test="healthCard != null">a.`health_card` = #{healthCard},</if>
+            <if test="healthCardNo != null">a.`healthcardno` = #{healthCardNo},</if>
+            <if test="healthValidity != null">a.`health_validity` = #{healthValidity}</if>
+        </set>
+        where 1=1
+        and a.`rider_id` = #{riderId}
+    </update>
+
+    <!--上传身份证-->
+    <update id="uploadIdCard">
+        update rider_examine a
+        <set>
+            <if test="idCard != null">a.`id_card` = #{idCard},</if>
+            <if test="status != null">a.`status` = #{status}</if>
+
+        </set>
+        where 1=1
+        and a.`rider_id` = #{riderId}
+    </update>
+
+    <!--骑手 提现 获取银行卡信息-->
+    <select id="bankCardList" resultType="com.vic.ck.entity.CustomerBankCard">
+        SELECT a.`id`, a.`customer_id` AS customerId, a.`bank_id` AS bankId, a.`account_name` AS accountName,
+		a.`bank_name` AS bankName, a.`bank_cardno` AS bankCardno,
+		a.`id_number` AS idNumber, a.`mobile` AS mobile, a.`bank_icon` As bankIcon, a.`card_type` AS cardType
+		,a.`balance` AS balance
+		FROM customer_bank_card a
+		WHERE a.`customer_id` = #{customerId}
+    </select>
+
+    <!--增加卡内余额-->
+    <update id="addBalance">
+        update customer_bank_card a
+        <set>
+            <if test="withdrawMoney != null">a.`balance` = #{withdrawMoney}</if>
+        </set>
+        where 1=1
+        and a.`customer_id` = #{id}
+    </update>
+
+    <!--消息中心-系统消息-->
+    <select id="getMsg" resultType="com.vic.ck.entity.PlatformMsg">
+        select
+         a.`id` AS id,
+         a.`role` AS role,
+         a.`title` AS titile,
+         a.`content` AS content,
+         a.`create_time` AS createTime,
+         a.`status` AS status,
+         a.`targt_type` AS targtType,
+         a.`mobile` AS mobile,
+         a.`push_time` AS pushTime,
+         a.`city_id` AS cityId
+         from platform_msg a
+         where 1=1
+         and a.`status`=1
+         and a.`role`= 3
+         order by a.`push_time` DESC
+
+    </select>
+
+   <!--消息中心-快捷消息-->
+   <select id="quickMsg" resultType="com.vic.ck.entity.RiderTask">
+       select
+       <include refid="task_list"></include>
+       from  rider_task d
+       where 1=1
+       and d.`order_status` in (1,2)
+       and d.`rider_id`= #{id}
+       order by d.`creation_time` DESC
+   </select>
+
+    <!--骑手邀请轮播图-->
+    <select id="InviteBanner" resultType="com.vic.ck.entity.PlatformBanner">
+       select
+        a.`id` AS id ,
+		a.`image` AS image ,
+		a.`type` AS TYPE ,
+		a.`url_type` AS urlType ,
+		a.`target` AS target ,
+		a.`city_id` AS cityId ,
+		a.`enabled` AS enabled ,
+		a.`sort` AS sort ,
+		a.`title` AS title
+		FROM platform_banner a
+		WHERE 1=1
+		and a.`type`=5
+    </select>
+
+</mapper>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.platform.mapper.PlatformAppVersionMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`name` AS name ,
+		a.`version` AS version ,
+		a.`number` AS number ,
+		a.`machine_type` AS machineType ,
+		a.`app_type` AS
+		appType ,
+		a.`log` AS log ,
+		a.`ios_url` AS iosUrl ,
+		a.`android_url` AS
+		androidUrl ,
+		a.`create_time` AS createTime
+	</sql>
+
+	<!-- 当前最新版本-->
+	<select id="currentVersion" resultType="com.vic.ck.entity.PlatformAppVersion">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_app_version a
+		WHERE a.`app_type` = #{appType} AND a.`machine_type` = #{machineType}
+		ORDER
+		BY a.`number` DESC LIMIT 1
+	</select>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.PlatformAppVersion">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_app_version a
+		WHERE 1=1
+		ORDER BY a.id DESC
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.PlatformAppVersion">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_app_version a
+		WHERE a.id = #{id}
+	</select>
+
+	<!--批量查询对象 -->
+	<select id="findByIds" resultType="com.vic.ck.entity.PlatformAppVersion">
+		SELECT
+		<include refid="base_list" />
+		FROM platform_app_version a
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into platform_app_version
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="name !=null and name !='' ">`name`, </if>
+			<if test="version !=null and version !='' ">`version`, </if>
+			<if test="number !=null and number !='' ">`number`, </if>
+			<if test="machineType !=null and machineType !='' ">`machine_type`, </if>
+			<if test="appType !=null and appType !='' ">`app_type`, </if>
+			<if test="log !=null and log !='' ">`log`, </if>
+			<if test="iosUrl !=null and iosUrl !='' ">`ios_url`, </if>
+			<if test="androidUrl !=null and androidUrl !='' ">`android_url`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="name !=null and name !='' ">#{name}, </if>
+			<if test="version !=null and version !='' ">#{version}, </if>
+			<if test="number !=null and number !='' ">#{number}, </if>
+			<if test="machineType !=null and machineType !='' ">#{machineType}, </if>
+			<if test="appType !=null and appType !='' ">#{appType}, </if>
+			<if test="log !=null and log !='' ">#{log}, </if>
+			<if test="iosUrl !=null and iosUrl !='' ">#{iosUrl}, </if>
+			<if test="androidUrl !=null and androidUrl !='' ">#{androidUrl}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}</if>
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.PlatformAppVersion">
+		update platform_app_version
+		<set>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="version != null">`version` = #{version}, </if>
+			<if test="number != null">`number` = #{number}, </if>
+			<if test="machineType != null">`machine_type` = #{machineType}, </if>
+			<if test="appType != null">`app_type` = #{appType}, </if>
+			<if test="log != null">`log` = #{log}, </if>
+			<if test="iosUrl != null">`ios_url` = #{iosUrl}, </if>
+			<if test="androidUrl != null">`android_url` = #{androidUrl}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from platform_app_version where id in
+		<foreach item="item" collection="ids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.api.rider.dispatch.controller.mapper.DispatchMapper">
+
+
+	<!--根据经纬度统计附近骑手的数量-->
+	<select id="riderNum" resultType="integer">
+     SELECT
+       COUNT(a.id)
+       from customer a, sys_area b
+       where
+       a.`lat`=b.`Lat`
+       and a.`lng`=b.`lng`
+       and a.`isRider`=1
+       and a.`lng`=#{lng}
+       and a.`lat`=#{lat}
+       and b.level_type!=1
+	</select>
+</mapper>

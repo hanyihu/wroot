@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.merchant.mapper.ConsoleMerchantMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`customer_id` AS customerId ,
+		a.`recommend_id` AS recommendId ,
+		a.`name` AS name ,
+		a.`province_id` AS provinceId ,
+		a.`city_id` AS cityId ,
+		a.`area_id` AS areaId ,
+		a.`address` AS address ,
+		a.`landmarks` AS landmarks ,
+		a.`longitude` AS longitude ,
+		a.`latitude` AS latitude ,
+		a.`type` AS type ,
+		a.`category_id` AS categoryId ,
+		a.`mobile` AS mobile ,
+		a.`out_pic` AS outPic ,
+		a.`in_pic` AS inPic ,
+		a.`license_pic` AS licensePic ,
+		a.`license_persistent` AS licensePersistent ,
+		a.`license_date` AS licenseDate ,
+		a.`license_name` AS licenseName ,
+		a.`license_regcode` AS licenseRegcode ,
+		a.`permit_pic` AS permitPic ,
+		a.`permit_persistent` AS permitPersistent ,
+		a.`permit_date` AS permitDate ,
+		a.`other_prove_pic` AS otherProvePic ,
+		a.`account_name` AS accountName ,
+		a.`bank_account` AS bankAccount ,
+		a.`bank_name` AS bankName ,
+		a.`status` AS status ,
+		a.`facility` AS facility ,
+		a.`describe` AS `describe` ,
+		a.`business_hours` AS businessHours ,
+		a.`price` AS price ,
+		a.`service_star` AS serviceStar ,
+		a.`environment_star` AS environmentStar ,
+		a.`flavor_star` AS flavorStar ,
+		a.`star` AS star ,
+		a.`view_num` AS viewNum ,
+		a.`comment_num` AS commentNum ,
+		a.`nice_comment_num` AS niceCommentNum ,
+		a.`sell_num` AS sellNum ,
+		a.`current_activity` AS currentActivity ,
+		a.`hotel_in_time` AS hotelInTime ,
+		a.`hotel_out_time` AS hotelOutTime ,
+		a.`hotel_can_add_bed` AS hotelCanAddBed ,
+		a.`hotel_add_bed_price` AS hotelAddBedPrice ,
+		a.`hotel_foreigned` AS hotelForeigned ,
+		a.`hotel_peted` AS hotelPeted ,
+		a.`hotel_pledge` AS hotelPledge ,
+		a.`hotel_level` AS hotelLevel ,
+		a.`well_chosened` AS wellChosened ,
+		a.`well_chosen_sort` AS wellChosenSort ,
+		a.`create_time` AS createTime ,
+		a.`qrcode` AS qrcode
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.ConsoleMerchant">
+		SELECT a.`id`, a.`name`, a.`type`, a.`out_pic` AS outPic, a.`create_time` AS createTime,
+		a.`status`, a.`price` , a.`qrcode`, a.`well_chosened` AS wellChosened, a.`well_chosen_sort` AS wellChosenSort, a.`star`, a.`mobile`,
+		d.`name` AS categoryName, e.`name` as cityName, b.`nickname` AS customerName, c.`merger_name` AS areaName
+		FROM merchant a
+		LEFT JOIN customer b ON a.`customer_id` =b.`id`
+		LEFT JOIN sys_area c ON a.`area_id` = c.`id`
+		LEFT JOIN platform_merchant_category d ON a.`category_id` = d.`id`
+		LEFT JOIN sys_area e ON a.`city_id` = e.`id`
+		WHERE 1=1 and state=1
+		
+		<!-- 管辖城市 -->
+		<if test="managerCityId !=null and managerCityId !=0">
+			AND a.city_id = #{managerCityId}
+		</if>
+		
+		<if test="categoryId !=null">
+			AND a.`category_id` = #{categoryId}
+		</if>
+		<if test="provinceId !=null">
+			AND a.`province_id` = #{provinceId}
+		</if>
+		<if test="cityId !=null">
+			AND a.`city_id` = #{cityId}
+		</if>
+		
+		<if test="areaId !=null">
+			AND a.`area_id` = #{areaId}
+		</if>
+		<if test="name !=null and name !=''">
+			AND a.`name` LIKE CONCAT('%', #{name},'%')
+		</if>
+		<if test="wellChosened !=null">
+			AND a.`well_chosened` = #{wellChosened}
+		</if>
+		<if test="status !=null">
+			AND a.`status` = #{status}
+		</if>
+		ORDER BY a.`status`, a.`id` DESC
+		<!-- SELECT
+		<include refid="base_list" />
+		FROM merchant a
+		WHERE 1=1
+		ORDER BY a.id DESC -->
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.ConsoleMerchant">
+		SELECT
+		<include refid="base_list" />
+		,d.`name` AS categoryName, e.`name` as cityName, b.`nickname` AS customerName, c.`merger_name` AS areaName,
+  		CONCAT(f.`nickname`,'-', f.`mobile`) AS recommendName
+		FROM merchant a
+		LEFT JOIN customer b ON a.`customer_id` =b.`id`
+		LEFT JOIN sys_area c ON a.`area_id` = c.`id`
+		LEFT JOIN platform_merchant_category d ON a.`category_id` = d.`id`
+		LEFT JOIN sys_area e ON a.`city_id` = e.`id`
+		LEFT JOIN customer f ON a.`recommend_id` = f.`id` 
+		WHERE a.id = #{id}
+	</select>
+	<!--根据id查询当前商铺信息-->
+	<select id="findByIdAll" resultType="com.vic.ck.entity.Merchant">
+		SELECT
+		<include refid="base_list" />
+		 FROM merchant a
+		WHERE a.id = #{id}
+	</select>
+	<!--查询所有的回收的商家-->
+	<select id="findByState" resultType="com.vic.ck.entity.ConsoleMerchant">
+		SELECT a.`id`, a.`name`, a.`type`, a.`out_pic` AS outPic, a.`create_time` AS createTime,
+		a.`status`, a.`price` , a.`qrcode`, a.`well_chosened` AS wellChosened, a.`well_chosen_sort` AS wellChosenSort, a.`star`, a.`mobile`,
+		d.`name` AS categoryName, e.`name` as cityName, b.`nickname` AS customerName, c.`merger_name` AS areaName
+		FROM merchant a
+		LEFT JOIN customer b ON a.`customer_id` =b.`id`
+		LEFT JOIN sys_area c ON a.`area_id` = c.`id`
+		LEFT JOIN platform_merchant_category d ON a.`category_id` = d.`id`
+		LEFT JOIN sys_area e ON a.`city_id` = e.`id`
+		WHERE 1=1 and a.state = #{state}
+	</select>
+
+	<!--批量查询对象 -->
+	<select id="findByIds" resultType="com.vic.ck.entity.ConsoleMerchant">
+		SELECT
+		<include refid="base_list" />
+		FROM merchant a
+		WHERE a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+	<!--新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into merchant
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="customerId !=null and customerId !='' ">`customer_id`, </if>
+			<if test="recommendId !=null and recommendId !='' ">`recommend_id`, </if>
+			<if test="name !=null and name !='' ">`name`, </if>
+			<if test="provinceId !=null and provinceId !='' ">`province_id`, </if>
+			<if test="cityId !=null and cityId !='' ">`city_id`, </if>
+			<if test="areaId !=null and areaId !='' ">`area_id`, </if>
+			<if test="address !=null and address !='' ">`address`, </if>
+			<if test="landmarks !=null and landmarks !='' ">`landmarks`, </if>
+			<if test="longitude !=null and longitude !='' ">`longitude`, </if>
+			<if test="latitude !=null and latitude !='' ">`latitude`, </if>
+			<if test="type !=null and type !='' ">`type`, </if>
+			<if test="categoryId !=null and categoryId !='' ">`category_id`, </if>
+			<if test="mobile !=null and mobile !='' ">`mobile`, </if>
+			<if test="outPic !=null and outPic !='' ">`out_pic`, </if>
+			<if test="inPic !=null and inPic !='' ">`in_pic`, </if>
+			<if test="licensePic !=null and licensePic !='' ">`license_pic`, </if>
+			<if test="licensePersistent !=null and licensePersistent !='' ">`license_persistent`, </if>
+			<if test="licenseDate !=null and licenseDate !='' ">`license_date`, </if>
+			<if test="licenseName !=null and licenseName !='' ">`license_name`, </if>
+			<if test="licenseRegcode !=null and licenseRegcode !='' ">`license_regcode`, </if>
+			<if test="permitPic !=null and permitPic !='' ">`permit_pic`, </if>
+			<if test="permitPersistent !=null and permitPersistent !='' ">`permit_persistent`, </if>
+			<if test="permitDate !=null and permitDate !='' ">`permit_date`, </if>
+			<if test="otherProvePic !=null and otherProvePic !='' ">`other_prove_pic`, </if>
+			<if test="accountName !=null and accountName !='' ">`account_name`, </if>
+			<if test="bankAccount !=null and bankAccount !='' ">`bank_account`, </if>
+			<if test="bankName !=null and bankName !='' ">`bank_name`, </if>
+			<if test="status !=null and status !='' ">`status`, </if>
+			<if test="facility !=null and facility !='' ">`facility`, </if>
+			<if test="describe !=null and describe !='' ">`describe`, </if>
+			<if test="businessHours !=null and businessHours !='' ">`business_hours`, </if>
+			<if test="price !=null and price !='' ">`price`, </if>
+			<if test="serviceStar !=null and serviceStar !='' ">`service_star`, </if>
+			<if test="environmentStar !=null and environmentStar !='' ">`environment_star`, </if>
+			<if test="flavorStar !=null and flavorStar !='' ">`flavor_star`, </if>
+			<if test="star !=null and star !='' ">`star`, </if>
+			<if test="viewNum !=null and viewNum !='' ">`view_num`, </if>
+			<if test="commentNum !=null and commentNum !='' ">`comment_num`, </if>
+			<if test="niceCommentNum !=null and niceCommentNum !='' ">`nice_comment_num`, </if>
+			<if test="sellNum !=null and sellNum !='' ">`sell_num`, </if>
+			<if test="currentActivity !=null and currentActivity !='' ">`current_activity`, </if>
+			<if test="hotelInTime !=null and hotelInTime !='' ">`hotel_in_time`, </if>
+			<if test="hotelOutTime !=null and hotelOutTime !='' ">`hotel_out_time`, </if>
+			<if test="hotelCanAddBed !=null and hotelCanAddBed !='' ">`hotel_can_add_bed`, </if>
+			<if test="hotelAddBedPrice !=null and hotelAddBedPrice !='' ">`hotel_add_bed_price`, </if>
+			<if test="hotelForeigned !=null and hotelForeigned !='' ">`hotel_foreigned`, </if>
+			<if test="hotelPeted !=null and hotelPeted !='' ">`hotel_peted`, </if>
+			<if test="hotelPledge !=null and hotelPledge !='' ">`hotel_pledge`, </if>
+			<if test="hotelLevel !=null and hotelLevel !='' ">`hotel_level`, </if>
+			<if test="wellChosened !=null and wellChosened !='' ">`well_chosened`, </if>
+			<if test="wellChosenSort !=null and wellChosenSort !='' ">`well_chosen_sort`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`, </if>
+			<if test="qrcode !=null and qrcode !='' ">`qrcode`,</if>
+			<if test="state !=null and state !='' ">`state`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="customerId !=null and customerId !='' ">#{customerId}, </if>
+			<if test="recommendId !=null and recommendId !='' ">#{recommendId}, </if>
+			<if test="name !=null and name !='' ">#{name}, </if>
+			<if test="provinceId !=null and provinceId !='' ">#{provinceId}, </if>
+			<if test="cityId !=null and cityId !='' ">#{cityId}, </if>
+			<if test="areaId !=null and areaId !='' ">#{areaId}, </if>
+			<if test="address !=null and address !='' ">#{address}, </if>
+			<if test="landmarks !=null and landmarks !='' ">#{landmarks}, </if>
+			<if test="longitude !=null and longitude !='' ">#{longitude}, </if>
+			<if test="latitude !=null and latitude !='' ">#{latitude}, </if>
+			<if test="type !=null and type !='' ">#{type}, </if>
+			<if test="categoryId !=null and categoryId !='' ">#{categoryId}, </if>
+			<if test="mobile !=null and mobile !='' ">#{mobile}, </if>
+			<if test="outPic !=null and outPic !='' ">#{outPic}, </if>
+			<if test="inPic !=null and inPic !='' ">#{inPic}, </if>
+			<if test="licensePic !=null and licensePic !='' ">#{licensePic}, </if>
+			<if test="licensePersistent !=null and licensePersistent !='' ">#{licensePersistent}, </if>
+			<if test="licenseDate !=null and licenseDate !='' ">#{licenseDate}, </if>
+			<if test="licenseName !=null and licenseName !='' ">#{licenseName}, </if>
+			<if test="licenseRegcode !=null and licenseRegcode !='' ">#{licenseRegcode}, </if>
+			<if test="permitPic !=null and permitPic !='' ">#{permitPic}, </if>
+			<if test="permitPersistent !=null and permitPersistent !='' ">#{permitPersistent}, </if>
+			<if test="permitDate !=null and permitDate !='' ">#{permitDate}, </if>
+			<if test="otherProvePic !=null and otherProvePic !='' ">#{otherProvePic}, </if>
+			<if test="accountName !=null and accountName !='' ">#{accountName}, </if>
+			<if test="bankAccount !=null and bankAccount !='' ">#{bankAccount}, </if>
+			<if test="bankName !=null and bankName !='' ">#{bankName}, </if>
+			<if test="status !=null and status !='' ">#{status}, </if>
+			<if test="facility !=null and facility !='' ">#{facility}, </if>
+			<if test="describe !=null and describe !='' ">#{describe}, </if>
+			<if test="businessHours !=null and businessHours !='' ">#{businessHours}, </if>
+			<if test="price !=null and price !='' ">#{price}, </if>
+			<if test="serviceStar !=null and serviceStar !='' ">#{serviceStar}, </if>
+			<if test="environmentStar !=null and environmentStar !='' ">#{environmentStar}, </if>
+			<if test="flavorStar !=null and flavorStar !='' ">#{flavorStar}, </if>
+			<if test="star !=null and star !='' ">#{star}, </if>
+			<if test="viewNum !=null and viewNum !='' ">#{viewNum}, </if>
+			<if test="commentNum !=null and commentNum !='' ">#{commentNum}, </if>
+			<if test="niceCommentNum !=null and niceCommentNum !='' ">#{niceCommentNum}, </if>
+			<if test="sellNum !=null and sellNum !='' ">#{sellNum}, </if>
+			<if test="currentActivity !=null and currentActivity !='' ">#{currentActivity}, </if>
+			<if test="hotelInTime !=null and hotelInTime !='' ">#{hotelInTime}, </if>
+			<if test="hotelOutTime !=null and hotelOutTime !='' ">#{hotelOutTime}, </if>
+			<if test="hotelCanAddBed !=null and hotelCanAddBed !='' ">#{hotelCanAddBed}, </if>
+			<if test="hotelAddBedPrice !=null and hotelAddBedPrice !='' ">#{hotelAddBedPrice}, </if>
+			<if test="hotelForeigned !=null and hotelForeigned !='' ">#{hotelForeigned}, </if>
+			<if test="hotelPeted !=null and hotelPeted !='' ">#{hotelPeted}, </if>
+			<if test="hotelPledge !=null and hotelPledge !='' ">#{hotelPledge}, </if>
+			<if test="hotelLevel !=null and hotelLevel !='' ">#{hotelLevel}, </if>
+			<if test="wellChosened !=null and wellChosened !='' ">#{wellChosened}, </if>
+			<if test="wellChosenSort !=null and wellChosenSort !='' ">#{wellChosenSort}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}, </if>
+			<if test="qrcode !=null and qrcode !='' ">#{qrcode},</if>
+			<if test="qrcode !=null and qrcode !='' ">#{state}</if>
+
+		</trim>
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.ConsoleMerchant">
+		update merchant
+		<set>
+			<if test="customerId != null">`customer_id` = #{customerId}, </if>
+			<if test="recommendId != null">`recommend_id` = #{recommendId}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="provinceId != null">`province_id` = #{provinceId}, </if>
+			<if test="cityId != null">`city_id` = #{cityId}, </if>
+			<if test="areaId != null">`area_id` = #{areaId}, </if>
+			<if test="address != null">`address` = #{address}, </if>
+			<if test="landmarks != null">`landmarks` = #{landmarks}, </if>
+			<if test="longitude != null">`longitude` = #{longitude}, </if>
+			<if test="latitude != null">`latitude` = #{latitude}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="categoryId != null">`category_id` = #{categoryId}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="outPic != null">`out_pic` = #{outPic}, </if>
+			<if test="inPic != null">`in_pic` = #{inPic}, </if>
+			<if test="licensePic != null">`license_pic` = #{licensePic}, </if>
+			<if test="licensePersistent != null">`license_persistent` = #{licensePersistent}, </if>
+			<if test="licenseDate != null">`license_date` = #{licenseDate}, </if>
+			<if test="licenseName != null">`license_name` = #{licenseName}, </if>
+			<if test="licenseRegcode != null">`license_regcode` = #{licenseRegcode}, </if>
+			<if test="permitPic != null">`permit_pic` = #{permitPic}, </if>
+			<if test="permitPersistent != null">`permit_persistent` = #{permitPersistent}, </if>
+			<if test="permitDate != null">`permit_date` = #{permitDate}, </if>
+			<if test="otherProvePic != null">`other_prove_pic` = #{otherProvePic}, </if>
+			<if test="accountName != null">`account_name` = #{accountName}, </if>
+			<if test="bankAccount != null">`bank_account` = #{bankAccount}, </if>
+			<if test="bankName != null">`bank_name` = #{bankName}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="facility != null">`facility` = #{facility}, </if>
+			<if test="describe != null">`describe` = #{describe}, </if>
+			<if test="businessHours != null">`business_hours` = #{businessHours}, </if>
+			<if test="price != null">`price` = #{price}, </if>
+			<if test="serviceStar != null">`service_star` = #{serviceStar}, </if>
+			<if test="environmentStar != null">`environment_star` = #{environmentStar}, </if>
+			<if test="flavorStar != null">`flavor_star` = #{flavorStar}, </if>
+			<if test="star != null">`star` = #{star}, </if>
+			<if test="viewNum != null">`view_num` = #{viewNum}, </if>
+			<if test="commentNum != null">`comment_num` = #{commentNum}, </if>
+			<if test="niceCommentNum != null">`nice_comment_num` = #{niceCommentNum}, </if>
+			<if test="sellNum != null">`sell_num` = #{sellNum}, </if>
+			<if test="currentActivity != null">`current_activity` = #{currentActivity}, </if>
+			<if test="hotelInTime != null">`hotel_in_time` = #{hotelInTime}, </if>
+			<if test="hotelOutTime != null">`hotel_out_time` = #{hotelOutTime}, </if>
+			<if test="hotelCanAddBed != null">`hotel_can_add_bed` = #{hotelCanAddBed}, </if>
+			<if test="hotelAddBedPrice != null">`hotel_add_bed_price` = #{hotelAddBedPrice}, </if>
+			<if test="hotelForeigned != null">`hotel_foreigned` = #{hotelForeigned}, </if>
+			<if test="hotelPeted != null">`hotel_peted` = #{hotelPeted}, </if>
+			<if test="hotelPledge != null">`hotel_pledge` = #{hotelPledge}, </if>
+			<if test="hotelLevel != null">`hotel_level` = #{hotelLevel}, </if>
+			<if test="wellChosened != null">`well_chosened` = #{wellChosened}, </if>
+			<if test="wellChosenSort != null">`well_chosen_sort` = #{wellChosenSort}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="qrcode != null">`qrcode` = #{qrcode}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from merchant where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<!--批量删除商家信息-->
+	<update id="deleteAll">
+		update merchant set `state`=0 where `id` in
+		<foreach item="item" collection="ids" open="(" separator=","
+		    close=")">
+		#{item}
+	</foreach>
+	</update>
+	
+	<!-- 修改用户类型 -->
+	<update id="updateCustomerType">
+		UPDATE customer SET `type` =#{type} WHERE `id` = #{customerId}
+	</update>
+	
+	<!-- 获得商户认证信息 -->
+	<select id="findMerchantAuthentication" resultType="com.vic.ck.entity.MerchantAuthentication">
+		SELECT a.`id` AS id ,
+		a.`merchant_id` AS merchantId ,
+		a.`id_number` AS idNumber ,
+		a.`read_name` AS readName ,
+		a.`gender` AS gender ,
+		a.`nation` AS nation ,
+		a.`birthday` AS birthday ,
+		a.`house_address` AS houseAddress ,
+		a.`expiry_date` AS expiryDate ,
+		a.`statsu` AS statsu ,
+		a.`audit_remark` AS auditRemark ,
+		a.`create_time` AS createTime 
+		FROM merchant_authentication a
+		WHERE a.`merchant_id` = #{merchantId}
+		LIMIT 1
+	</select>
+	
+</mapper>

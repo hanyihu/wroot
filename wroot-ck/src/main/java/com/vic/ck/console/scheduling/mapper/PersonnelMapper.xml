@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.vic.ck.console.scheduling.mapper.PersonnelMapper">
+
+    <!--骑手列表-->
+    <select id="selectRiderPersonnel" resultType="com.vic.ck.entity.RiderPersonnel">
+        SELECT id,nickname,mobile,gender,headpic,enabled,score,viped,sendarea FROM customer WHERE isRider =1
+        <if test="nickname !=null and nickname !='' ">
+            AND nickname = #{nickname}
+        </if>
+
+        <if test="mobile !=null and mobile !='' ">
+            AND mobile = #{mobile}
+        </if>
+        <if test="gender !=null">
+            AND gender = #{gender}
+        </if>
+        <if test="enabled !=null">
+            AND enabled = #{enabled}
+        </if>
+    </select>
+
+    <!--骑手详细信息-->
+    <select id="selectById" resultType="com.vic.ck.entity.RiderPersonnel">
+        SELECT * FROM customer WHERE id=#{id}
+    </select>
+
+    <!--订单-->
+    <select id="selectAllOrder" resultType="com.vic.ck.entity.RiderOrder">
+      SELECT a.id AS id,a.orderno AS orderno,c.nickname AS name,c.mobile AS phone,
+      a.`status` AS status,d.address AS shippingAddress,m.`name` AS merchantName,a.pay_time AS time
+      FROM `order` a LEFT JOIN
+      rider_task r on a.orderno=r.orderno LEFT JOIN
+      customer c on c.id=r.rider_id LEFT JOIN
+      customer_delivery_address d on d.id=a.addressId LEFT JOIN
+      merchant m on a.merchant_id=m.id
+      where 1=1
+        <if test="startTime !=null and startTime !='' ">
+            AND a.pay_time &gt; #{startTime}
+        </if>
+
+        <if test="endTime !=null and endTime !='' ">
+            AND a.pay_time &lt; #{endTime}
+        </if>
+        <if test="status !=null">
+            AND a.status = #{status}
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vic.ck.console.mall.mapper.ScoreMallGoodsMapper">
+
+	<sql id="base_list">
+		a.`id` AS id ,
+		a.`name` AS name ,
+		a.`score` AS score ,
+		a.`price` AS price ,
+		a.`norms` AS norms ,
+		a.`icon` AS icon ,
+		a.`merchant_name` AS merchantName ,
+		a.`merchant_tel` AS merchantTel ,
+		a.`merchant_service_time` AS merchantServiceTime ,
+		a.`swaped_num` AS swapedNum ,
+		a.`describe` AS `describe` ,
+		a.`create_time` AS createTime ,
+		a.`category_id` AS categoryId ,
+		a.`enabled` AS enabled
+	</sql>
+
+	<!--查询列表 -->
+	<select id="list" resultType="com.vic.ck.entity.ScoreMallGoods">
+		SELECT
+		a.`id` AS id ,
+		a.`name` AS name ,
+		a.`score` AS score ,
+		a.`price` AS price ,
+		a.`norms` AS norms ,
+		a.`icon` AS icon ,
+		a.`merchant_name` AS merchantName ,
+		a.`merchant_tel` AS merchantTel ,
+		a.`merchant_service_time` AS merchantServiceTime ,
+		a.`swaped_num` AS swapedNum ,
+		a.`create_time` AS createTime ,
+		a.`category_id` AS categoryId ,
+		a.`enabled` AS enabled
+		,b.`name` AS categoryName
+		FROM score_mall_goods a
+		LEFT JOIN score_mall_category b ON a.`category_id` = b.`id`
+		WHERE 1=1
+		<if test="enabled != null">
+			AND a.`enabled` =  #{enabled}
+		</if>
+		<if test="categoryId !=null">
+			AND a.category_id = #{categoryId}
+		</if>
+		<if test="name !=null and name !=''">
+			AND a.`name` LIKE CONCAT('%', #{name},'%')
+		</if>  
+		ORDER BY id desc
+	</select>
+	
+	<select id="findByIds"   resultType="com.vic.ck.entity.ScoreMallGoods">
+		SELECT
+		a.`id` AS id ,
+		a.`name` AS name ,
+		a.`score` AS score ,
+		a.`price` AS price ,
+		a.`norms` AS norms ,
+		a.`icon` AS icon ,
+		a.`merchant_name` AS merchantName ,
+		a.`merchant_tel` AS merchantTel ,
+		a.`merchant_service_time` AS merchantServiceTime ,
+		a.`swaped_num` AS swapedNum ,
+		a.`create_time` AS createTime ,
+		a.`category_id` AS categoryId ,
+		a.`enabled` AS enabled
+		,b.`name` AS categoryName
+		FROM score_mall_goods a
+		LEFT JOIN score_mall_category b ON a.`category_id` = b.`id`
+		WHERE 1=1 AND a.id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+		
+	</select>
+
+	<!--根据主键查询对象 -->
+	<select id="findById" resultType="com.vic.ck.entity.ScoreMallGoods">
+		SELECT
+		<include refid="base_list" />
+		FROM score_mall_goods a
+		WHERE id = #{id}
+	</select>
+
+	<!--新增数据 -->
+	<insert id="insert">
+		insert into score_mall_goods
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id !=null and id !='' ">`id`, </if>
+			<if test="name !=null and name !='' ">`name`, </if>
+			<if test="score !=null and score !='' ">`score`, </if>
+			<if test="price !=null and price !='' ">`price`, </if>
+			<if test="norms !=null and norms !='' ">`norms`, </if>
+			<if test="icon !=null and icon !='' ">`icon`, </if>
+			<if test="merchantName !=null and merchantName !='' ">`merchant_name`, </if>
+			<if test="merchantTel !=null and merchantTel !='' ">`merchant_tel`, </if>
+			<if test="merchantServiceTime !=null and merchantServiceTime !='' ">`merchant_service_time`, </if>
+			<if test="swapedNum !=null and swapedNum !='' ">`swaped_num`, </if>
+			<if test="describe !=null and describe !='' ">`describe`, </if>
+			<if test="createTime !=null and createTime !='' ">`create_time`, </if>
+			<if test="categoryId !=null and categoryId !='' ">`category_id`, </if>
+			<if test="enabled !=null and enabled !='' ">`enabled`</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id !=null and id !='' ">#{id}, </if>
+			<if test="name !=null and name !='' ">#{name}, </if>
+			<if test="score !=null and score !='' ">#{score}, </if>
+			<if test="price !=null and price !='' ">#{price}, </if>
+			<if test="norms !=null and norms !='' ">#{norms}, </if>
+			<if test="icon !=null and icon !='' ">#{icon}, </if>
+			<if test="merchantName !=null and merchantName !='' ">#{merchantName}, </if>
+			<if test="merchantTel !=null and merchantTel !='' ">#{merchantTel}, </if>
+			<if test="merchantServiceTime !=null and merchantServiceTime !='' ">#{merchantServiceTime}, </if>
+			<if test="swapedNum !=null and swapedNum !='' ">#{swapedNum}, </if>
+			<if test="describe !=null and describe !='' ">#{describe}, </if>
+			<if test="createTime !=null and createTime !='' ">#{createTime}, </if>
+			<if test="categoryId !=null and categoryId !='' ">#{categoryId}, </if>
+			<if test="enabled !=null and enabled !='' ">#{enabled}</if>
+		</trim>	
+	</insert>
+
+
+	<!--更新数据 -->
+	<update id="update" parameterType="com.vic.ck.entity.ScoreMallGoods">
+		update score_mall_goods
+		<set>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="score != null">`score` = #{score}, </if>
+			<if test="price != null">`price` = #{price}, </if>
+			<if test="norms != null">`norms` = #{norms}, </if>
+			<if test="icon != null">`icon` = #{icon}, </if>
+			<if test="merchantName != null">`merchant_name` = #{merchantName}, </if>
+			<if test="merchantTel != null">`merchant_tel` = #{merchantTel}, </if>
+			<if test="merchantServiceTime != null">`merchant_service_time` = #{merchantServiceTime}, </if>
+			<if test="swapedNum != null">`swaped_num` = #{swapedNum}, </if>
+			<if test="describe != null">`describe` = #{describe}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="categoryId != null">`category_id` = #{categoryId}, </if>
+			<if test="enabled != null">`enabled` = #{enabled}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<delete id="delete">
+		delete from score_mall_goods where id in
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>
