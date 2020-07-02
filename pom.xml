@@ -224,7 +224,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.45</version>
+			<version>8.0.16</version>
 			<!-- 改为provided 并把jar放到tomct lib 下防止造成内存泄漏 -->
 			<!-- <scope>provided</scope> -->
 		</dependency>
