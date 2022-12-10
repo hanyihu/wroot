@@ -21,7 +21,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<springversion>4.2.4.RELEASE</springversion>
+		<springversion>6.0.0</springversion>
 		<junitversion>4.12</junitversion>
 		<aspectjversion>1.8.9</aspectjversion>
 	</properties>
